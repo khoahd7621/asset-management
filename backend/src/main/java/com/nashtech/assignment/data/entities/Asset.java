@@ -31,4 +31,8 @@ public class Asset {
     private ELocation location;
     @Column(name = "is_deleted")
     private boolean isDeleted;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "category_id")
+    private Category category;
 }

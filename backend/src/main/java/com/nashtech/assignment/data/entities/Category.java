@@ -3,6 +3,7 @@ package com.nashtech.assignment.data.entities;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "category_tbl")
@@ -20,4 +21,7 @@ public class Category {
     private String name;
     @Column(name = "prefix_asset_code", unique = true)
     private String prefixAssetCode;
+
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    List<Asset> assets;
 }
