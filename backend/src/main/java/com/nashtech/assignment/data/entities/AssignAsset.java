@@ -1,19 +1,19 @@
 package com.nashtech.assignment.data.entities;
 
-import com.nashtech.assignment.data.constants.EAssignmentStatus;
+import com.nashtech.assignment.data.constants.EAssignStatus;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "assigment_tbl")
+@Table(name = "assign_asset_tbl")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Assigment {
+public class AssignAsset {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -23,7 +23,7 @@ public class Assigment {
     @Column(name = "note", columnDefinition = "text")
     private String note;
     @Column(name = "status")
-    private EAssignmentStatus status;
+    private EAssignStatus status;
     @Column(name = "is_deleted")
     private boolean isDeleted;
 }
