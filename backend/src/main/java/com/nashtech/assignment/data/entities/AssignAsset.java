@@ -26,4 +26,12 @@ public class AssignAsset {
     private EAssignStatus status;
     @Column(name = "is_deleted")
     private boolean isDeleted;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "asset_id")
+    private Asset asset;
 }
