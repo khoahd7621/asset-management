@@ -39,4 +39,7 @@ public class Asset {
 
     @OneToMany(mappedBy = "asset", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AssignAsset> assignAssets;
+
+    @OneToMany(mappedBy = "asset", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ReturnAsset> returnAssets;
 }

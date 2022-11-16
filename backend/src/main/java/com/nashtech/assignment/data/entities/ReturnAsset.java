@@ -18,10 +18,22 @@ public class ReturnAsset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "assigned_date")
+    @Column(name = "returned_date")
     private Date returnedDate;
     @Column(name = "status")
     private EReturnStatus status;
     @Column(name = "is_deleted")
     private boolean isDeleted;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "asset_id")
+    private Asset asset;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "assign_asset_id", referencedColumnName = "id")
+    private AssignAsset assignAsset;
 }

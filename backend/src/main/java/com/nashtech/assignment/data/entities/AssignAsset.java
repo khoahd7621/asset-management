@@ -34,4 +34,7 @@ public class AssignAsset {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "asset_id")
     private Asset asset;
+
+    @OneToOne(mappedBy = "assignAsset")
+    private ReturnAsset returnAsset;
 }
