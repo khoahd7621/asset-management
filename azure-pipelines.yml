@@ -13,7 +13,7 @@ steps:
 - task: Maven@4
   inputs:
     mavenPomFile: 'backend/pom.xml'
-    options: '-Xmx3072m'
+    mavenOptions: '-Xmx3072m'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     javaHomeOption: 'JDKVersion'
