@@ -1,0 +1,39 @@
+.navbar-header {
+  background-color: #cf2338;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--nav-bar-height);
+
+  .navbar-header__left {
+    display: flex;
+    align-items: end;
+    height: inherit;
+
+    h3 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+      height: inherit;
+      line-height: var(--nav-bar-height);
+    }
+
+    span {
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      margin: 0 8px;
+      display: block;
+      height: inherit;
+      line-height: calc(var(--nav-bar-height) + 8px);
+    }
+  }
+
+  .navbar-header__right {
+    .ant-dropdown-trigger {
+      color: #fff;
+      font-size: 18px;
+    }
+  }
+}
