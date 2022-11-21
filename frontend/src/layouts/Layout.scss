@@ -1,0 +1,16 @@
+.main-layout {
+  height: 100vh;
+  background-color: #fff;
+
+  .sub-layout {
+    background-color: #fff;
+    margin: 0 50px;
+    display: flex;
+    flex-direction: row;
+
+    .content {
+      flex: 1;
+      height: calc(100vh - var(--nav-bar-height));
+    }
+  }
+}
