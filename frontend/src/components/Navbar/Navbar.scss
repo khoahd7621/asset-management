@@ -5,6 +5,10 @@
   justify-content: space-between;
   height: var(--nav-bar-height);
 
+  .login {
+    margin-left: 70px;
+  }
+
   .navbar-header__left {
     display: flex;
     align-items: end;
@@ -17,6 +21,10 @@
       color: #fff;
       height: inherit;
       line-height: var(--nav-bar-height);
+    }
+
+    .titleLogin {
+      padding-left: 30px;
     }
 
     span {
@@ -35,5 +43,12 @@
       color: #fff;
       font-size: 18px;
     }
+  }
+
+  .logo {
+    display: block;
+    margin: 0;
+    width: 70px;
+    height: 70px;
   }
 }

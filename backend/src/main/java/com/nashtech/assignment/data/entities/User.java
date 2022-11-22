@@ -1,7 +1,6 @@
 package com.nashtech.assignment.data.entities;
 
 import com.nashtech.assignment.data.constants.EGender;
-import com.nashtech.assignment.data.constants.ELocation;
 import com.nashtech.assignment.data.constants.EUserType;
 import lombok.*;
 
@@ -38,9 +37,10 @@ public class User {
     @Column(name = "joined_date")
     private Date joinedDate;
     @Column(name = "type")
+    @Enumerated(EnumType.STRING)
     private EUserType type;
     @Column(name = "location")
-    private ELocation location;
+    private String location;
     @Column(name = "is_deleted")
     private boolean isDeleted;
 

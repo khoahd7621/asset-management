@@ -1,0 +1,133 @@
+.manage-user {
+  padding-left: 6rem;
+  padding-top: 6rem;
+  flex: 1;
+
+  .title-manage-user {
+    color: #e61931;
+    font-weight: bold;
+  }
+}
+
+.user-list {
+  table {
+    display: table;
+    width: 100%;
+    border-spacing: 1em 0;
+    background-color: white;
+    font-size: 13px;
+  }
+
+  .ant-table-thead > tr > th {
+    border-bottom: 1.5px solid #b1b1b1;
+    background-color: white;
+  }
+
+  .ant-table-tbody > tr > td {
+    border-bottom: 1.5px solid #d3d0d0;
+    background-color: white;
+    height: -100px;
+  }
+
+  .ant-table-container table > thead > tr:first-child th:last-child {
+    width: 100px;
+    background-color: #ffffff;
+    border-bottom: 1.5px solid white;
+  }
+
+  .ant-table-container table > tbody > tr > td:last-child {
+    width: 100px;
+    background-color: #ffffff;
+    border-bottom: 1.5px solid white;
+  }
+
+  .ant-table-thead
+    > tr
+    > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan]):before {
+    background-color: white;
+  }
+
+  .ant-pagination {
+    text-align: end;
+  }
+
+  .ant-pagination-item-active {
+    font-weight: 500;
+    color: #ffffff;
+    // background: #cf2338;
+    border-color: #cf2338;
+    // background: #cf2338;
+  }
+
+  .ant-table-column-sorter {
+    display: none;
+  }
+
+  a {
+    color: rgb(14, 12, 12);
+  }
+  a:hover {
+    color: rgb(19, 17, 17);
+  }
+
+  #frame {
+    div {
+      display: inline-block;
+      padding-right: 4px;
+    }
+  }
+
+  //modal
+
+  .ant-modal-content {
+    border-radius: 10px;
+    border-color: black;
+    color: #666a6d;
+    width: 410px;
+    height: 345px;
+    line-height: 50px;
+    border: 1.5px solid rgb(134, 123, 123);
+  }
+
+  .ant-modal-title {
+    color: #cf2338;
+    font-size: 17px;
+    font-weight: bold;
+  }
+
+  .ant-modal-header {
+    padding-left: 45px;
+    padding-bottom: 15px;
+    background-color: #ecedf3;
+    border-bottom: 0.1rem solid rgb(121, 110, 110);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+
+  .ant-modal-body {
+    padding-left: 45px;
+    line-height: 1.2;
+  }
+  // close icon
+
+  .ant-modal-close {
+    fill: #d62136;
+    margin-right: 30px;
+
+    justify-content: center;
+    svg {
+      height: 54px;
+      width: 25px;
+      stroke: #d62136;
+    }
+  }
+
+  //edit icon
+
+  .edit-icon svg {
+    padding-top: 3px;
+    fill: #585c5f;
+    width: 18px;
+    height: 16px;
+  }
+}

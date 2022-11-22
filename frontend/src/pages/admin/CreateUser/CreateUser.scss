@@ -1,0 +1,61 @@
+.create-user-block {
+  flex: 1;
+  padding: 80px 160px 0;
+
+  .create-user__title {
+    font-size: 20px;
+    color: #cf2338;
+    font-weight: bold;
+    margin: 4px 0 24px;
+  }
+
+  .create-user__form {
+    min-width: 350px;
+    width: 400px;
+
+    .ant-picker {
+      width: 100%;
+    }
+
+    .ant-form-item-explain {
+      padding: 8px 0;
+      color: #cf2338 !important;
+    }
+
+    .ant-radio-checked {
+      .ant-radio-inner {
+        border-color: #cf2338 !important;
+
+        &:after {
+          background-color: #cf2338;
+        }
+
+        &:focus {
+          border-color: #cf2338;
+        }
+      }
+    }
+
+    .ant-radio {
+      &:hover {
+        .ant-radio-inner {
+          border-color: #cf2338;
+        }
+      }
+    }
+
+    .create-user__form-action {
+      display: flex;
+      justify-content: end;
+
+      button {
+        & + button {
+          margin-left: 40px;
+        }
+      }
+      .ant-form-item-row {
+        justify-content: end;
+      }
+    }
+  }
+}
