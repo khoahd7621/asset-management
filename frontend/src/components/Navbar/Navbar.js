@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Dropdown, Layout, Space } from 'antd';
 import CustomBreadcrumb from './CustomBreadcrumb';
 import { CaretDownOutlined } from '@ant-design/icons';
@@ -21,6 +22,7 @@ const Navbar = () => {
     },
   ];
   const [listTitles, setListTitles] = useState(['Home']);
+  const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
     const currentPath = location.pathname.slice(location.pathname.lastIndexOf('/') + 1, location.pathname.length);
@@ -59,7 +61,7 @@ const Navbar = () => {
         <Dropdown menu={{ items }} trigger={['click']}>
           <a onClick={(e) => e.preventDefault()}>
             <Space>
-              username <CaretDownOutlined />
+              {user.username} <CaretDownOutlined />
             </Space>
           </a>
         </Dropdown>

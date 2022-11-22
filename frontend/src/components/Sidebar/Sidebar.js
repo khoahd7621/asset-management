@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import './Sidebar.scss';
 
@@ -41,7 +42,7 @@ const Sizebar = () => {
     },
   ];
 
-  const userItems = [
+  const staffItems = [
     {
       key: 'Home',
       label: 'Home',
@@ -50,6 +51,7 @@ const Sizebar = () => {
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
     const currentPath = location.pathname.slice(location.pathname.lastIndexOf('/') + 1, location.pathname.length);
@@ -75,11 +77,18 @@ const Sizebar = () => {
       <img className="logo" src={logoNash} alt="Asset Application" title="Asset Application" />
       <div className="title">Online Asset Management</div>
       <div className="list-items">
-        {adminItems.map((item, index) => (
-          <div key={item.key} className={`item ${index === currentIndex ? 'active' : ''}`}>
-            <Link to={item.path}>{item.label}</Link>
-          </div>
-        ))}
+        {user.role === 'ADMIN' &&
+          adminItems.map((item, index) => (
+            <div key={item.key} className={`item ${index === currentIndex ? 'active' : ''}`}>
+              <Link to={item.path}>{item.label}</Link>
+            </div>
+          ))}
+        {user.role === 'STAFF' &&
+          staffItems.map((item, index) => (
+            <div key={item.key} className={`item ${index === currentIndex ? 'active' : ''}`}>
+              <Link to={item.path}>{item.label}</Link>
+            </div>
+          ))}
       </div>
     </div>
   );

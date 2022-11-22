@@ -67,7 +67,7 @@ const CreateUser = () => {
     });
     if (response && +response.status === 204) {
       resetFileds();
-      navigate(`${adminRoute.home}/${adminRoute.manageUser}`);
+      navigate(`/${adminRoute.home}/${adminRoute.manageUser}`);
       // Todo: Toast success message
     } else {
       // Todo: Toast error message
@@ -77,7 +77,7 @@ const CreateUser = () => {
 
   const handleClickClose = () => {
     resetFileds();
-    navigate(`${adminRoute.home}/${adminRoute.manageUser}`);
+    navigate(`/${adminRoute.home}/${adminRoute.manageUser}`);
   };
 
   const resetFileds = () => {

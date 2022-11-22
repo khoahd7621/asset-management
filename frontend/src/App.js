@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import Admin from './layouts/Admin';
+import Login from './layouts/Login';
 import User from './layouts/User';
 import { CreateUser, Home as AdminHome } from './pages/admin';
 import { Home as UserHome } from './pages/user';
@@ -10,6 +11,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path='/' element={<Login/>} />
         <Route path={adminRoute.home} element={<Admin />}>
           <Route index element={<AdminHome />} />
           {/* Add more route here - like format below ... */}
