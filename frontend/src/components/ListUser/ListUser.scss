@@ -1,0 +1,112 @@
+.list-user-wrapper {
+  .ant-row .ant-btn:focus {
+    color: rgb(134, 123, 123);
+    border-color: rgb(134, 123, 123);
+  }
+
+  .border-right {
+    border-right: 1px solid rgb(134, 123, 123);
+    top: -4px;
+  }
+}
+
+//button
+.handle-button {
+  color: aliceblue;
+  border-radius: 5px;
+  background-color: #e5273d;
+
+  &:hover {
+    color: #fff;
+    background-color: #a8081a;
+    border-color: #a8081a;
+  }
+}
+
+//search
+.handle-search {
+  .ant-input-group .ant-input-affix-wrapper:not(:last-child) {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border: 1px solid rgb(134, 123, 123);
+  }
+
+  .ant-input-group > .ant-input-group-addon:last-child .ant-input-search-button:not(.ant-btn-primary) {
+    border: 1px solid rgb(134, 123, 123);
+    color: rgba(5, 3, 3, 0.45);
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+}
+
+//filter
+.handle-filter {
+  text-align: left;
+  width: 8rem;
+  border-radius: 5px;
+  border-color: rgb(134, 123, 123);
+
+  svg {
+    height: 25px;
+    width: 18px;
+  }
+}
+
+.list-user-dropdown-box-type {
+  .ant-popover-content {
+    top: -19px;
+    position: relative;
+    border: 1px solid rgb(134, 123, 123);
+    width: 128px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  .ant-popover.ant-popover-placement-bottom {
+    padding-top: 0;
+  }
+
+  .ant-popover-inner-content {
+    background-color: #f5f5f5;
+  }
+
+  .ant-popover-arrow {
+    visibility: hidden;
+  }
+
+  // checkbox
+  .checkbox-filter {
+    // before check
+    .ant-checkbox .ant-checkbox-inner {
+      border-radius: 4px;
+      border-color: rgb(134, 123, 123);
+    }
+
+    // after check
+    .ant-checkbox-checked {
+      .ant-checkbox-inner {
+        background-color: white;
+        border: 1px solid;
+        border-radius: 4px;
+      }
+
+      .ant-checkbox-inner:after {
+        border-color: red !important;
+      }
+    }
+  }
+}
+
+.list-user-pagination {
+  // paging
+  .ant-pagination-item a {
+    display: block;
+    padding: 0 6px;
+    color: #e5273d;
+    transition: none;
+  }
+
+  .ant-pagination-prev {
+    color: #e5273d;
+  }
+}

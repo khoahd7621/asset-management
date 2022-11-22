@@ -1,4 +1,3 @@
-import { Outlet } from 'react-router-dom';
 import { Layout } from 'antd';
 
 import '../components/FormLogin/FormLogin.scss';
@@ -8,11 +7,7 @@ import FormLogin from '../components/FormLogin/FormLogin';
 const Login = () => {
   return (
     <Layout className="main-layout">
-      <NavbarLogin>
-        <Layout className="sub-layout">
-          <Outlet />
-        </Layout>
-      </NavbarLogin>
+      <NavbarLogin />
       <div className="form-login-wrapper">
         <h3 className="form-login-title">Welcome to Online Asset Management</h3>
         <hr />

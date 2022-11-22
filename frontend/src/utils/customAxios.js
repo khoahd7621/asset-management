@@ -5,7 +5,7 @@ import { store } from '../redux/store';
 NProgress.configure({ showSpinner: false, trickleSpeed: 100 });
 
 const instance = axios.create({
-  baseURL: 'http://localhost:8080/',
+  baseURL: process.env.REACT_APP_BASE_API_HOST,
 });
 
 instance.interceptors.request.use(

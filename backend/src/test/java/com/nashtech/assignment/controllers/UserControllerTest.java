@@ -1,4 +1,4 @@
-package com.nashtech.assignment.controller;
+package com.nashtech.assignment.controllers;
 
 import static org.mockito.Mockito.doNothing;
 import static org.hamcrest.Matchers.is;

@@ -9,11 +9,8 @@ const PasswordModal = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const user = useSelector((state) => state.user.user);
 
-  const [isShowPasswordModal, setIsShowPasswordModal] = useState(false);
-
   useEffect(() => {
     if (user.isFirstLogin) {
-      setIsShowPasswordModal(true);
       setIsModalOpen(true);
       toast.success('Show modal change password');
     }

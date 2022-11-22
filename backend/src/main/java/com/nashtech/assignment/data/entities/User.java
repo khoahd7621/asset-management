@@ -37,6 +37,7 @@ public class User {
     @Column(name = "joined_date")
     private Date joinedDate;
     @Column(name = "type")
+    @Enumerated(EnumType.STRING)
     private EUserType type;
     @Column(name = "location")
     private String location;
