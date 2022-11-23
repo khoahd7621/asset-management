@@ -16,7 +16,7 @@ const Paging = ({ total, current, onChange }) => {
   return (
     <Pagination
       className="list-user-pagination"
-      pageSize="3"
+      pageSize="19"
       onChange={onChange}
       current={current}
       total={total}

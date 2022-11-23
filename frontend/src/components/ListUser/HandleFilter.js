@@ -32,6 +32,8 @@ class CheckboxMenu extends React.Component {
 
   checkIconFilled = () => {
     if (this.state.selectedItems.length) {
+    
+      console.log("Selected: " ,this.state.selectedItems)
       this.setState({ icon: { theme: 'filled' } });
     } else {
       this.setState({ icon: {} });
