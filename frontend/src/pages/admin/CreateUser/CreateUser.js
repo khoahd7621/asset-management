@@ -233,13 +233,22 @@ const CreateUser = () => {
         onFinish={handleSubmitCreateNewUser}
       >
         <Form.Item name="firstName" label="First Name" help={firstNameValidate.help}>
-          <Input onChange={(event) => handleValidString(event, 'FIRST_NAME')} status={firstNameValidate.status} />
+          <Input
+            id="create-user-input__first-name"
+            onChange={(event) => handleValidString(event, 'FIRST_NAME')}
+            status={firstNameValidate.status}
+          />
         </Form.Item>
         <Form.Item name="lastName" label="Last Name" help={lastNameValidate.help}>
-          <Input onChange={(event) => handleValidString(event, 'LAST_NAME')} status={lastNameValidate.status} />
+          <Input
+            id="create-user-input__last-name"
+            onChange={(event) => handleValidString(event, 'LAST_NAME')}
+            status={lastNameValidate.status}
+          />
         </Form.Item>
         <Form.Item name="dateOfBirth" label="Date of Birth" help={dateOfBirthValidate.help}>
           <DatePicker
+            id="create-user-date-picker__date-of-birth"
             placeholder=""
             format={'DD/MM/YYYY'}
             onChange={handleValidateDateOfBirth}
@@ -247,13 +256,14 @@ const CreateUser = () => {
           />
         </Form.Item>
         <Form.Item name="gender" label="Gender">
-          <Radio.Group value={genderType}>
+          <Radio.Group id="create-user-radio__gender" value={genderType}>
             <Radio value={'FEMALE'}>Female</Radio>
             <Radio value={'MALE'}>Male</Radio>
           </Radio.Group>
         </Form.Item>
         <Form.Item name="joinedDate" label="Joined Date" help={joinedDateValidate.help}>
           <DatePicker
+            id="create-user-date-picker__joined-date"
             placeholder=""
             format={'DD/MM/YYYY'}
             onChange={handleValidateJoinedDate}
@@ -261,7 +271,7 @@ const CreateUser = () => {
           />
         </Form.Item>
         <Form.Item name="type" label="Type">
-          <Select placeholder="" allowClear>
+          <Select id="create-user-select__type" placeholder="" allowClear>
             <Option value="STAFF">Staff</Option>
             <Option value="ADMIN">Admin</Option>
           </Select>
@@ -270,7 +280,11 @@ const CreateUser = () => {
           {({ getFieldValue }) =>
             getFieldValue('type') === 'ADMIN' ? (
               <Form.Item name="location" label="Location" help={locationValidate.help}>
-                <Input onChange={(event) => handleValidString(event, 'LOCATION')} status={locationValidate.status} />
+                <Input
+                  id="create-user-input__location"
+                  onChange={(event) => handleValidString(event, 'LOCATION')}
+                  status={locationValidate.status}
+                />
               </Form.Item>
             ) : null
           }
