@@ -6,6 +6,7 @@ import './CreateUser.scss';
 
 import { postCreateNewUser } from '../../../services/createService';
 import { adminRoute } from '../../../routes/routes';
+import { toast } from 'react-toastify';
 
 const CreateUser = () => {
   const navigate = useNavigate();
@@ -65,12 +66,16 @@ const CreateUser = () => {
       dateOfBirth: values.dateOfBirth.format('DD/MM/YYYY'),
       joinedDate: values.joinedDate.format('DD/MM/YYYY'),
     });
-    if (response && +response.status === 204) {
+    if (response && +response.status === 200) {
       resetFileds();
-      navigate(`/${adminRoute.home}/${adminRoute.manageUser}`);
-      // Todo: Toast success message
+      navigate(`/${adminRoute.home}/${adminRoute.manageUser}`, {
+        state: {
+          userCreateResponse: response.data,
+        },
+      });
+      toast.success('Create new user successfully');
     } else {
-      // Todo: Toast error message
+      toast.error(response.message);
     }
     setIsDisabled(false);
   };

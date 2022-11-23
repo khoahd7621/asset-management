@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Table, Row, Col, Modal, Input, Button, Checkbox, Popover } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
@@ -15,6 +15,7 @@ import './ListUser.scss';
 
 const ListUser = () => {
   const user = useSelector((state) => state.user.user);
+  const location = useLocation();
   const navigate = useNavigate();
   const { Search } = Input;
   const [userList, setUserList] = useState([]);
@@ -29,35 +30,34 @@ const ListUser = () => {
   const defaultCheckedList = ['ALL'];
   const [checkedList, setCheckedList] = useState([]);
   const [checkAll, setCheckAll] = useState(false);
-  const[isFilter, setIsFilter] = useState(false);
-  const[isSearch, setIsSearch] = useState(false);
-  const[searchValue, setSearchValue] = useState('')
+  const [isFilter, setIsFilter] = useState(false);
+  const [isSearch, setIsSearch] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
 
   const formatDate = (joineddate) => {
-    var initial = joineddate.split(/\//);
-    const newdate = new Date([ initial[1], initial[0], initial[2] ].join('/')); 
-    return newdate.getTime()
-  } 
+    let initial = joineddate.split(/\//);
+    const newdate = new Date([initial[1], initial[0], initial[2]].join('/'));
+    return newdate.getTime();
+  };
 
   const onChange = async (list) => {
-    let url = `/api/find/filter/0?location=${user.location}`
-    setType(list)
-    setIsFilter(true)
-    setIsSearch(false)
-    setSearchValue("")
-    setCurrent(1)
-    if(list.some((data) => data === 'STAFF'|| data ==='ADMIN' ) && list.length<2){
-      console.log("STAFF")
-      url = `/api/find/filter/0?type=${list}&location=${user.location}`
+    let url = `/api/find/filter/0?location=${user.location}`;
+    setType(list);
+    setIsFilter(true);
+    setIsSearch(false);
+    setSearchValue('');
+    setCurrent(1);
+    if (list.some((data) => data === 'STAFF' || data === 'ADMIN') && list.length < 2) {
+      url = `/api/find/filter/0?type=${list}&location=${user.location}`;
     }
-    const response = await getItems(url)
+    const response = await getItems(url);
     if (response.status === 200) {
       setUserList(response.data);
     }
     setCheckedList(list);
     setCheckAll(list.length === plainOptions.length);
     if (list.length === plainOptions.length) {
-      setType(["ALL"])
+      setType(['ALL']);
       setCheckAll(true);
       setCheckedList(defaultCheckedList);
       const response = await getItems(`/api/find/filter/0?location=${user.location}`);
@@ -66,18 +66,17 @@ const ListUser = () => {
       }
     }
   };
+
   const onCheckAllChange = async (e) => {
-    console.log(e.target.checked);
-    setCurrent(1)
+    setCurrent(1);
     setCheckedList([]);
     setCheckValue(['ADMIN', 'STAFF']);
-    setIsFilter(false)
-    console.log(checkValue);
-    setType(["ALL"])
+    setIsFilter(false);
+    setType(['ALL']);
     const response = await getItems(`/api/find/filter/0?location=${user.location}`);
-      if (response.status === 200) {
-        setUserList(response.data);
-      }
+    if (response.status === 200) {
+      setUserList(response.data);
+    }
     setCheckAll(e.target.checked);
   };
 
@@ -100,19 +99,34 @@ const ListUser = () => {
   }, [current]);
 
   const getData = async () => {
-    let url = `/api/find?location=${user.location}&pageNumber=${current - 1}`
-    if(isFilter===true&& isSearch===false){
-      url = `/api/find/filter/${current -1 }?type=${type}&location=${user.location}`
+    let url = `/api/find?location=${user.location}&pageNumber=${current - 1}`;
+    if (isFilter === true && isSearch === false) {
+      url = `/api/find/filter/${current - 1}?type=${type}&location=${user.location}`;
     }
-    if(isFilter===true&& isSearch===true){
-      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&type=${type}&location=${user.location}&page=${current-1}`
+    if (isFilter === true && isSearch === true) {
+      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&type=${type}&location=${
+        user.location
+      }&page=${current - 1}`;
     }
-    if(isFilter===false && isSearch===true){
-      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&location=${user.location}&page=${current-1}`
+    if (isFilter === false && isSearch === true) {
+      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&location=${user.location}&page=${
+        current - 1
+      }`;
     }
     const response = await getItems(url);
     if (response.status === 200) {
-      setUserList(response.data);
+      const newUserCreate = location.state?.userCreateResponse;
+      if (newUserCreate && newUserCreate.username) {
+        const listDatas = response?.data.data.filter((item) => item.username !== newUserCreate.username);
+        listDatas.unshift(newUserCreate);
+        setUserList({
+          ...response.data,
+          data: listDatas,
+        });
+        window.history.replaceState({}, document.title);
+      } else {
+        setUserList(response.data);
+      }
     }
   };
 
@@ -142,18 +156,18 @@ const ListUser = () => {
       title: title('Staff Code'),
       dataIndex: 'staffCode',
       key: 'staffcode',
-      ellipsis:true,
-      sortDirections: ['ascend','desencd','ascend'],
+      ellipsis: true,
+      sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.staffCode.match(/\d+/)[0] - b.staffCode.match(/\d+/)[0],
     },
     {
       width: '12em',
       title: title('Full Name'),
       dataIndex: 'fullName',
-      ellipsis:true,
+      ellipsis: true,
       key: 'fullname',
       defaultSortOder: 'ascend',
-      sortDirections: ['ascend','desencd','ascend'],
+      sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.fullName.localeCompare(b.fullName),
       render: (text, record) => (
         <a className="user-list" data-id={record.staffCode} onClick={showModal}>
@@ -165,7 +179,7 @@ const ListUser = () => {
       width: '9em',
       title: 'Username',
       dataIndex: 'username',
-      ellipsis:true,
+      ellipsis: true,
       key: 'username',
     },
     {
@@ -173,17 +187,17 @@ const ListUser = () => {
       title: title('Joined Date'),
       dataIndex: 'joinedDate',
       key: 'joineddate',
-      ellipsis:true,
-      sortDirections: ['ascend', 'desencd','ascend'],
-      sorter: (a, b) => formatDate(a.joinedDate) - formatDate(b.joinedDate)
+      ellipsis: true,
+      sortDirections: ['ascend', 'desencd', 'ascend'],
+      sorter: (a, b) => formatDate(a.joinedDate) - formatDate(b.joinedDate),
     },
     {
       width: '5em',
       title: title('Type'),
       dataIndex: 'type',
       key: 'type',
-      ellipsis:true,
-      sortDirections: ['ascend', 'desencd','ascend'],
+      ellipsis: true,
+      sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.type.localeCompare(b.type),
     },
     {
@@ -220,16 +234,14 @@ const ListUser = () => {
   };
 
   const onSearch = async (value) => {
-    setCurrent(1)
+    setCurrent(1);
     let url = '';
-    console.log("Type: ", type)
-    setIsSearch(true)
-    setSearchValue(value)
-    if(value===""){
-      setIsSearch(false)
+    setIsSearch(true);
+    setSearchValue(value);
+    if (value === '') {
+      setIsSearch(false);
     }
     if (type.some((data) => data === 'ALL') || type.length === 2 || type.length === 0) {
-      console.log("Type: ", type)
       url = `/api/find/search?name=${value}&staffCode=${value}&location=${user.location}&page=0`;
     } else {
       url = `/api/find/search?name=${value}&staffCode=${value}&type=${type}&location=${user.location}&page=0`;
@@ -239,16 +251,18 @@ const ListUser = () => {
       setUserList(response.data);
     }
   };
+
   return (
     <div className="list-user-wrapper">
       <div>
         <Row>
           <Col xs={20} sm={4} md={6} lg={10} xl={11}>
-            <Popover 
-                content={content} 
-                placement="bottom" 
-                trigger="click"
-                overlayClassName="list-user-dropdown-box-type">
+            <Popover
+              content={content}
+              placement="bottom"
+              trigger="click"
+              overlayClassName="list-user-dropdown-box-type"
+            >
               <Button className="handle-filter">
                 <Row>
                   <Col span={21}>Type</Col>
