@@ -29,6 +29,9 @@ const ListUser = () => {
   const defaultCheckedList = ['ALL'];
   const [checkedList, setCheckedList] = useState([]);
   const [checkAll, setCheckAll] = useState(false);
+  const[isFilter, setIsFilter] = useState(false);
+  const[isSearch, setIsSearch] = useState(false);
+  const[searchValue, setSearchValue] = useState('')
 
   const formatDate = (joineddate) => {
     var initial = joineddate.split(/\//);
@@ -37,11 +40,15 @@ const ListUser = () => {
   } 
 
   const onChange = async (list) => {
-    let url = ''
+    let url = `/api/find/filter/0?location=${user.location}`
     setType(list)
+    setIsFilter(true)
+    setIsSearch(false)
+    setSearchValue("")
+    setCurrent(1)
     if(list.some((data) => data === 'STAFF'|| data ==='ADMIN' ) && list.length<2){
       console.log("STAFF")
-      url = `/api/find/filter/${current - 1}?type=${list}&location=${user.location}`
+      url = `/api/find/filter/0?type=${list}&location=${user.location}`
     }
     const response = await getItems(url)
     if (response.status === 200) {
@@ -50,9 +57,10 @@ const ListUser = () => {
     setCheckedList(list);
     setCheckAll(list.length === plainOptions.length);
     if (list.length === plainOptions.length) {
+      setType(["ALL"])
       setCheckAll(true);
       setCheckedList(defaultCheckedList);
-      const response = await getItems(`/api/find/filter/${current - 1}?location=${user.location}`);
+      const response = await getItems(`/api/find/filter/0?location=${user.location}`);
       if (response.status === 200) {
         setUserList(response.data);
       }
@@ -60,10 +68,13 @@ const ListUser = () => {
   };
   const onCheckAllChange = async (e) => {
     console.log(e.target.checked);
+    setCurrent(1)
     setCheckedList([]);
     setCheckValue(['ADMIN', 'STAFF']);
+    setIsFilter(false)
     console.log(checkValue);
-    const response = await getItems(`/api/find/filter/${current - 1}?location=${user.location}`);
+    setType(["ALL"])
+    const response = await getItems(`/api/find/filter/0?location=${user.location}`);
       if (response.status === 200) {
         setUserList(response.data);
       }
@@ -89,7 +100,17 @@ const ListUser = () => {
   }, [current]);
 
   const getData = async () => {
-    const response = await getItems(`/api/find?location=${user.location}&pageNumber=${current - 1}`);
+    let url = `/api/find?location=${user.location}&pageNumber=${current - 1}`
+    if(isFilter===true&& isSearch===false){
+      url = `/api/find/filter/${current -1 }?type=${type}&location=${user.location}`
+    }
+    if(isFilter===true&& isSearch===true){
+      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&type=${type}&location=${user.location}&page=${current-1}`
+    }
+    if(isFilter===false && isSearch===true){
+      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&location=${user.location}&page=${current-1}`
+    }
+    const response = await getItems(url);
     if (response.status === 200) {
       setUserList(response.data);
     }
@@ -122,7 +143,7 @@ const ListUser = () => {
       dataIndex: 'staffCode',
       key: 'staffcode',
       ellipsis:true,
-      sortDirections: ['ascend','desencd'],
+      sortDirections: ['ascend','desencd','ascend'],
       sorter: (a, b) => a.staffCode.match(/\d+/)[0] - b.staffCode.match(/\d+/)[0],
     },
     {
@@ -132,7 +153,7 @@ const ListUser = () => {
       ellipsis:true,
       key: 'fullname',
       defaultSortOder: 'ascend',
-      sortDirections: ['ascend','desencd'],
+      sortDirections: ['ascend','desencd','ascend'],
       sorter: (a, b) => a.fullName.localeCompare(b.fullName),
       render: (text, record) => (
         <a className="user-list" data-id={record.staffCode} onClick={showModal}>
@@ -153,7 +174,7 @@ const ListUser = () => {
       dataIndex: 'joinedDate',
       key: 'joineddate',
       ellipsis:true,
-      sortDirections: ['ascend', 'desencd'],
+      sortDirections: ['ascend', 'desencd','ascend'],
       sorter: (a, b) => formatDate(a.joinedDate) - formatDate(b.joinedDate)
     },
     {
@@ -162,7 +183,7 @@ const ListUser = () => {
       dataIndex: 'type',
       key: 'type',
       ellipsis:true,
-      sortDirections: ['ascend', 'desencd'],
+      sortDirections: ['ascend', 'desencd','ascend'],
       sorter: (a, b) => a.type.localeCompare(b.type),
     },
     {
@@ -199,21 +220,25 @@ const ListUser = () => {
   };
 
   const onSearch = async (value) => {
+    setCurrent(1)
     let url = '';
+    console.log("Type: ", type)
+    setIsSearch(true)
+    setSearchValue(value)
+    if(value===""){
+      setIsSearch(false)
+    }
     if (type.some((data) => data === 'ALL') || type.length === 2 || type.length === 0) {
       console.log("Type: ", type)
-      url = `/api/find/search?name=${value}&staffCode=${value}&location=${user.location}&page=${current - 1}`;
+      url = `/api/find/search?name=${value}&staffCode=${value}&location=${user.location}&page=0`;
     } else {
-      url = `/api/find/search?name=${value}&staffCode=${value}&type=${type}&location=${user.location}&page=${
-        current - 1
-      }`;
+      url = `/api/find/search?name=${value}&staffCode=${value}&type=${type}&location=${user.location}&page=0`;
     }
     const response = await getItems(url);
     if (response.status === 200) {
       setUserList(response.data);
     }
   };
-
   return (
     <div className="list-user-wrapper">
       <div>

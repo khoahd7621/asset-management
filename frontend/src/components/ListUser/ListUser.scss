@@ -116,3 +116,11 @@
     color: #e5273d;
   }
 }
+
+p {
+  text-overflow: ellipsis;
+  display: block;
+  width: 100px;
+  overflow: hidden;     
+  white-space: nowrap;
+}
