@@ -26,9 +26,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     +" where " 
     +" u.location = :location" 
     +" and (u.type = :type or :type is null)"
-    +" and ((u.firstName like :name or :name is null)"
-        +" or (u.lastName like :name or :name is null)"
-        +" or (u.staffCode like :code or :code is null))"
+    +" and ((lower(u.firstName)  like lower(:name) or :name is null)"
+        +" or (lower(u.lastName)  like lower(:name) or :name is null)"
+        +" or (lower(u.staffCode) like lower(:code) or :code is null))"
     +" order by u.firstName asc")
     Page<User> search(@Param("name") String name, @Param("code") String staffCode, @Param("location") String location, @Param("type")EUserType type, Pageable pageable);
     

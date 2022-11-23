@@ -18,8 +18,8 @@ public class UserResponse {
     private String firstName;
     private String lastName;
     private EGender gender;
-    private Date joinedDate;
-    private Date dateOfBirth;
+    private String joinedDate;
+    private String dateOfBirth;
     private EUserType type;
     private String location;
     private String fullName;

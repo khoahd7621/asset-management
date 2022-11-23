@@ -10,6 +10,12 @@
   }
 }
 
+.ant-table-cell{
+  white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 //button
 .handle-button {
   color: aliceblue;
