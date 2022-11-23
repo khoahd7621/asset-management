@@ -4,6 +4,7 @@ import com.nashtech.assignment.data.constants.EUserType;
 import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.data.repositories.UserRepository;
 import com.nashtech.assignment.dto.request.CreateNewUserRequest;
+import com.nashtech.assignment.dto.response.user.UserResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.mappers.UserMapper;
 import com.nashtech.assignment.services.CreateService;
@@ -37,7 +38,7 @@ public class CreateServiceImpl implements CreateService {
     @Autowired
     private SecurityContextService securityContextService;
 
-    public void createNewUser(CreateNewUserRequest createNewUserRequest) throws ParseException {
+    public UserResponse createNewUser(CreateNewUserRequest createNewUserRequest) throws ParseException {
         SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
         Date dateOfBirth = formatterDate.parse(createNewUserRequest.getDateOfBirth());
         LocalDate birth = LocalDate.ofInstant(dateOfBirth.toInstant(), ZoneId.systemDefault());
@@ -89,5 +90,6 @@ public class CreateServiceImpl implements CreateService {
         user.setPassword(passwordEncoder.encode(password));
 
         userRepository.save(user);
+        return userMapper.mapEntityToResponseDto(user);
     }
 }

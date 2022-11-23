@@ -1,6 +1,6 @@
 package com.nashtech.assignment.controllers;
 
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -25,10 +25,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nashtech.assignment.AssignmentApplication;
 import com.nashtech.assignment.config.CORSConfig;
 import com.nashtech.assignment.config.SecurityConfig;
-import com.nashtech.assignment.controllers.UserController;
 import com.nashtech.assignment.data.constants.EGender;
 import com.nashtech.assignment.data.constants.EUserType;
 import com.nashtech.assignment.dto.request.CreateNewUserRequest;
+import com.nashtech.assignment.dto.response.user.UserResponse;
 import com.nashtech.assignment.services.CreateService;
 
 import java.nio.charset.StandardCharsets;
@@ -61,7 +61,17 @@ public class UserControllerTest {
         ArgumentCaptor<CreateNewUserRequest> createNewUserRequestCaptor =
                 ArgumentCaptor.forClass(CreateNewUserRequest.class);
 
-        doNothing().when(createService).createNewUser(createNewUserRequestCaptor.capture());
+        UserResponse response = UserResponse.builder()
+                .firstName("hau")
+                .lastName("doan")
+                .dateOfBirth("21/12/2001")
+                .joinedDate("17/11/2022")
+                .gender(EGender.MALE)
+                .type(EUserType.ADMIN)
+                .location("hehe")
+                .build();
+
+        when(createService.createNewUser(createNewUserRequestCaptor.capture())).thenReturn(response);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .post("/api/user")
@@ -71,6 +81,9 @@ public class UserControllerTest {
 
         MvcResult result = mockMvc.perform(request).andReturn();
 
-        assertThat(result.getResponse().getStatus(), is(HttpStatus.NO_CONTENT.value()));
+        assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
+        assertThat(result.getResponse().getContentAsString(), 
+            is("{\"username\":null,\"staffCode\":null,\"firstName\":\"hau\",\"lastName\":\"doan\",\"gender\":\"MALE\",\"joinedDate\":\"17/11/2022\",\"dateOfBirth\":\"21/12/2001\",\"type\":\"ADMIN\",\"location\":\"hehe\",\"fullName\":null}"
+        ));
     }
 }

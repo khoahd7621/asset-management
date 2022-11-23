@@ -16,6 +16,7 @@ import com.nashtech.assignment.data.constants.EUserType;
 import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.data.repositories.UserRepository;
 import com.nashtech.assignment.dto.request.CreateNewUserRequest;
+import com.nashtech.assignment.dto.response.user.UserResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.mappers.UserMapper;
 
@@ -135,13 +136,15 @@ class CreateServiceImplTest {
         SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
         Date dateOfBirth = formatterDate.parse(createNewUserRequest.getDateOfBirth());
         Date joinedDate = formatterDate.parse(createNewUserRequest.getJoinedDate());
+        UserResponse expected = mock(UserResponse.class);
         
         when(userRepository.save(user)).thenReturn(user);
         when(user.getFirstName()).thenReturn(createNewUserRequest.getFirstName());
         when(userMapper.toUser(createNewUserRequest)).thenReturn(user);
         when(user.getUsername()).thenReturn("haud");
+        when(userMapper.mapEntityToResponseDto(user)).thenReturn(expected);
 
-        createService.createNewUser(createNewUserRequest);
+        UserResponse actual=createService.createNewUser(createNewUserRequest);
 
         verify(user).setStaffCode(staffCodeCaptor.capture());
         verify(user).setUsername("haud");
@@ -149,5 +152,9 @@ class CreateServiceImplTest {
         verify(user).setJoinedDate(joinedDate);
         verify(user).setPassword(passwordEncoder.encode("haud@21122001"));
         assertThat(staffCodeCaptor.getValue(), is("SD0000"));
+        assertThat(actual, is(expected));
+        
+
+        
     }
 }

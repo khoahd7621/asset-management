@@ -1,20 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { Table, Row, Col, Modal, Input, Button } from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Table, Row, Col, Modal, Input, Button, Checkbox, Popover } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
 import { getItems } from '../../services/findApiService';
 import { adminRoute } from '../../routes/routes';
 
-import { CloseIcon, EditIcon, SortIcon } from '../../assets/CustomIcon';
-import { CheckboxMenu } from './HandleFilter';
+import { CloseIcon, EditIcon, SortIcon, FilterIcon } from '../../assets/CustomIcon';
+
 import Paging from './HandlePaging';
 
 import './ListUser.scss';
 
 const ListUser = () => {
   const user = useSelector((state) => state.user.user);
+  const location = useLocation();
   const navigate = useNavigate();
   const { Search } = Input;
   const [userList, setUserList] = useState([]);
@@ -23,24 +24,109 @@ const ListUser = () => {
   const [userDetail, setUserDetail] = useState({});
   const [checkValue, setCheckValue] = useState(['ALL']);
 
+  // Handle Filter
+  const CheckboxGroup = Checkbox.Group;
+  const plainOptions = ['ADMIN', 'STAFF'];
+  const defaultCheckedList = ['ALL'];
+  const [checkedList, setCheckedList] = useState([]);
+  const [checkAll, setCheckAll] = useState(false);
+  const [isFilter, setIsFilter] = useState(false);
+  const [isSearch, setIsSearch] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+
+  const formatDate = (joineddate) => {
+    let initial = joineddate.split(/\//);
+    const newdate = new Date([initial[1], initial[0], initial[2]].join('/'));
+    return newdate.getTime();
+  };
+
+  const onChange = async (list) => {
+    let url = `/api/find/filter/0?location=${user.location}`;
+    setType(list);
+    setIsFilter(true);
+    setIsSearch(false);
+    setSearchValue('');
+    setCurrent(1);
+    if (list.some((data) => data === 'STAFF' || data === 'ADMIN') && list.length < 2) {
+      url = `/api/find/filter/0?type=${list}&location=${user.location}`;
+    }
+    const response = await getItems(url);
+    if (response.status === 200) {
+      setUserList(response.data);
+    }
+    setCheckedList(list);
+    setCheckAll(list.length === plainOptions.length);
+    if (list.length === plainOptions.length) {
+      setType(['ALL']);
+      setCheckAll(true);
+      setCheckedList(defaultCheckedList);
+      const response = await getItems(`/api/find/filter/0?location=${user.location}`);
+      if (response.status === 200) {
+        setUserList(response.data);
+      }
+    }
+  };
+
+  const onCheckAllChange = async (e) => {
+    setCurrent(1);
+    setCheckedList([]);
+    setCheckValue(['ADMIN', 'STAFF']);
+    setIsFilter(false);
+    setType(['ALL']);
+    const response = await getItems(`/api/find/filter/0?location=${user.location}`);
+    if (response.status === 200) {
+      setUserList(response.data);
+    }
+    setCheckAll(e.target.checked);
+  };
+
+  const content = (
+    <div style={{ display: 'list-item' }}>
+      <Checkbox
+        defaultChecked={defaultCheckedList}
+        onChange={onCheckAllChange}
+        checked={checkAll}
+        className="checkbox-filter"
+      >
+        ALL
+      </Checkbox>
+      <CheckboxGroup options={plainOptions} value={checkedList} onChange={onChange} className="checkbox-filter" />
+    </div>
+  );
+
   useEffect(() => {
     getData();
   }, [current]);
 
   const getData = async () => {
-    let url = `/api/find?location=${user.location}&pageNumber=${current - 1}`
-    if(isFilter===true&& isSearch===false){
-      url = `/api/find/filter/${current -1 }?type=${type}&location=${user.location}`
+    let url = `/api/find?location=${user.location}&pageNumber=${current - 1}`;
+    if (isFilter === true && isSearch === false) {
+      url = `/api/find/filter/${current - 1}?type=${type}&location=${user.location}`;
     }
-    if(isFilter===true&& isSearch===true){
-      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&type=${type}&location=${user.location}&page=${current-1}`
+    if (isFilter === true && isSearch === true) {
+      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&type=${type}&location=${
+        user.location
+      }&page=${current - 1}`;
     }
-    if(isFilter===false && isSearch===true){
-      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&location=${user.location}&page=${current-1}`
+    if (isFilter === false && isSearch === true) {
+      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&location=${user.location}&page=${
+        current - 1
+      }`;
     }
     const response = await getItems(url);
     if (response.status === 200) {
-      setUserList(response.data);
+      const newUserCreate = location.state?.userCreateResponse;
+      if (newUserCreate && newUserCreate.username) {
+        const listDatas = response?.data.data.filter((item) => item.username !== newUserCreate.username);
+        listDatas.unshift(newUserCreate);
+        setUserList({
+          ...response.data,
+          data: listDatas,
+        });
+        window.history.replaceState({}, document.title);
+      } else {
+        setUserList(response.data);
+      }
     }
   };
 
@@ -66,21 +152,23 @@ const ListUser = () => {
 
   const columns = [
     {
-      width: '110px',
+      width: '9em',
       title: title('Staff Code'),
       dataIndex: 'staffCode',
       key: 'staffcode',
-      sortDirections: ['ascend'],
+      ellipsis: true,
+      sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.staffCode.match(/\d+/)[0] - b.staffCode.match(/\d+/)[0],
     },
     {
-      width: '120px',
+      width: '12em',
       title: title('Full Name'),
       dataIndex: 'fullName',
+      ellipsis: true,
       key: 'fullname',
       defaultSortOder: 'ascend',
-      sortDirections: ['ascend'],
-      sorter: (a, b) => a.fullName.length - b.fullName.length,
+      sortDirections: ['ascend', 'desencd', 'ascend'],
+      sorter: (a, b) => a.fullName.localeCompare(b.fullName),
       render: (text, record) => (
         <a className="user-list" data-id={record.staffCode} onClick={showModal}>
           {text}
@@ -88,25 +176,28 @@ const ListUser = () => {
       ),
     },
     {
-      width: '110px',
+      width: '9em',
       title: 'Username',
       dataIndex: 'username',
+      ellipsis: true,
       key: 'username',
     },
     {
-      width: '250px',
+      width: '12em',
       title: title('Joined Date'),
       dataIndex: 'joinedDate',
       key: 'joineddate',
-      sortDirections: ['ascend'],
-      sorter: (a, b) => Date.parse(a.joinedDate) / 1000 - Date.parse(b.joinedDate) / 1000,
+      ellipsis: true,
+      sortDirections: ['ascend', 'desencd', 'ascend'],
+      sorter: (a, b) => formatDate(a.joinedDate) - formatDate(b.joinedDate),
     },
     {
-      width: '100px',
+      width: '5em',
       title: title('Type'),
       dataIndex: 'type',
       key: 'type',
-      sortDirections: ['ascend'],
+      ellipsis: true,
+      sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.type.localeCompare(b.type),
     },
     {
@@ -142,28 +233,16 @@ const ListUser = () => {
     setIsModalVisible(false);
   };
 
-  const onCheckboxChange = async (selection) => {
-    if (selection === 'ADMIN' || selection === 'STAFF') {
-      setCheckValue(selection);
-      setType([selection]);
-      const response = await getItems(`/api/find/filter/${current - 1}?type=${selection}&location=${user.location}`);
-      if (response.status === 200) {
-        setUserList(response.data);
-      }
-    } else {
-      const response = await getItems(`/api/find/filter/${current - 1}?location=${user.location}`);
-      if (response.status === 200) {
-        setUserList(response.data);
-      }
-      setCheckValue(['ALL']);
-      setType(['ADMIN', 'STAFF']);
-    }
-  };
   const onSearch = async (value) => {
-    setCurrent(1)
+    setCurrent(1);
     let url = '';
-    if (type === 'ALL' || type.length === 2 || type.length === 0) {
-      url = `/api/find/search?name=${value}&staffCode=${value}&location=${user.location}&page=${current - 1}`;
+    setIsSearch(true);
+    setSearchValue(value);
+    if (value === '') {
+      setIsSearch(false);
+    }
+    if (type.some((data) => data === 'ALL') || type.length === 2 || type.length === 0) {
+      url = `/api/find/search?name=${value}&staffCode=${value}&location=${user.location}&page=0`;
     } else {
       url = `/api/find/search?name=${value}&staffCode=${value}&type=${type}&location=${user.location}&page=0`;
     }
@@ -172,12 +251,28 @@ const ListUser = () => {
       setUserList(response.data);
     }
   };
+
   return (
     <div className="list-user-wrapper">
       <div>
         <Row>
           <Col xs={20} sm={4} md={6} lg={10} xl={11}>
-            <CheckboxMenu options={['ALL', 'ADMIN', 'STAFF']} value={checkValue} onChange={onCheckboxChange} />
+            <Popover
+              content={content}
+              placement="bottom"
+              trigger="click"
+              overlayClassName="list-user-dropdown-box-type"
+            >
+              <Button className="handle-filter">
+                <Row>
+                  <Col span={21}>Type</Col>
+                  <Col span={1} className="border-right"></Col>
+                  <Col span={2}>
+                    <FilterIcon type="filter" />
+                  </Col>
+                </Row>
+              </Button>
+            </Popover>
           </Col>
           <Col xs={20} sm={16} md={12} lg={10} xl={8}>
             <Search

@@ -7,6 +7,8 @@ import com.nashtech.assignment.services.CreateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.nashtech.assignment.dto.request.CreateNewUserRequest;
+import com.nashtech.assignment.dto.response.user.UserResponse;
+
 
 import java.text.ParseException;
 
@@ -28,12 +32,13 @@ public class UserController {
 
     @Operation(summary = "Create new user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Create user success")
+        @ApiResponse(responseCode = "200", description = "Create user successfully", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponse.class))
+        })
     })
     @PostMapping
-    public ResponseEntity<Void> createNewUser(@Valid @RequestBody CreateNewUserRequest createNewUserRequest)
+    public ResponseEntity<UserResponse> createNewUser(@Valid @RequestBody CreateNewUserRequest createNewUserRequest)
             throws ParseException {
-        createService.createNewUser(createNewUserRequest);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.OK).body(createService.createNewUser(createNewUserRequest));
     }
 }
