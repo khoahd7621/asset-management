@@ -116,17 +116,17 @@ const ListUser = () => {
     const response = await getItems(url);
     if (response.status === 200) {
       const newUserCreate = location.state?.userCreateResponse;
-      if (newUserCreate && newUserCreate.username) {
+      if (newUserCreate && newUserCreate.location && newUserCreate.location === user.location) {
         const listDatas = response?.data.data.filter((item) => item.username !== newUserCreate.username);
         listDatas.unshift(newUserCreate);
         setUserList({
           ...response.data,
           data: listDatas,
         });
-        window.history.replaceState({}, document.title);
       } else {
         setUserList(response.data);
       }
+      window.history.replaceState({}, document.title);
     }
   };
 

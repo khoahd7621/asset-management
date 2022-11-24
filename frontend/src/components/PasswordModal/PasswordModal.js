@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 import { Button, Form, Modal, Input } from 'antd';
 
 import './PasswordModal.scss';
@@ -12,7 +11,6 @@ const PasswordModal = () => {
   useEffect(() => {
     if (user.isFirstLogin) {
       setIsModalOpen(true);
-      toast.success('Show modal change password');
     }
   }, []);
 
@@ -48,7 +46,7 @@ const PasswordModal = () => {
             name="password"
             rules={[
               {
-                required: true,
+                required: false,
                 message: 'Please input your password!',
               },
             ]}
