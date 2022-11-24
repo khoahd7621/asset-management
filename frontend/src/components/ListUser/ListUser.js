@@ -28,7 +28,7 @@ const ListUser = () => {
   const plainOptions = ['ADMIN', 'STAFF'];
   const defaultCheckedList = ['ALL'];
   const [checkedList, setCheckedList] = useState([]);
-  const [checkAll, setCheckAll] = useState(false);
+  const [checkAll, setCheckAll] = useState(true);
   const [isFilter, setIsFilter] = useState(false);
   const [isSearch, setIsSearch] = useState(false);
   const [searchValue, setSearchValue] = useState('');
