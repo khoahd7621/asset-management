@@ -1,7 +1,5 @@
 package com.nashtech.assignment.dto.response.user;
 
-import java.util.Date;
-
 import com.nashtech.assignment.data.constants.EGender;
 import com.nashtech.assignment.data.constants.EUserType;
 

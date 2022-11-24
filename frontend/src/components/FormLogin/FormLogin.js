@@ -10,6 +10,7 @@ import { adminRoute, userRoute } from '../../routes/routes';
 import jwt_decode from 'jwt-decode';
 
 const FormLogin = () => {
+  const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [user, setUser] = useState({
@@ -21,6 +22,14 @@ const FormLogin = () => {
   useEffect(() => {
     document.title = 'Login';
   }, []);
+
+  useEffect(() => {
+    if (!user.username || !user.password) {
+      setIsSending(true);
+    } else {
+      setIsSending(false);
+    }
+  }, [user.username, user.password]);
 
   const handleChangeInput = (event) => {
     setUser({
@@ -67,12 +76,13 @@ const FormLogin = () => {
       }
       toast.success('Login success!');
     } else {
-      toast.error('Username or password is incorrect. Please try again!');
+      toast.error('Username or password is incorrect. Please try again');
     }
     setIsSending(false);
   };
   return (
     <Form
+      form={form}
       name="basic"
       labelCol={{
         span: 6,
@@ -131,7 +141,7 @@ const FormLogin = () => {
           type="primary"
           htmlType="submit"
         >
-          Submit
+          Login
         </Button>
       </Form.Item>
     </Form>

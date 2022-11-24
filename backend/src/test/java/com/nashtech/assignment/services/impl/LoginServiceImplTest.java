@@ -1,12 +1,10 @@
 package com.nashtech.assignment.services.impl;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;

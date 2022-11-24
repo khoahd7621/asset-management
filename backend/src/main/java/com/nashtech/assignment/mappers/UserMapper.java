@@ -1,13 +1,11 @@
 package com.nashtech.assignment.mappers;
 
-import java.text.DateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Component;
 
 import com.nashtech.assignment.data.entities.User;
