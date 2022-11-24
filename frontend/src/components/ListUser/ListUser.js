@@ -8,7 +8,6 @@ import { getItems } from '../../services/findApiService';
 import { adminRoute } from '../../routes/routes';
 
 import { CloseIcon, EditIcon, SortIcon, FilterIcon } from '../../assets/CustomIcon';
-
 import Paging from './HandlePaging';
 
 import './ListUser.scss';
@@ -35,7 +34,7 @@ const ListUser = () => {
   const [searchValue, setSearchValue] = useState('');
 
   const formatDate = (joineddate) => {
-    let initial = joineddate.split(/\//);
+    var initial = joineddate.split(/\//);
     const newdate = new Date([initial[1], initial[0], initial[2]].join('/'));
     return newdate.getTime();
   };
@@ -57,7 +56,8 @@ const ListUser = () => {
     setCheckedList(list);
     setCheckAll(list.length === plainOptions.length);
     if (list.length === plainOptions.length) {
-      setType(['ALL']);
+      setType(['ADMIN', 'STAFF']);
+
       setCheckAll(true);
       setCheckedList(defaultCheckedList);
       const response = await getItems(`/api/find/filter/0?location=${user.location}`);
@@ -72,7 +72,9 @@ const ListUser = () => {
     setCheckedList([]);
     setCheckValue(['ADMIN', 'STAFF']);
     setIsFilter(false);
-    setType(['ALL']);
+
+    setType(['ADMIN', 'STAFF']);
+
     const response = await getItems(`/api/find/filter/0?location=${user.location}`);
     if (response.status === 200) {
       setUserList(response.data);
@@ -101,7 +103,10 @@ const ListUser = () => {
   const getData = async () => {
     let url = `/api/find?location=${user.location}&pageNumber=${current - 1}`;
     if (isFilter === true && isSearch === false) {
-      url = `/api/find/filter/${current - 1}?type=${type}&location=${user.location}`;
+      if (type.length < 2) {
+        url = `/api/find/filter/${current - 1}?type=${type}&location=${user.location}`;
+      }
+      url = `/api/find/filter/${current - 1}?location=${user.location}`;
     }
     if (isFilter === true && isSearch === true) {
       url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&type=${type}&location=${
@@ -152,7 +157,7 @@ const ListUser = () => {
 
   const columns = [
     {
-      width: '9em',
+      width: '8em',
       title: title('Staff Code'),
       dataIndex: 'staffCode',
       key: 'staffcode',
@@ -161,7 +166,7 @@ const ListUser = () => {
       sorter: (a, b) => a.staffCode.match(/\d+/)[0] - b.staffCode.match(/\d+/)[0],
     },
     {
-      width: '12em',
+      width: '10em',
       title: title('Full Name'),
       dataIndex: 'fullName',
       ellipsis: true,
@@ -176,7 +181,7 @@ const ListUser = () => {
       ),
     },
     {
-      width: '9em',
+      width: '10em',
       title: 'Username',
       dataIndex: 'username',
       ellipsis: true,
@@ -236,6 +241,7 @@ const ListUser = () => {
   const onSearch = async (value) => {
     setCurrent(1);
     let url = '';
+
     setIsSearch(true);
     setSearchValue(value);
     if (value === '') {
