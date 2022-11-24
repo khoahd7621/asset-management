@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, Form, Modal, Input } from 'antd';
+import { toast } from 'react-toastify';
 
 import './PasswordModal.scss';
 
@@ -15,7 +16,19 @@ const PasswordModal = () => {
   }, []);
 
   const handleOk = () => {
+    toast.success('Password changed successfully');
     setIsModalOpen(false);
+  };
+
+  const [newPassword, setNewPassword] = useState({
+    password: '',
+  });
+
+  const handleChangeInput = (event) => {
+    setNewPassword({
+      ...newPassword,
+      [event.target.name]: event.target.value,
+    });
   };
 
   return (
@@ -40,7 +53,12 @@ const PasswordModal = () => {
           This is the first time you logged in.
           <p>You have to change your password to continue.</p>
         </div>
-        <Form>
+        <Form
+          initialValues={{
+            remember: true,
+          }}
+          onFinish={handleOk}
+        >
           <Form.Item
             label="New Password"
             name="password"
@@ -51,17 +69,12 @@ const PasswordModal = () => {
               },
             ]}
           >
-            <Input.Password />
+            <Input.Password name="password" onChange={(event) => handleChangeInput(event)} />
           </Form.Item>
+          <Button style={{ background: '#cf2338', borderColor: '#cf2338' }} type="primary" htmlType="submit">
+            Save
+          </Button>
         </Form>
-        <Button
-          style={{ background: '#cf2338', borderColor: '#cf2338' }}
-          type="primary"
-          htmlType="submit"
-          onClick={handleOk}
-        >
-          Save
-        </Button>
       </div>
     </Modal>
   );
