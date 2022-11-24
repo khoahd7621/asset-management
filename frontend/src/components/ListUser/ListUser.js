@@ -21,11 +21,10 @@ const ListUser = () => {
   const [current, setCurrent] = useState(1);
   const [type, setType] = useState(['ALL']);
   const [userDetail, setUserDetail] = useState({});
-  const [checkValue, setCheckValue] = useState(['ALL']);
 
   // Handle Filter
   const CheckboxGroup = Checkbox.Group;
-  const plainOptions = ['ADMIN', 'STAFF'];
+  const plainOptions = ['Admin', 'Staff'];
   const defaultCheckedList = ['ALL'];
   const [checkedList, setCheckedList] = useState([]);
   const [checkAll, setCheckAll] = useState(true);
@@ -34,9 +33,17 @@ const ListUser = () => {
   const [searchValue, setSearchValue] = useState('');
 
   const formatDate = (joineddate) => {
-    var initial = joineddate.split(/\//);
+    const initial = joineddate.split(/\//);
     const newdate = new Date([initial[1], initial[0], initial[2]].join('/'));
     return newdate.getTime();
+  };
+
+  // Letter case
+  const toUpper = function (str) {
+    return str.toUpperCase();
+  };
+  const toTitle = function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
   };
 
   const onChange = async (list) => {
@@ -46,8 +53,8 @@ const ListUser = () => {
     setIsSearch(false);
     setSearchValue('');
     setCurrent(1);
-    if (list.some((data) => data === 'STAFF' || data === 'ADMIN') && list.length < 2) {
-      url = `/api/find/filter/0?type=${list}&location=${user.location}`;
+    if (list.map(toUpper).some((data) => data === 'STAFF' || data === 'ADMIN') && list.length < 2) {
+      url = `/api/find/filter/0?type=${list.map(toUpper)}&location=${user.location}`;
     }
     const response = await getItems(url);
     if (response.status === 200) {
@@ -70,7 +77,6 @@ const ListUser = () => {
   const onCheckAllChange = async (e) => {
     setCurrent(1);
     setCheckedList([]);
-    setCheckValue(['ADMIN', 'STAFF']);
     setIsFilter(false);
 
     setType(['ADMIN', 'STAFF']);
@@ -90,7 +96,7 @@ const ListUser = () => {
         checked={checkAll}
         className="checkbox-filter"
       >
-        ALL
+        All
       </Checkbox>
       <CheckboxGroup options={plainOptions} value={checkedList} onChange={onChange} className="checkbox-filter" />
     </div>
@@ -105,8 +111,9 @@ const ListUser = () => {
     if (isFilter === true && isSearch === false) {
       if (type.length < 2) {
         url = `/api/find/filter/${current - 1}?type=${type}&location=${user.location}`;
+      } else {
+        url = `/api/find/filter/${current - 1}?location=${user.location}`;
       }
-      url = `/api/find/filter/${current - 1}?location=${user.location}`;
     }
     if (isFilter === true && isSearch === true) {
       url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&type=${type}&location=${
@@ -204,6 +211,7 @@ const ListUser = () => {
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.type.localeCompare(b.type),
+      render: (text) => toTitle(text),
     },
     {
       align: 'center',
@@ -341,9 +349,9 @@ const ListUser = () => {
             <p>{userDetail?.fullName}</p>
             <p>{userDetail?.username}</p>
             <p>{userDetail?.dateOfBirth}</p>
-            <p>{userDetail?.gender}</p>
+            <p>{!userDetail?.gender ? userDetail?.gender : toTitle(userDetail?.gender)}</p>
             <p>{userDetail?.joinedDate}</p>
-            <p>{userDetail?.type}</p>
+            <p>{!userDetail?.type ? userDetail?.type : toTitle(userDetail?.type)}</p>
             <p>{userDetail?.location}</p>
           </Col>
         </Row>

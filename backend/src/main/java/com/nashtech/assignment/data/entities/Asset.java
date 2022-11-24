@@ -19,6 +19,8 @@ public class Asset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "asset_name")
+    private String name;
     @Column(name = "asset_code")
     private String assetCode;
     @Column(name = "installed_date")
