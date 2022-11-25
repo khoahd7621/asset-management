@@ -1,11 +1,15 @@
 .manage-user {
-  padding-left: 6rem;
-  padding-top: 6rem;
   flex: 1;
+  padding: 80px 50px 0 96px;
+  min-height: 700px;
+  height: calc(100vh - var(--nav-bar-height));
+  overflow-x: auto;
+  overflow-y: auto;
 
   .title-manage-user {
-    color: #e61931;
+    font-size: 20px;
     font-weight: bold;
+    color: #cf2338;
   }
 }
 

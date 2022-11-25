@@ -14,7 +14,6 @@ import lombok.*;
 public class UserLoginRequest {
     @NotBlank(message = "Username is required")
     @Pattern(regexp = Constants.USERNAME_REGEX, message = "Invalid username")
-    @Size(max = 100, message = "Username maximum 100 characters")
     private String username;
 
     @NotBlank(message = "Password is required")
