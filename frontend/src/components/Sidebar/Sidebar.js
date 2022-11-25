@@ -74,8 +74,10 @@ const Sizebar = () => {
 
   return (
     <div className="main-side-bar">
-      <img className="logo" src={logoNash} alt="Asset Application" title="Asset Application" />
-      <div className="title">Online Asset Management</div>
+      <Link to={user.role === 'ADMIN' ? `/${adminRoute.home}` : `/${userRoute.home}`}>
+        <img className="logo" src={logoNash} alt="Asset Application" title="Asset Application" />
+        <div className="title">Online Asset Management</div>
+      </Link>
       <div className="list-items">
         {user.role === 'ADMIN' &&
           adminItems.map((item, index) => (

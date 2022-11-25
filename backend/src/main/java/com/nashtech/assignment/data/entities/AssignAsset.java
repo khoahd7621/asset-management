@@ -28,13 +28,17 @@ public class AssignAsset {
     private boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "asset_id")
     private Asset asset;
 
     @OneToOne(mappedBy = "assignAsset")
     private ReturnAsset returnAsset;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "assigned_to_user_id")
+    private User userAssignedTo;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "assigned_by_user_id")
+    private User userAssignedBy;
 }

@@ -74,7 +74,6 @@ const FormLogin = () => {
       } else {
         navigate(userRoute.home);
       }
-      toast.success('Login success!');
     } else {
       toast.error('Username or password is incorrect. Please try again');
     }
@@ -102,10 +101,6 @@ const FormLogin = () => {
           {
             required: true,
             message: 'Please input your username!',
-          },
-          {
-            max: 100,
-            message: 'Username maximum 100 characters',
           },
           {
             pattern: /^[a-zA-Z0-9]*$/,

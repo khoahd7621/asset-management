@@ -44,9 +44,15 @@ public class User {
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<AssignAsset> assignAssets;
+    @OneToMany(mappedBy = "userAssignedTo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<AssignAsset> yourBorrowed;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<ReturnAsset> returnAssets;
+    @OneToMany(mappedBy = "userAssignedBy", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<AssignAsset> yourAssignedTo;
+
+    @OneToMany(mappedBy = "userRequestedReturn", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ReturnAsset> yourRequestedReturn;
+
+    @OneToMany(mappedBy = "userAcceptedReturn", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ReturnAsset> yourAcceptedReturn;
 }

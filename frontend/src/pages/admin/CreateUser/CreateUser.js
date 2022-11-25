@@ -254,8 +254,8 @@ const CreateUser = () => {
         <Form.Item name="dateOfBirth" label="Date of Birth" help={dateOfBirthValidate.help}>
           <DatePicker
             id="create-user-date-picker__date-of-birth"
-            placeholder=""
-            format={'DD/MM/YYYY'}
+            placeholder="dd/mm/yyyy"
+            format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
             onChange={handleValidateDateOfBirth}
             status={dateOfBirthValidate.status}
           />
@@ -269,8 +269,8 @@ const CreateUser = () => {
         <Form.Item name="joinedDate" label="Joined Date" help={joinedDateValidate.help}>
           <DatePicker
             id="create-user-date-picker__joined-date"
-            placeholder=""
-            format={'DD/MM/YYYY'}
+            placeholder="dd/mm/yyyy"
+            format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
             onChange={handleValidateJoinedDate}
             status={joinedDateValidate.status}
           />
