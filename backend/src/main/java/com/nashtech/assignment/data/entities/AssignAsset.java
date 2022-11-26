@@ -23,6 +23,7 @@ public class AssignAsset {
     @Column(name = "note", columnDefinition = "text")
     private String note;
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private EAssignStatus status;
     @Column(name = "is_deleted")
     private boolean isDeleted;

@@ -21,6 +21,7 @@ public class ReturnAsset {
     @Column(name = "returned_date")
     private Date returnedDate;
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private EReturnStatus status;
     @Column(name = "is_deleted")
     private boolean isDeleted;

@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Admin from './layouts/Admin';
 import Login from './layouts/Login';
 import User from './layouts/User';
-import { CreateUser, Home as AdminHome, ManageUser } from './pages/admin';
+import { CreateUser, Home as AdminHome, ManageAsset, ManageUser } from './pages/admin';
 import { Home as UserHome } from './pages/user';
 import AdminPrivateRoute from './routes/AdminPrivateRoute';
 import { adminRoute, userRoute } from './routes/routes';
@@ -27,6 +27,7 @@ const App = () => {
           {/* <Route path={adminRoute.[your-path]} element={[your-component]} /> */}
           <Route path={adminRoute.manageUser} element={<ManageUser />} />
           <Route path={`${adminRoute.manageUser}/${adminRoute.createUser}`} element={<CreateUser />} />
+          <Route path={adminRoute.manageAsset} element={<ManageAsset />} />
         </Route>
         <Route
           path={userRoute.home}
