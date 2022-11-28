@@ -102,8 +102,7 @@ const EditUser = () => {
             help: 'Joined date is under 18 year than Date of Birth. Please select a different date',
             status: 'error',
           });
-        } 
-         else {
+        } else {
           setJoinedDateValidate({ ...initialError });
         }
       }
@@ -122,14 +121,13 @@ const EditUser = () => {
         return;
       }
       if (dateOfBirthType) {
-        if (date.diff(dateOfBirthType, 'days') <= 6574 ) {
+        if (date.diff(dateOfBirthType, 'days') <= 6574) {
           setJoinedDateValidate({
             help: 'Joined date is under 18 year than Date of Birth. Please select a different date',
             status: 'error',
           });
           return;
-        } 
-        
+        }
       }
       setJoinedDateValidate({ ...initialError });
     }
@@ -146,6 +144,7 @@ const EditUser = () => {
           gender: userDetails?.gender,
           joinedDate: moment(userDetails?.joinedDate, 'DD/MM/YYYY'),
           type: userDetails?.type,
+          location: userDetails?.location,
         }}
         form={form}
         labelCol={{ span: 6 }}
@@ -197,6 +196,15 @@ const EditUser = () => {
             <Option value="STAFF">Staff</Option>
             <Option value="ADMIN">Admin</Option>
           </Select>
+        </Form.Item>
+        <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues.type !== currentValues.type}>
+          {({ getFieldValue }) =>
+            getFieldValue('type') === 'ADMIN' ? (
+              <Form.Item name="location" label="Location">
+                <Input id="create-user-input__location" disabled/>
+              </Form.Item>
+            ) : null
+          }
         </Form.Item>
         <Form.Item>
           <div className="edit-user__form-action">

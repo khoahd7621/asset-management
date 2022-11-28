@@ -130,12 +130,7 @@ const FormLogin = () => {
           span: 18,
         }}
       >
-        <Button
-          disabled={isSending}
-          style={{ background: '#cf2338', borderColor: '#cf2338' }}
-          type="primary"
-          htmlType="submit"
-        >
+        <Button disabled={isSending} danger type="primary" htmlType="submit">
           Login
         </Button>
       </Form.Item>
