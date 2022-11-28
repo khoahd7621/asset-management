@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, DatePicker, Form, Input, Radio, Select } from 'antd';
-
 import './CreateUser.scss';
 
-import { postCreateNewUser } from '../../../services/createService';
+import { postCreateNewUser } from '../../../services/createApiService';
 import { adminRoute } from '../../../routes/routes';
 import { toast } from 'react-toastify';
 
@@ -70,7 +69,7 @@ const CreateUser = () => {
       resetFileds();
       navigate(`/${adminRoute.home}/${adminRoute.manageUser}`, {
         state: {
-          userCreateResponse: response.data,
+          userResponse: response.data,
         },
       });
       toast.success('Create new user successfully');

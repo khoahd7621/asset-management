@@ -50,7 +50,7 @@ public class LoginServiceImplTest {
     void testLogin_WhenUserFindNull_ShouldReturnBadRequestException() throws BadRequestException {
         UserLoginRequest userLoginRequest = UserLoginRequest.builder().username("username").build();
 
-        when(userRepository.findByUsernameAndIsDeletedFalse(userLoginRequest.getUsername())).thenReturn(Optional.empty());
+        when(userRepository.findByUsername(userLoginRequest.getUsername())).thenReturn(Optional.empty());
 
         BadRequestException actualException = Assertions.assertThrows(BadRequestException.class,
                 () -> loginServiceImpl.login(userLoginRequest));
@@ -62,20 +62,20 @@ public class LoginServiceImplTest {
     void testLogin_WhenUserFindNotActive_ShouldReturnBadRequestException() throws BadRequestException {
         UserLoginRequest userLoginRequest = UserLoginRequest.builder().username("username").build();
 
-        when(userRepository.findByUsernameAndIsDeletedFalse(userLoginRequest.getUsername())).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername(userLoginRequest.getUsername())).thenReturn(Optional.of(user));
         when(user.isDeleted()).thenReturn(true);
 
         BadRequestException actualException = Assertions.assertThrows(BadRequestException.class,
                 () -> loginServiceImpl.login(userLoginRequest));
 
-        Assertions.assertEquals("User is not active", actualException.getMessage());
+        Assertions.assertEquals("This account has been disabled", actualException.getMessage());
     }
 
     @Test
     void testLogin_WhenPasswordInvalid_ShouldReturnBadRequestException() throws BadRequestException {
         UserLoginRequest userLoginRequest = UserLoginRequest.builder().username("username").password("123456").build();
 
-        when(userRepository.findByUsernameAndIsDeletedFalse(userLoginRequest.getUsername())).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername(userLoginRequest.getUsername())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(userLoginRequest.getPassword(), user.getPassword())).thenReturn(false);
 
         BadRequestException actualException = Assertions.assertThrows(BadRequestException.class,
@@ -88,7 +88,7 @@ public class LoginServiceImplTest {
     void testLogin_WhenPasswordFirstLogin_ShouldReturnTrue() throws BadRequestException {
         UserLoginRequest userLoginRequest = UserLoginRequest.builder().username("username").password("123456").build();
 
-        when(userRepository.findByUsernameAndIsDeletedFalse(userLoginRequest.getUsername())).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername(userLoginRequest.getUsername())).thenReturn(Optional.of(user));
         when(user.isDeleted()).thenReturn(false);
         when(passwordEncoder.matches(userLoginRequest.getPassword(), user.getPassword())).thenReturn(true);
         when(passwordEncoder.matches(userLoginRequest.getPassword(), generatePassword.firstPassword(user)))
@@ -103,7 +103,7 @@ public class LoginServiceImplTest {
     void testLogin_WhenPasswordValid_ShouldLoginSuccess() throws BadRequestException {
         UserLoginRequest userLoginRequest = UserLoginRequest.builder().username("username").password("123456").build();
 
-        when(userRepository.findByUsernameAndIsDeletedFalse(userLoginRequest.getUsername())).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername(userLoginRequest.getUsername())).thenReturn(Optional.of(user));
         when(user.isDeleted()).thenReturn(false);
         when(passwordEncoder.matches(userLoginRequest.getPassword(), user.getPassword())).thenReturn(true);
         when(jwtTokenUtil.generateJwtToken(user)).thenReturn("accessToken");

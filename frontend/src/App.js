@@ -6,6 +6,7 @@ import User from './layouts/User';
 import { CreateUser, Home as AdminHome, ManageAsset, ManageUser } from './pages/admin';
 import EditAsset from './pages/admin/EditAsset/EditAsset';
 import { Home as UserHome } from './pages/user';
+import EditUser from './pages/admin/EditUser/EditUser';
 import AdminPrivateRoute from './routes/AdminPrivateRoute';
 import { adminRoute, userRoute } from './routes/routes';
 import StaffPrivateRoute from './routes/StaffPrivateRoute';
@@ -29,6 +30,7 @@ const App = () => {
           <Route path={adminRoute.manageUser} element={<ManageUser />} />
           <Route path={`${adminRoute.manageUser}/${adminRoute.createUser}`} element={<CreateUser />} />
           <Route path={adminRoute.manageAsset} element={<ManageAsset />} />
+          <Route path={`${adminRoute.manageUser}/${adminRoute.editUser}`} element={<EditUser />} />
           <Route path={`${adminRoute.manageAsset}/${adminRoute.editAsset}/:id`} element={<EditAsset />} />
         </Route>
         <Route

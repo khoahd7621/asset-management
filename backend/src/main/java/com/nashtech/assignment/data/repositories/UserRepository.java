@@ -15,19 +15,22 @@ import com.nashtech.assignment.data.entities.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findByStaffCodeOrderByFirstNameAsc(String staffCode);
+    User findByStaffCode(String staffCode);
 
-    Page<User> findByLocationOrderByFirstNameAsc(String location, Pageable pageable);
+    Optional<User> findByUsername(String username);
 
-    Page<User> findByLocationAndTypeOrderByFirstNameAsc(String location, EUserType type, Pageable pageable);
+    Page<User> findByLocationAndIsDeletedFalseOrderByFirstNameAsc(String location, Pageable pageable);
+
+    Page<User> findByLocationAndTypeAndIsDeletedFalseOrderByFirstNameAsc(String location, EUserType type, Pageable pageable);
 
     @Query("SELECT u"
     +" FROM User u "
     +" where " 
     +" u.location = :location" 
     +" and (u.type = :type or :type is null)"
-    +" and ((lower(u.firstName)  like lower(:name) or :name is null)"
-        +" or (lower(u.lastName)  like lower(:name) or :name is null)"
+    +" and u.isDeleted = 'false'"
+    +" and ((lower(concat(u.firstName,' ', u.lastName))  like lower(:name) or :name is null)"
+        +" or (lower(concat(u.lastName,' ', u.firstName))  like lower(:name) or :name is null)"
         +" or (lower(u.staffCode) like lower(:code) or :code is null))"
     +" order by u.firstName asc")
     Page<User> search(@Param("name") String name, @Param("code") String staffCode, @Param("location") String location, @Param("type")EUserType type, Pageable pageable);

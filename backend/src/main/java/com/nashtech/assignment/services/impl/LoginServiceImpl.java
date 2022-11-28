@@ -37,12 +37,12 @@ public class LoginServiceImpl implements LoginService {
     public UserLoginResponse login(UserLoginRequest userLoginRequest) {
         Boolean isFirstLogin = false;
         String username = userLoginRequest.getUsername();
-        Optional<User> userOpt = userRepository.findByUsernameAndIsDeletedFalse(username);
+        Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) {
             throw new BadRequestException("Username not found");
         }
         if (userOpt.get().isDeleted() == true) {
-            throw new BadRequestException("User is not active");
+            throw new BadRequestException("This account has been disabled");
         }
         if (!passwordEncoder.matches(userLoginRequest.getPassword(), userOpt.get().getPassword())) {
             throw new BadRequestException("Username or password is incorrect. Please try again");
