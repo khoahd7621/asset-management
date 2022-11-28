@@ -20,9 +20,17 @@
     gap: 16px;
     flex-wrap: wrap;
 
+    @media (max-width: 1300px) {
+      gap: 4px;
+    }
+
     .search-input {
       width: 260px;
       height: 36px;
+
+      @media (max-width: 1300px) {
+        width: 160px;
+      }
 
       .ant-input-affix-wrapper {
         height: 36px;

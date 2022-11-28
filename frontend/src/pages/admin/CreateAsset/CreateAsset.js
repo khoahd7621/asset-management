@@ -121,7 +121,7 @@ const CreateAsset = () => {
       form.resetFields();
       navigate(`/${adminRoute.home}/${adminRoute.manageAsset}`, {
         state: {
-          assetCreateResponse: response.data,
+          assetResponse: response.data,
         },
       });
     }

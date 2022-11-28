@@ -26,7 +26,7 @@ const ManageAsset = () => {
 
   useEffect(() => {
     fetchListCategories();
-    fetchListAssets(
+    fetchAssets(
       searchKeywords,
       convertListStatus(currentChoosedStatus),
       mapListCategoriesNameToListCategoriesId(currentChoosedCategories),
@@ -37,7 +37,7 @@ const ManageAsset = () => {
     );
   }, []);
 
-  const fetchListAssets = async (keyWord, statuses, categories, limit, page, sortField, sortType) => {
+  const fetchAssets = async (keyWord, statuses, categories, limit, page, sortField, sortType) => {
     const response = await filterAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination({
       keyWord,
       statuses,
@@ -84,6 +84,35 @@ const ManageAsset = () => {
       }
 
       window.history.replaceState({}, document.title);
+    }
+  };
+
+  const fetchListAssets = async (keyWord, statuses, categories, limit, page, sortField, sortType) => {
+    const response = await filterAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination({
+      keyWord,
+      statuses,
+      categories,
+      limit,
+      page,
+      sortField,
+      sortType,
+    });
+    if (response && response.status === 200) {
+      setTotalRow(response?.data.totalRow);
+      setListAssets(
+        response?.data?.data.length === 0
+          ? []
+          : response?.data?.data.map((item) => {
+              return {
+                key: item.assetCode,
+                assetId: item.id,
+                assetCode: item.assetCode,
+                assetName: item.assetName,
+                category: item.category.name,
+                state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
+              };
+            }),
+      );
     }
   };
 
