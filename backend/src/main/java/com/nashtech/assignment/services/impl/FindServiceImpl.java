@@ -35,7 +35,7 @@ public class FindServiceImpl implements FindService {
     public PaginationResponse<List<UserResponse>> findByLocation(String location, Integer pageNumber) {
         Pageable pageWithNumberAndSize = PageRequest.of(pageNumber, 19);
 
-        Page<User> user = userRepository.findByLocationOrderByFirstNameAsc(location, pageWithNumberAndSize);
+        Page<User> user = userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc(location, pageWithNumberAndSize);
 
         if(user == null || user.isEmpty()){
             return new PaginationResponse<>(Collections.emptyList(), 0, 0);
@@ -49,7 +49,7 @@ public class FindServiceImpl implements FindService {
 
     @Override
     public UserResponse viewUserDetails(String staffCode) {
-        User user = userRepository.findByStaffCodeOrderByFirstNameAsc(staffCode);
+        User user = userRepository.findByStaffCode(staffCode);
         if (user == null) {
             throw new NotFoundException("Cannot Found Staff With Code: " + staffCode);
         }
@@ -89,7 +89,7 @@ public class FindServiceImpl implements FindService {
         Page<User> users = null;
         PaginationResponse<List<UserResponse>> result = null;
         if (type != EUserType.ADMIN && type != EUserType.STAFF) {
-            Page<User> pageUsers = userRepository.findByLocationOrderByFirstNameAsc(location,pagination);
+            Page<User> pageUsers = userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc(location,pagination);
             if (pageUsers == null || pageUsers.isEmpty()) {
                 return new PaginationResponse<>(
                         Collections.emptyList(), 0, 0);
@@ -100,7 +100,7 @@ public class FindServiceImpl implements FindService {
                     pageUsers.getTotalElements());
             return result;
         }
-        users = userRepository.findByLocationAndTypeOrderByFirstNameAsc(location,type, pagination);
+        users = userRepository.findByLocationAndTypeAndIsDeletedFalseOrderByFirstNameAsc(location,type, pagination);
         if (users == null || users.isEmpty()) {
             return new PaginationResponse<>(
                     Collections.emptyList(), 0, 0);

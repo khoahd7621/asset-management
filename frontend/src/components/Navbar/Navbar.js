@@ -25,15 +25,24 @@ const Navbar = () => {
   const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
-    const currentPath = location.pathname.slice(location.pathname.lastIndexOf('/') + 1, location.pathname.length);
+    const pathArray = location.pathname.split('/');
+    const currentPath = Number(pathArray[pathArray.length - 1])
+      ? pathArray[pathArray.length - 2]
+      : pathArray[pathArray.length - 1];
     if (currentPath === '' || currentPath === adminRoute.home || currentPath === userRoute.home) {
       setListTitles(['Home']);
     } else if (currentPath === adminRoute.manageUser) {
       setListTitles(['Manage User']);
     } else if (currentPath === adminRoute.createUser) {
       setListTitles(['Manage User', 'Create New User']);
+    } else if (currentPath === adminRoute.editUser) {
+      setListTitles(['Manage Asset', 'Edit User']);
     } else if (currentPath === adminRoute.manageAsset) {
       setListTitles(['Manage Asset']);
+    } else if (currentPath === adminRoute.createAsset) {
+      setListTitles(['Manage Asset', 'Create New Asset']);
+    } else if (currentPath === adminRoute.editAsset) {
+      setListTitles(['Manage Asset', 'Edit Asset']);
     } else if (currentPath === adminRoute.manageAssignment) {
       setListTitles(['Manage Assignment']);
     } else if (currentPath === adminRoute.requestForReturning) {

@@ -28,6 +28,7 @@ public class Asset {
     @Column(name = "specification", columnDefinition = "text")
     private String specification;
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private EAssetStatus status;
     @Column(name = "location")
     private String location;

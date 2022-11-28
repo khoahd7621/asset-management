@@ -45,7 +45,7 @@ public class FindServiceImplTest {
         Page<User> page = mock(Page.class);
         List<UserResponse> users = mock(List.class);
 
-        when(userRepository.findByLocationAndTypeOrderByFirstNameAsc("HCM",EUserType.ADMIN,pageable)).thenReturn(page);
+        when(userRepository.findByLocationAndTypeAndIsDeletedFalseOrderByFirstNameAsc("HCM",EUserType.ADMIN,pageable)).thenReturn(page);
         when(userMapper.mapListEntityUserResponses(page.getContent())).thenReturn(users);
         
         PaginationResponse<List<UserResponse>> actual = findServiceImpl.filterByType(EUserType.ADMIN, 0,"HCM");
@@ -58,7 +58,7 @@ public class FindServiceImplTest {
         Page<User> page = mock(Page.class);
         List<UserResponse> users = mock(List.class);
 
-        when(userRepository.findByLocationAndTypeOrderByFirstNameAsc("HCM",EUserType.ADMIN,pageable)).thenReturn(null);
+        when(userRepository.findByLocationAndTypeAndIsDeletedFalseOrderByFirstNameAsc("HCM",EUserType.ADMIN,pageable)).thenReturn(null);
         when(userMapper.mapListEntityUserResponses(page.getContent())).thenReturn(users);
         
         PaginationResponse<List<UserResponse>> actual = findServiceImpl.filterByType(EUserType.ADMIN, 0,"HCM");
@@ -73,7 +73,7 @@ public class FindServiceImplTest {
         Page<User> page = mock(Page.class);
         List<UserResponse> users = mock(List.class);
 
-        when(userRepository.findByLocationOrderByFirstNameAsc("HCM",pageable)).thenReturn(page);
+        when(userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc("HCM",pageable)).thenReturn(page);
         when(userMapper.mapListEntityUserResponses(page.getContent())).thenReturn(users);
 
         PaginationResponse<List<UserResponse>> actual = findServiceImpl.filterByType(null, 0,"HCM");
@@ -87,7 +87,7 @@ public class FindServiceImplTest {
         Page<User> page = mock(Page.class);
         List<UserResponse> users = mock(List.class);
 
-        when(userRepository.findByLocationOrderByFirstNameAsc("HCM",pageable)).thenReturn(null);
+        when(userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc("HCM",pageable)).thenReturn(null);
         when(userMapper.mapListEntityUserResponses(page.getContent())).thenReturn(users);
 
         PaginationResponse<List<UserResponse>> actual = findServiceImpl.filterByType(null, 0,"HCM");
@@ -101,7 +101,7 @@ public class FindServiceImplTest {
         Page<User> pages = mock(Page.class);
         List<UserResponse> expected = mock(List.class);
 
-        when(userRepository.findByLocationOrderByFirstNameAsc("test", page)).thenReturn(pages);
+        when(userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc("test", page)).thenReturn(pages);
         when(userMapper.mapListEntityUserResponses(pages.getContent())).thenReturn(expected);
 
         PaginationResponse<List<UserResponse>> actual = findServiceImpl.findByLocation("test", 0);
@@ -115,7 +115,7 @@ public class FindServiceImplTest {
         Page<User> pages = mock(Page.class);
         List<UserResponse> expected = mock(List.class);
 
-        when(userRepository.findByLocationOrderByFirstNameAsc("test", page)).thenReturn(null);
+        when(userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc("test", page)).thenReturn(null);
         when(userMapper.mapListEntityUserResponses(pages.getContent())).thenReturn(expected);
 
         PaginationResponse<List<UserResponse>> actual = findServiceImpl.findByLocation("test", 0);
@@ -129,7 +129,7 @@ public class FindServiceImplTest {
         Page<User> pages = new PageImpl<>(Collections.emptyList());
         List<UserResponse> expected = mock(List.class);
 
-        when(userRepository.findByLocationOrderByFirstNameAsc("test", page)).thenReturn(pages);
+        when(userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc("test", page)).thenReturn(pages);
         when(userMapper.mapListEntityUserResponses(pages.getContent())).thenReturn(expected);
 
         PaginationResponse<List<UserResponse>> actual = findServiceImpl.findByLocation("test", 0);
@@ -190,7 +190,7 @@ public class FindServiceImplTest {
         User user = mock(User.class);
         UserResponse userResponse = mock(UserResponse.class);
 
-        when(userRepository.findByStaffCodeOrderByFirstNameAsc("test")).thenReturn(user);
+        when(userRepository.findByStaffCode("test")).thenReturn(user);
         when(userMapper.mapEntityToResponseDto(user)).thenReturn(userResponse);
 
         UserResponse actual = findServiceImpl.viewUserDetails("test");
@@ -203,7 +203,7 @@ public class FindServiceImplTest {
         User user = mock(User.class);
         UserResponse userResponse = mock(UserResponse.class);
 
-        when(userRepository.findByStaffCodeOrderByFirstNameAsc("test")).thenReturn(null);
+        when(userRepository.findByStaffCode("test")).thenReturn(null);
         when(userMapper.mapEntityToResponseDto(user)).thenReturn(userResponse);
 
         NotFoundException actual = assertThrows(NotFoundException.class, ()->findServiceImpl.viewUserDetails("test"));

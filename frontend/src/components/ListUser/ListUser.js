@@ -11,6 +11,7 @@ import { CloseIcon, EditIcon, SortIcon, FilterIcon } from '../../assets/CustomIc
 import Paging from './HandlePaging';
 
 import './ListUser.scss';
+import { checkValid, disableUser } from '../../services/disableApiService';
 
 const ListUser = () => {
   const user = useSelector((state) => state.user.user);
@@ -21,6 +22,7 @@ const ListUser = () => {
   const [current, setCurrent] = useState(1);
   const [type, setType] = useState(['ALL']);
   const [userDetail, setUserDetail] = useState({});
+  const [disabled, setDisable] = useState(false);
 
   // Handle Filter
   const CheckboxGroup = Checkbox.Group;
@@ -31,6 +33,13 @@ const ListUser = () => {
   const [isFilter, setIsFilter] = useState(false);
   const [isSearch, setIsSearch] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const [confirmPopUp, setConfirmPopUp] = useState(false);
+  const [validPopUp, setValidPopUp] = useState(false);
+  const [disablePopUp, setDisablePopUp] = useState(false);
+  const [valueStaffCode, setValueStaffCode] = useState();
+  const [isDisabled, setIsDisable] = useState(false);
 
   const formatDate = (joineddate) => {
     const initial = joineddate.split(/\//);
@@ -48,13 +57,13 @@ const ListUser = () => {
 
   const onChange = async (list) => {
     let url = `/api/find/filter/0?location=${user.location}`;
-    setType(list);
+    setType(list.map(toUpper));
     setIsFilter(true);
-    setIsSearch(false);
-    setSearchValue('');
     setCurrent(1);
     if (list.map(toUpper).some((data) => data === 'STAFF' || data === 'ADMIN') && list.length < 2) {
-      url = `/api/find/filter/0?type=${list.map(toUpper)}&location=${user.location}`;
+      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&type=${list.map(toUpper)}&location=${
+        user.location
+      }&page=${current - 1}`;
     }
     const response = await getItems(url);
     if (response.status === 200) {
@@ -67,7 +76,9 @@ const ListUser = () => {
 
       setCheckAll(true);
       setCheckedList(defaultCheckedList);
-      const response = await getItems(`/api/find/filter/0?location=${user.location}`);
+      const response = await getItems(
+        `/api/find/search?name=${searchValue}&staffCode=${searchValue}&location=${user.location}&page=${current - 1}`,
+      );
       if (response.status === 200) {
         setUserList(response.data);
       }
@@ -78,10 +89,14 @@ const ListUser = () => {
     setCurrent(1);
     setCheckedList([]);
     setIsFilter(false);
-
     setType(['ADMIN', 'STAFF']);
-
-    const response = await getItems(`/api/find/filter/0?location=${user.location}`);
+    let url = `/api/find/filter/0?location=${user.location}`;
+    if (isSearch === true) {
+      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&location=${user.location}&page=${
+        current - 1
+      }`;
+    }
+    const response = await getItems(url);
     if (response.status === 200) {
       setUserList(response.data);
     }
@@ -104,13 +119,13 @@ const ListUser = () => {
 
   useEffect(() => {
     getData();
-  }, [current]);
+  }, [current, isDisabled]);
 
   const getData = async () => {
     let url = `/api/find?location=${user.location}&pageNumber=${current - 1}`;
     if (isFilter === true && isSearch === false) {
       if (type.length < 2) {
-        url = `/api/find/filter/${current - 1}?type=${type}&location=${user.location}`;
+        url = `/api/find/filter/${current - 1}?type=${type.map(toUpper)}&location=${user.location}`;
       } else {
         url = `/api/find/filter/${current - 1}?location=${user.location}`;
       }
@@ -127,10 +142,10 @@ const ListUser = () => {
     }
     const response = await getItems(url);
     if (response.status === 200) {
-      const newUserCreate = location.state?.userCreateResponse;
-      if (newUserCreate && newUserCreate.location && newUserCreate.location === user.location) {
-        const listDatas = response?.data.data.filter((item) => item.username !== newUserCreate.username);
-        listDatas.unshift(newUserCreate);
+      const userResponse = location.state?.userResponse;
+      if (userResponse && userResponse.location && userResponse.location === user.location) {
+        const listDatas = response?.data.data.filter((item) => item.username !== userResponse.username);
+        listDatas.unshift(userResponse);
         setUserList({
           ...response.data,
           data: listDatas,
@@ -149,7 +164,16 @@ const ListUser = () => {
     }
   };
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const onClickToEdit = (data) => {
+    let lists = userList.data;
+    let index = lists.findIndex((item) => item.staffCode === data.currentTarget.dataset.id);
+    let editUser = lists[index];
+    navigate(`/${adminRoute.home}/${adminRoute.manageUser}/${adminRoute.editUser}`, {
+      state: {
+        userDetails: editUser,
+      },
+    });
+  };
 
   const title = (title) => {
     return (
@@ -218,20 +242,77 @@ const ListUser = () => {
       key: 'options',
       dataIndex: 'status',
       title: '',
-      render: () => (
+      render: (text, record) => (
         <div id="frame">
           <div className="edit-icon">
-            <EditIcon />
+            <Button
+              data-id={record.staffCode}
+              type="link"
+              icon={<EditIcon />}
+              disabled={disabled}
+              onClick={onClickToEdit}
+            ></Button>
           </div>
           <div></div>
-          <div></div>
           <div>
-            <CloseCircleOutlined style={{ color: 'red' }} />
+            <Button
+              onClick={record.username === user?.username ? onClickToCurrentUser : onClickToCheck}
+              data-id={record.staffCode}
+              type="link"
+              icon={<CloseCircleOutlined style={{ color: 'red' }} />}
+            ></Button>
           </div>
         </div>
       ),
     },
+    {
+      title: title(''),
+      dataIndex: 'firstName',
+      key: 'firstname',
+      hidden: true,
+    },
+    {
+      title: title(''),
+      dataIndex: 'lastName',
+      key: 'lastname',
+      hidden: true,
+    },
+    {
+      title: title(''),
+      dataIndex: 'gender',
+      key: 'gender',
+      hidden: true,
+    },
+    {
+      title: title(''),
+      dataIndex: 'dateOfBirth',
+      key: 'datoOfbirth',
+      hidden: true,
+    },
   ].filter((item) => !item.hidden);
+
+  const onClickToCheck = async (staffCode) => {
+    setIsDisable(false);
+    setValueStaffCode(staffCode.currentTarget.dataset.id);
+    const response = await checkValid(staffCode.currentTarget.dataset.id);
+    if (response.status === 200) {
+      setConfirmPopUp(true);
+    } else {
+      setValidPopUp(true);
+    }
+  };
+
+  const onClickToCurrentUser = async () => {
+    setDisablePopUp(true);
+  };
+
+  const onClickToDisable = async () => {
+    const response = await disableUser(valueStaffCode);
+    if (response.status === 204) {
+      setConfirmPopUp(false);
+      setIsDisable(true);
+    }
+  };
 
   const showModal = (staffcode) => {
     ApiUserDetails(staffcode.currentTarget.dataset.id);
@@ -323,6 +404,7 @@ const ListUser = () => {
       </div>
 
       <Modal
+        centered
         className="user-list"
         mask={false}
         title={'Detailed User Information'}
@@ -355,6 +437,49 @@ const ListUser = () => {
             <p>{userDetail?.location}</p>
           </Col>
         </Row>
+      </Modal>
+
+      <Modal
+        className="user-list__valid-modal"
+        title={'Can not disable user'}
+        centered
+        open={validPopUp}
+        onCancel={() => setValidPopUp(false)}
+        onOk={() => setValidPopUp(false)}
+        footer={null}
+        closeIcon={<CloseIcon />}
+        mask={null}
+      >
+        <p>There are valid assignment belonging to this user.</p>
+        <p>Please close all assignments before disabling user.</p>
+      </Modal>
+
+      <Modal
+        open={confirmPopUp}
+        className="user-list__disable-modal"
+        title={'Are you sure?'}
+        centered
+        onOk={onClickToDisable}
+        onCancel={() => setConfirmPopUp(false)}
+        okText="Disable"
+        cancelText="Cancel"
+        closable={false}
+      >
+        <p>Do you want to disable this user?</p>
+      </Modal>
+
+      <Modal
+        className="user-list__disable-modal"
+        title={'Can not disable yourself'}
+        centered
+        open={disablePopUp}
+        onCancel={() => setDisablePopUp(false)}
+        onOk={() => setDisablePopUp(false)}
+        footer={null}
+        closeIcon={<CloseIcon />}
+        mask={null}
+      >
+        <p>You can not disable your account</p>
       </Modal>
     </div>
   );

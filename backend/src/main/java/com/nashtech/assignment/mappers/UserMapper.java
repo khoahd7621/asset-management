@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.nashtech.assignment.data.entities.User;
-import com.nashtech.assignment.dto.request.CreateNewUserRequest;
+import com.nashtech.assignment.dto.request.user.CreateNewUserRequest;
 import com.nashtech.assignment.dto.response.user.UserResponse;
 
 @Component

@@ -75,7 +75,7 @@ const FormLogin = () => {
         navigate(userRoute.home);
       }
     } else {
-      toast.error('Username or password is incorrect. Please try again');
+      toast.error(response?.response?.data?.message);
     }
     setIsSending(false);
   };

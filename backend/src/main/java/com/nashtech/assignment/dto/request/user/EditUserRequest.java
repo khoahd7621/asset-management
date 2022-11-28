@@ -1,9 +1,7 @@
-package com.nashtech.assignment.dto.request;
+package com.nashtech.assignment.dto.request.user;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nashtech.assignment.data.constants.EGender;
@@ -13,20 +11,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+@Builder
 @Getter
 @Setter
-@Builder
-public class CreateNewUserRequest {
-    @NotBlank(message = "First name is required")
-    @Pattern(regexp = "^.*[A-Za-z].*$")
-    @Size(max = 100)
-    private String firstName;
-
-    @NotBlank(message = "Last name is required")
-    @Pattern(regexp = "^.*[A-Za-z].*[\\s]?+.*$")
-    @Size(max = 100)
-    private String lastName;
-
+public class EditUserRequest {
     @NotBlank(message = "Date of birth is required")
     @JsonFormat(pattern = "dd/MM/yyyy")
     private String dateOfBirth;
@@ -41,6 +29,7 @@ public class CreateNewUserRequest {
     @NotNull(message = "User Type is required")
     private EUserType type;
 
-    @Size(max = 100)
-    private String location;
+    @NotNull(message = "Staff code is required")
+    private String staffCode;
+
 }
