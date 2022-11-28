@@ -28,7 +28,7 @@ import com.nashtech.assignment.config.CORSConfig;
 import com.nashtech.assignment.config.SecurityConfig;
 import com.nashtech.assignment.data.constants.EGender;
 import com.nashtech.assignment.data.constants.EUserType;
-import com.nashtech.assignment.dto.request.CreateNewUserRequest;
+import com.nashtech.assignment.dto.request.user.CreateNewUserRequest;
 import com.nashtech.assignment.dto.request.user.EditUserRequest;
 import com.nashtech.assignment.dto.response.user.UserResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
@@ -71,25 +71,25 @@ public class UserControllerTest {
         ArgumentCaptor<CreateNewUserRequest> createNewUserRequestCaptor = ArgumentCaptor
                 .forClass(CreateNewUserRequest.class);
 
-        UserResponse response = UserResponse.builder()
-                .firstName("hau")
-                .lastName("doan")
-                .dateOfBirth("21/12/2001")
-                .joinedDate("17/11/2022")
-                .gender(EGender.MALE)
-                .type(EUserType.ADMIN)
-                .location("hehe")
-                .build();
+    UserResponse response = UserResponse.builder()
+        .firstName("hau")
+        .lastName("doan")
+        .dateOfBirth("21/12/2001")
+        .joinedDate("17/11/2022")
+        .gender(EGender.MALE)
+        .type(EUserType.ADMIN)
+        .location("hehe")
+        .build();
 
-        when(createService.createNewUser(createNewUserRequestCaptor.capture())).thenReturn(response);
+    when(createService.createNewUser(createNewUserRequestCaptor.capture())).thenReturn(response);
 
-        RequestBuilder request = MockMvcRequestBuilders
-                .post("/api/user")
-                .content(objectMapper.writeValueAsString(createNewUserRequest))
-                .characterEncoding(StandardCharsets.UTF_8)
-                .contentType(MediaType.APPLICATION_JSON);
+    RequestBuilder request = MockMvcRequestBuilders
+        .post("/api/user")
+        .content(objectMapper.writeValueAsString(createNewUserRequest))
+        .characterEncoding(StandardCharsets.UTF_8)
+        .contentType(MediaType.APPLICATION_JSON);
 
-        MvcResult result = mockMvc.perform(request).andReturn();
+    MvcResult result = mockMvc.perform(request).andReturn();
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
         assertThat(result.getResponse().getContentAsString(),

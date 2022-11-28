@@ -1,0 +1,50 @@
+.custom-modal {
+  .ant-modal-content {
+    border-radius: 8px;
+    border: 1px solid #000;
+  }
+
+  .ant-modal-close {
+    width: 24px;
+    height: 24px;
+    right: 42px;
+    top: 20px;
+
+    .ant-modal-close-x {
+      width: 24px;
+      height: 24px;
+    }
+
+    span {
+      color: #cf2338;
+      font-weight: bold;
+      top: 0;
+      position: absolute;
+      left: 0;
+      font-size: 24px;
+
+      &:hover {
+        color: red;
+        transition: all 0.15s ease;
+      }
+    }
+  }
+
+  .ant-modal-header {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom: 1px solid #000;
+    background-color: #eff1f5;
+    padding: 20px 48px;
+
+    .ant-modal-title {
+      font-weight: bold;
+      font-size: 18px;
+      color: #cf2338;
+    }
+  }
+
+  .ant-modal-body {
+    padding: 16px 48px;
+  }
+}

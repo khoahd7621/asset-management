@@ -6,10 +6,19 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.nashtech.assignment.data.entities.Category;
+import com.nashtech.assignment.dto.request.category.CreateNewCategoryRequest;
 import com.nashtech.assignment.dto.response.category.CategoryResponse;
 
 @Component
 public class CategoryMapper {
+
+    public Category mapCategoryRequestToEntity(CreateNewCategoryRequest createNewCategoryRequest) {
+        Category categoryResponse = Category.builder()
+                .name(createNewCategoryRequest.getCategoryName())
+                .prefixAssetCode(createNewCategoryRequest.getPrefixAssetCode())
+                .build();
+        return categoryResponse;
+    }
 
     public CategoryResponse toCategoryResponse(Category category) {
         return CategoryResponse.builder()

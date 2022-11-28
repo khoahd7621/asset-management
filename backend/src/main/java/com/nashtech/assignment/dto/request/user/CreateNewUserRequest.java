@@ -1,4 +1,4 @@
-package com.nashtech.assignment.dto.request;
+package com.nashtech.assignment.dto.request.user;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

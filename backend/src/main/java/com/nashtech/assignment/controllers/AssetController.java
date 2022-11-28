@@ -1,6 +1,7 @@
 package com.nashtech.assignment.controllers;
 
 import com.nashtech.assignment.data.constants.EAssetStatus;
+import com.nashtech.assignment.dto.request.asset.CreateNewAssetRequest;
 import com.nashtech.assignment.dto.request.asset.EditAssetInformationRequest;
 import com.nashtech.assignment.dto.request.asset.SearchFilterAssetRequest;
 import com.nashtech.assignment.dto.response.PaginationResponse;
@@ -8,6 +9,7 @@ import com.nashtech.assignment.dto.response.asset.AssetAndHistoriesResponse;
 import com.nashtech.assignment.dto.response.asset.AssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
+import com.nashtech.assignment.services.CreateService;
 import com.nashtech.assignment.services.EditService;
 import com.nashtech.assignment.services.FilterService;
 import com.nashtech.assignment.services.GetService;
@@ -16,20 +18,22 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 @RestController
 @RequestMapping("/api/asset")
 public class AssetController {
-
+    @Autowired
+    private CreateService createService;
     @Autowired
     private FilterService filterService;
     @Autowired
@@ -39,14 +43,14 @@ public class AssetController {
 
     @Operation(summary = "Get asset detail and its histories by assetId")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Get asset detail successfully.", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssetAndHistoriesResponse.class)) }),
-            @ApiResponse(responseCode = "404", description = "Not exist asset with this assetId.", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) })
+        @ApiResponse(responseCode = "200", description = "Get asset detail successfully.", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = AssetAndHistoriesResponse.class)) }),
+        @ApiResponse(responseCode = "404", description = "Not exist asset with this assetId.", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) })
     })
     @GetMapping("/{assetId}")
     public ResponseEntity<AssetAndHistoriesResponse> getAssetAndItsHistoriesByAssetId(@PathVariable Long assetId) {
-        return ResponseEntity.status(HttpStatus.OK).body(getService.getAssetAndItsHistoriesByAssetId(assetId));
+      return ResponseEntity.status(HttpStatus.OK).body(getService.getAssetAndItsHistoriesByAssetId(assetId));
     }
 
     @Operation(summary = "Filter all assets by assetCode or assetName (optional) in list status (optional) and in list categories (optional) same location with current user with pagination")
@@ -89,5 +93,19 @@ public class AssetController {
             throws ParseException {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(editService.editAssetInformation(assetId, editAssetInformationRequest));
+    }
+
+    @Operation(summary = "Create new asset")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Create new asset success.", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = AssetResponse.class)) }),
+        @ApiResponse(responseCode = "404", description = "Asset name, category name, specification and installed date cannot be blank.", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) })
+    })
+    @PostMapping
+    public ResponseEntity<AssetResponse> createAssetResponse(
+        @Valid @RequestBody CreateNewAssetRequest createNewAssetRequest) throws ParseException {
+      return ResponseEntity.status(HttpStatus.OK)
+          .body(createService.createAssetResponse(createNewAssetRequest));
     }
 }

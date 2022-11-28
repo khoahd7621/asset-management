@@ -54,12 +54,23 @@ const Sizebar = () => {
   const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
-    const currentPath = location.pathname.slice(location.pathname.lastIndexOf('/') + 1, location.pathname.length);
+    const pathArray = location.pathname.split('/');
+    const currentPath = Number(pathArray[pathArray.length - 1])
+      ? pathArray[pathArray.length - 2]
+      : pathArray[pathArray.length - 1];
     if (currentPath === '' || currentPath === adminRoute.home || currentPath === userRoute.home) {
       setCurrentIndex(adminItems.findIndex((item) => item.key === 'Home'));
-    } else if (currentPath === adminRoute.manageUser || currentPath === adminRoute.createUser) {
+    } else if (
+      currentPath === adminRoute.manageUser ||
+      currentPath === adminRoute.createUser ||
+      currentPath === adminRoute.editUser
+    ) {
       setCurrentIndex(adminItems.findIndex((item) => item.key === 'Manage User'));
-    } else if (currentPath === adminRoute.manageAsset) {
+    } else if (
+      currentPath === adminRoute.manageAsset ||
+      currentPath === adminRoute.createAsset ||
+      currentPath === adminRoute.editAsset
+    ) {
       setCurrentIndex(adminItems.findIndex((item) => item.key === 'Manage Asset'));
     } else if (currentPath === adminRoute.manageAssignment) {
       setCurrentIndex(adminItems.findIndex((item) => item.key === 'Manage Assignment'));

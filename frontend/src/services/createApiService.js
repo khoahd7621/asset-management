@@ -12,4 +12,21 @@ const postCreateNewUser = ({ firstName, lastName, dateOfBirth, gender, joinedDat
   });
 };
 
-export { postCreateNewUser };
+const postCreateNewCategory = ({ categoryName, prefixAssetCode }) => {
+  return axios.post('/api/category', {
+    categoryName,
+    prefixAssetCode,
+  });
+};
+
+const postCreateNewAsset = ({ assetName, categoryName, specification, installedDate, assetStatus }) => {
+  return axios.post('/api/asset', {
+    assetName,
+    categoryName,
+    specification,
+    installedDate,
+    assetStatus,
+  });
+};
+
+export { postCreateNewUser, postCreateNewCategory, postCreateNewAsset };

@@ -9,6 +9,7 @@ import com.nashtech.assignment.AssignmentApplication;
 import com.nashtech.assignment.config.CORSConfig;
 import com.nashtech.assignment.config.SecurityConfig;
 import com.nashtech.assignment.data.constants.EAssetStatus;
+import com.nashtech.assignment.dto.request.asset.CreateNewAssetRequest;
 import com.nashtech.assignment.dto.request.asset.EditAssetInformationRequest;
 import com.nashtech.assignment.dto.request.asset.SearchFilterAssetRequest;
 import com.nashtech.assignment.dto.response.PaginationResponse;
@@ -18,6 +19,7 @@ import com.nashtech.assignment.dto.response.asset.AssetResponse;
 import com.nashtech.assignment.dto.response.category.CategoryResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
+import com.nashtech.assignment.services.CreateService;
 import com.nashtech.assignment.services.EditService;
 import com.nashtech.assignment.services.FilterService;
 import com.nashtech.assignment.services.GetService;
@@ -61,6 +63,8 @@ class AssetControllerTest {
     private SecurityContextService securityContextService;
     @MockBean
     private EditService editService;
+    @MockBean
+    private CreateService createService;
 
     private Date date;
     private AssetResponse assetResponse;
@@ -263,5 +267,39 @@ class AssetControllerTest {
         assertThat(actual.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
         assertThat(actual.getContentAsString(), is("{\"message\":\"error message\"}"));
     }
+
+    @Test
+    void testCreateAssetResponse_WhenDataValid_ShouldReturnData() throws Exception {
+    CreateNewAssetRequest request = CreateNewAssetRequest
+        .builder()
+        .assetName("assetName")
+        .categoryName("categoryName")
+        .specification("specification")
+        .assetStatus(EAssetStatus.AVAILABLE)
+        .installedDate("01/01/2001")
+        .build();
+
+    ArgumentCaptor<CreateNewAssetRequest> assetCaptor = ArgumentCaptor
+        .forClass(CreateNewAssetRequest.class);
+
+    AssetResponse response = AssetResponse
+        .builder()
+        .assetName("assetName")
+        .installedDate(date)
+        .specification("specification")
+        .status(EAssetStatus.AVAILABLE)
+        .location("location")
+        .build();
+
+    when(createService.createAssetResponse(assetCaptor.capture())).thenReturn(response);
+
+    RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/asset")
+        .content(objectMapper.writeValueAsString(request))
+        .contentType(MediaType.APPLICATION_JSON);
+
+    MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+    assertThat(actual.getContentAsString(),
+        is("{\"id\":0,\"assetName\":\"assetName\",\"assetCode\":null,\"installedDate\":\"2001-01-01T00:00:00.000+00:00\",\"specification\":\"specification\",\"status\":\"AVAILABLE\",\"location\":\"location\",\"category\":null,\"deleted\":false}"));
+  }
 
 }

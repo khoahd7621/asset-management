@@ -200,7 +200,10 @@ const ManageAsset = () => {
           checkboxType="ASSET_CATEGORY"
         />
         <Search allowClear className="search-input" onSearch={handleSubmitSearch} enterButton />
-        <Link to={`/${adminRoute.home}/${adminRoute.manageAsset}`} className="create-asset-btn">
+        <Link
+          to={`/${adminRoute.home}/${adminRoute.manageAsset}/${adminRoute.createAsset}`}
+          className="create-asset-btn"
+        >
           Create new asset
         </Link>
       </div>

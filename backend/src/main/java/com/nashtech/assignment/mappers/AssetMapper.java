@@ -1,5 +1,11 @@
 package com.nashtech.assignment.mappers;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.nashtech.assignment.data.constants.EReturnStatus;
 import com.nashtech.assignment.data.entities.Asset;
 import com.nashtech.assignment.data.entities.AssignAsset;
@@ -8,11 +14,6 @@ import com.nashtech.assignment.dto.request.asset.CreateNewAssetRequest;
 import com.nashtech.assignment.dto.response.asset.AssetAndHistoriesResponse;
 import com.nashtech.assignment.dto.response.asset.AssetHistory;
 import com.nashtech.assignment.dto.response.asset.AssetResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.nashtech.assignment.data.repositories.CategoryRepository;
 import com.nashtech.assignment.dto.response.category.CategoryResponse;
@@ -20,10 +21,9 @@ import com.nashtech.assignment.dto.response.category.CategoryResponse;
 @Component
 public class AssetMapper {
     @Autowired
-    private CategoryMapper categoryMapper;
-
-    @Autowired 
     private CategoryRepository categoryRepository;
+    @Autowired
+    private CategoryMapper categoryMapper;
 
     public AssetResponse toAssetResponse(Asset asset) {
         return AssetResponse.builder()

@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Table, Pagination, Modal, Row, Col } from 'antd';
-import { CaretDownOutlined, CloseSquareOutlined } from '@ant-design/icons';
+import { Table } from 'antd';
+import { CaretDownOutlined } from '@ant-design/icons';
 
 import './TableAsset.scss';
 
+import Pagination from '../Pagination/Pagination';
+import ModalAssetDetail from './ModalAssetDetail';
 import { DeleteIcon, EditIcon } from '../../assets/CustomIcon';
 import { getAssetDetailAndItsHistories } from '../../services/getApiService';
 import { Link } from 'react-router-dom';
@@ -53,7 +55,6 @@ const TableAsset = ({
           </div>
         );
       },
-      defaultSortOrder: 'ascend',
       sorter: (a, b) => a.assetName.localeCompare(b.assetName),
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
@@ -122,33 +123,6 @@ const TableAsset = ({
     },
   ];
 
-  const TableHistoryColumns = [
-    {
-      title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
-      ellipsis: true,
-    },
-    {
-      title: 'Assigned to',
-      dataIndex: 'assignedTo',
-      key: 'assignedTo',
-      ellipsis: true,
-    },
-    {
-      title: 'Assigned by',
-      dataIndex: 'assignedBy',
-      key: 'assignedBy',
-      ellipsis: true,
-    },
-    {
-      title: 'Returned Date',
-      dataIndex: 'returnedDate',
-      key: 'returnedDate',
-      ellipsis: true,
-    },
-  ];
-
   const [isShowModalAssetDetail, setIsShowModalAssetDetail] = useState(false);
   const [modalData, setModalData] = useState({});
   const [listHistory, setListHistory] = useState([]);
@@ -183,8 +157,6 @@ const TableAsset = ({
     handleChangeSizePage(current, pageSize);
   };
 
-  const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
-
   const convertStrDate = (dateStr) => {
     const date = new Date(dateStr);
     return (
@@ -207,122 +179,24 @@ const TableAsset = ({
         pagination={false}
       />
       <Pagination
-        className="table-asset-pagination"
-        showSizeChanger
         onShowSizeChange={handleChangePageSize}
         onChange={handleChangePage}
         current={currentPage}
         defaultPageSize={pageSize}
         total={totalRow}
-        itemRender={itemRender}
       />
-      <Modal
-        className="modal-asset-detail"
-        title="Detail Asset Information"
-        centered
+      <ModalAssetDetail
         open={isShowModalAssetDetail}
         onCancel={() => {
           setIsShowModalAssetDetail(false);
           setModalData({});
           setListHistory([]);
         }}
-        closeIcon={<CloseSquareOutlined />}
-        footer={null}
-        width="700px"
-      >
-        <Row>
-          <Col span={8} sm={5} md={4}>
-            <div className="title">Asset Code</div>
-          </Col>
-          <Col span={16} sm={19} md={20}>
-            <div className="content">{modalData.assetCode ?? 'Loading...'}</div>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={8} sm={5} md={4}>
-            <div className="title">Asset Name</div>
-          </Col>
-          <Col span={16} sm={19} md={20}>
-            <div className="content">{modalData.assetName ?? 'Loading...'}</div>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={8} sm={5} md={4}>
-            <div className="title">Category</div>
-          </Col>
-          <Col span={16} sm={19} md={20}>
-            <div className="content">{modalData?.category?.name ?? 'Loading...'}</div>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={8} sm={5} md={4}>
-            <div className="title">Installed Date</div>
-          </Col>
-          <Col span={16} sm={19} md={20}>
-            <div className="content">
-              {modalData.installedDate ? convertStrDate(modalData.installedDate) : 'Loading...'}
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={8} sm={5} md={4}>
-            <div className="title">State</div>
-          </Col>
-          <Col span={16} sm={19} md={20}>
-            <div className="content">
-              {modalData.status
-                ? capitalizeFirstLetter(modalData.status.toLowerCase().replaceAll('_', ' '))
-                : 'Loading...'}
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={8} sm={5} md={4}>
-            <div className="title">Location</div>
-          </Col>
-          <Col span={16} sm={19} md={20}>
-            <div className="content">{modalData.location ?? 'Loading...'}</div>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={8} sm={5} md={4}>
-            <div className="title">Specification</div>
-          </Col>
-          <Col span={16} sm={19} md={20}>
-            <div className="content">{modalData.specification ?? 'Loading...'}</div>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={8} sm={5} md={4}>
-            <div className="title">History</div>
-          </Col>
-          <Col span={16} sm={19} md={20}>
-            <div className="table-history-wrapper">
-              <Table
-                className="table-history-assign"
-                showSorterTooltip={false}
-                rowSelection={false}
-                columns={TableHistoryColumns}
-                dataSource={listHistory}
-                pagination={false}
-                size={'small'}
-              />
-            </div>
-          </Col>
-        </Row>
-      </Modal>
+        data={modalData}
+        listHistories={listHistory}
+      />
     </>
   );
-};
-
-const itemRender = (_, type, originalElement) => {
-  if (type === 'prev') {
-    return <a>Previous</a>;
-  }
-  if (type === 'next') {
-    return <a>Next</a>;
-  }
-  return originalElement;
 };
 
 export default TableAsset;

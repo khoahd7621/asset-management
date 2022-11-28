@@ -4,6 +4,7 @@ export const adminRoute = {
   createUser: 'create-user',
   editUser: 'edit-user',
   manageAsset: 'manage-asset',
+  createAsset: 'create-asset',
   editAsset: 'edit-asset',
   manageAssignment: 'manage-assignment',
   requestForReturning: 'request-for-returning',
