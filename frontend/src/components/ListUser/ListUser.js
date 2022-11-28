@@ -57,13 +57,13 @@ const ListUser = () => {
 
   const onChange = async (list) => {
     let url = `/api/find/filter/0?location=${user.location}`;
-    setType(list);
+    setType(list.map(toUpper));
     setIsFilter(true);
-    setIsSearch(false);
-    setSearchValue('');
     setCurrent(1);
     if (list.map(toUpper).some((data) => data === 'STAFF' || data === 'ADMIN') && list.length < 2) {
-      url = `/api/find/filter/0?type=${list.map(toUpper)}&location=${user.location}`;
+      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&type=${list.map(toUpper)}&location=${
+        user.location
+      }&page=${current - 1}`;
     }
     const response = await getItems(url);
     if (response.status === 200) {
@@ -76,7 +76,9 @@ const ListUser = () => {
 
       setCheckAll(true);
       setCheckedList(defaultCheckedList);
-      const response = await getItems(`/api/find/filter/0?location=${user.location}`);
+      const response = await getItems(
+        `/api/find/search?name=${searchValue}&staffCode=${searchValue}&location=${user.location}&page=${current - 1}`,
+      );
       if (response.status === 200) {
         setUserList(response.data);
       }
@@ -87,10 +89,14 @@ const ListUser = () => {
     setCurrent(1);
     setCheckedList([]);
     setIsFilter(false);
-
     setType(['ADMIN', 'STAFF']);
-
-    const response = await getItems(`/api/find/filter/0?location=${user.location}`);
+    let url = `/api/find/filter/0?location=${user.location}`;
+    if (isSearch === true) {
+      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&location=${user.location}&page=${
+        current - 1
+      }`;
+    }
+    const response = await getItems(url);
     if (response.status === 200) {
       setUserList(response.data);
     }
