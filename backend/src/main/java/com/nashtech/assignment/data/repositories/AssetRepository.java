@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,7 +22,11 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
             "AND (coalesce(:categoryIds, NULL) IS NULL OR a.category.id IN :categoryIds) " +
             "AND a.location = :location AND a.isDeleted = FALSE")
     Page<Asset> findAllAssetsByQueryAndStatusesAndCategoryIds(
-            String query, List<EAssetStatus> statuses, List<Integer> categoryIds, String location, Pageable pageable);
+                @Param("query") String query,
+                @Param("statuses") List<EAssetStatus> statuses,
+                @Param("categoryIds") List<Integer> categoryIds,
+                @Param("location") String location,
+                Pageable pageable);
 
     Optional<Asset> findByIdAndIsDeletedFalse(long id);
 }

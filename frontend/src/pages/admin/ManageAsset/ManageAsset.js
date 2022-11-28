@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Input } from 'antd';
 
 import './ManageAsset.scss';
@@ -10,6 +10,7 @@ import { filterAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination } from '
 import { getAllCategories } from '../../../services/getApiService';
 
 const ManageAsset = () => {
+  const location = useLocation();
   const { Search } = Input;
   const LIST_STATUS = ['All', 'Assigned', 'Available', 'Not available', 'Waiting for recycling', 'Recycled'];
 
@@ -47,21 +48,42 @@ const ManageAsset = () => {
       sortType,
     });
     if (response && response.status === 200) {
+      const newAssetCreate = location.state?.assetResponse;
       setTotalRow(response?.data.totalRow);
-      setListAssets(
-        response?.data?.data.length === 0
-          ? []
-          : response?.data?.data.map((item) => {
-              return {
-                key: item.assetCode,
-                assetId: item.id,
-                assetCode: item.assetCode,
-                assetName: item.assetName,
-                category: item.category.name,
-                state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
-              };
-            }),
-      );
+
+      if (newAssetCreate) {
+        const listDatas = response?.data?.data.filter((item) => item.assetCode !== newAssetCreate.assetCode);
+        const listDataNew = [newAssetCreate, ...listDatas];
+        setListAssets(
+          listDataNew.map((item) => {
+            return {
+              key: item.assetCode,
+              assetId: item.id,
+              assetCode: item.assetCode,
+              assetName: item.assetName,
+              category: item.category.name,
+              state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
+            };
+          }),
+        );
+      } else {
+        setListAssets(
+          response?.data?.data.length === 0
+            ? []
+            : response?.data?.data.map((item) => {
+                return {
+                  key: item.assetCode,
+                  assetId: item.id,
+                  assetCode: item.assetCode,
+                  assetName: item.assetName,
+                  category: item.category.name,
+                  state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
+                };
+              }),
+        );
+      }
+
+      window.history.replaceState({}, document.title);
     }
   };
 

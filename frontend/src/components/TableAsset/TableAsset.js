@@ -6,6 +6,8 @@ import './TableAsset.scss';
 
 import { DeleteIcon, EditIcon } from '../../assets/CustomIcon';
 import { getAssetDetailAndItsHistories } from '../../services/getApiService';
+import { Link } from 'react-router-dom';
+import { adminRoute } from '../../routes/routes';
 
 const TableAsset = ({
   listAssets = [],
@@ -99,9 +101,18 @@ const TableAsset = ({
       render: (text, record) => {
         return (
           <div className="col-action in-active">
-            <button className="edit-btn" disabled={record.state === 'Assigned'}>
-              <EditIcon />
-            </button>
+            <Link
+              to={
+                record.state === 'Assigned'
+                  ? '#'
+                  : `/${adminRoute.home}/${adminRoute.manageAsset}/${adminRoute.editAsset}/${record.assetId}`
+              }
+            >
+              <button className="edit-btn" disabled={record.state === 'Assigned'}>
+                <EditIcon />
+              </button>
+            </Link>
+
             <button className="delete-btn" disabled={record.state === 'Assigned'}>
               <DeleteIcon />
             </button>

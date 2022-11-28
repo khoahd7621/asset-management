@@ -1,11 +1,12 @@
 package com.nashtech.assignment.mappers;
 
-import com.nashtech.assignment.data.entities.Category;
-import com.nashtech.assignment.dto.response.category.CategoryResponse;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
+import com.nashtech.assignment.data.entities.Category;
+import com.nashtech.assignment.dto.response.category.CategoryResponse;
 
 @Component
 public class CategoryMapper {
