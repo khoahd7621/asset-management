@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Table, Row, Col, Modal, Input, Button, Checkbox, Popover } from 'antd';
+import { Table, Row, Col, Modal, Input, Button, Checkbox, Popover, Space, Spin } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
 import { getItems } from '../../services/findApiService';
@@ -23,6 +23,7 @@ const ListUser = () => {
   const [type, setType] = useState(['ALL']);
   const [userDetail, setUserDetail] = useState({});
   const [disabled, setDisable] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Handle Filter
   const CheckboxGroup = Checkbox.Group;
@@ -118,6 +119,7 @@ const ListUser = () => {
   );
 
   useEffect(() => {
+    setIsLoading(true);
     getData();
   }, [current, isDisabled]);
 
@@ -153,6 +155,7 @@ const ListUser = () => {
       } else {
         setUserList(response.data);
       }
+      setIsLoading(false);
       window.history.replaceState({}, document.title);
     }
   };
@@ -389,20 +392,27 @@ const ListUser = () => {
         </Row>
       </div>
       <br></br>
-      <Table
-        showSorterTooltip={false}
-        size="small"
-        sortDirections={'ascend'}
-        pagination={false}
-        className="user-list"
-        dataSource={userList.data}
-        columns={columns}
-      />
-      <br></br>
-      <div className="user-list">
-        <Paging total={userList['totalRow']} current={current} onChange={setCurrent} />
-      </div>
-
+      {isLoading ? (
+        <Space size="middle">
+          <Spin size="large" style={{ paddingLeft: '30rem', paddingTop: '10rem' }} />
+        </Space>
+      ) : (
+        <>
+          <Table
+            showSorterTooltip={false}
+            size="small"
+            sortDirections={'ascend'}
+            pagination={false}
+            className="user-list"
+            dataSource={userList.data}
+            columns={columns}
+          />
+          <br></br>
+          <div className="user-list">
+            <Paging total={userList['totalRow']} current={current} onChange={setCurrent} />
+          </div>
+        </>
+      )}
       <Modal
         centered
         className="user-list"

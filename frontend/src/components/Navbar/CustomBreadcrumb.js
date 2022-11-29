@@ -1,11 +1,15 @@
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { RightOutlined } from '@ant-design/icons';
+import React from 'react';
 
-const CustomBreadcrumb = ({ title }) => {
+const CustomBreadcrumb = ({ title, link }) => {
   return (
     <>
       <RightOutlined />
-      <h3>{title}</h3>
+      <Link to={link}>
+        <h3>{title}</h3>
+      </Link>
     </>
   );
 };

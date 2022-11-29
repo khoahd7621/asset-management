@@ -8,13 +8,17 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nashtech.assignment.data.constants.EAssetStatus;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CreateNewAssetRequest {
     @NotBlank(message = "Asset name is required")
     @Pattern(regexp = "^[a-zA-Z0-9 ]*$", message = "Invalid asset name")
@@ -25,7 +29,6 @@ public class CreateNewAssetRequest {
     @Size(max = 100, message = "Category name maximum 100 characters")
     private String categoryName;
 
-    @Pattern(regexp = "^.[a-zA-Z0-9 ].*[\\s]?+.*$", message = "Invalid specification")
     @Size(max = 500, message = "Specification maximum 500 characters")
     private String specification;
 

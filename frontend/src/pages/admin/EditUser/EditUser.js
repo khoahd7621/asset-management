@@ -28,6 +28,7 @@ const EditUser = () => {
   const [isDisabled, setIsDisabled] = useState(true);
 
   useEffect(() => {
+    document.title = 'Manage User - Edit User';
     window.history.replaceState({}, document.title);
   }, []);
 
@@ -201,7 +202,7 @@ const EditUser = () => {
           {({ getFieldValue }) =>
             getFieldValue('type') === 'ADMIN' ? (
               <Form.Item name="location" label="Location">
-                <Input id="create-user-input__location" disabled/>
+                <Input id="create-user-input__location" disabled />
               </Form.Item>
             ) : null
           }
