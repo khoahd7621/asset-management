@@ -460,7 +460,7 @@ const ListUser = () => {
         closeIcon={<CloseIcon />}
         mask={null}
       >
-        <p>There are valid assignment belonging to this user.</p>
+        <p>There are valid assignments belonging to this user.</p>
         <p>Please close all assignments before disabling user.</p>
       </Modal>
 

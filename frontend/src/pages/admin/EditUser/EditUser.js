@@ -153,6 +153,7 @@ const EditUser = () => {
         layout="horizontal"
         className="edit-user__form"
         onFinish={handleSubmitEditUser}
+        colon={false}
       >
         <Form.Item name="firstname" label="First Name" disable>
           <Input disabled />
