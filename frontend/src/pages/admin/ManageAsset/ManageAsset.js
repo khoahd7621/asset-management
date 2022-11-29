@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Input } from 'antd';
+import { Input, Space, Spin } from 'antd';
 
 import './ManageAsset.scss';
 
@@ -23,8 +23,14 @@ const ManageAsset = () => {
   const [listCategoriesOption, setListCategoriesOption] = useState(['All']);
   const [currentChoosedCategories, setCurrentChoosedCategories] = useState(['All']);
   const [searchKeywords, setSearchKeywords] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    document.title = 'Manage Asset - Asset List';
+  }, []);
+
+  useEffect(() => {
+    setIsLoading(true);
     fetchListCategories();
     fetchAssets(
       searchKeywords,
@@ -50,7 +56,7 @@ const ManageAsset = () => {
     if (response && response.status === 200) {
       const newAssetCreate = location.state?.assetResponse;
       setTotalRow(response?.data.totalRow);
-
+      setIsLoading(false);
       if (newAssetCreate) {
         const listDatas = response?.data?.data.filter((item) => item.assetCode !== newAssetCreate.assetCode);
         const listDataNew = [newAssetCreate, ...listDatas];
@@ -60,7 +66,7 @@ const ManageAsset = () => {
               key: item.assetCode,
               assetId: item.id,
               assetCode: item.assetCode,
-              assetName: item.assetName,
+              assetName: item.assetName.replaceAll(' ', '\u00a0'),
               category: item.category.name,
               state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
             };
@@ -75,7 +81,7 @@ const ManageAsset = () => {
                   key: item.assetCode,
                   assetId: item.id,
                   assetCode: item.assetCode,
-                  assetName: item.assetName,
+                  assetName: item.assetName.replaceAll(' ', '\u00a0'),
                   category: item.category.name,
                   state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
                 };
@@ -107,7 +113,7 @@ const ManageAsset = () => {
                 key: item.assetCode,
                 assetId: item.id,
                 assetCode: item.assetCode,
-                assetName: item.assetName,
+                assetName: item.assetName.replaceAll(' ', '\u00a0'),
                 category: item.category.name,
                 state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
               };
@@ -237,14 +243,20 @@ const ManageAsset = () => {
         </Link>
       </div>
       <div className="manage-asset-block__table">
-        <TableAsset
-          currentPage={currentPage}
-          listAssets={listAssets}
-          totalRow={totalRow}
-          pageSize={pageSize}
-          handleChangeCurrentPage={handleChangeCurrentPage}
-          handleChangeSizePage={handleChangePageSize}
-        />
+        {isLoading ? (
+          <Space size="middle">
+            <Spin size="large" style={{ paddingLeft: '30rem', paddingTop: '10rem' }} />
+          </Space>
+        ) : (
+          <TableAsset
+            currentPage={currentPage}
+            listAssets={listAssets}
+            totalRow={totalRow}
+            pageSize={pageSize}
+            handleChangeCurrentPage={handleChangeCurrentPage}
+            handleChangeSizePage={handleChangePageSize}
+          />
+        )}
       </div>
     </div>
   );

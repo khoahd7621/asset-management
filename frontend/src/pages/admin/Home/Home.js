@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Table } from 'antd';
 import { CaretDownOutlined, CheckOutlined, UndoOutlined, CloseOutlined } from '@ant-design/icons';
 
@@ -129,6 +130,10 @@ const Home = () => {
       state: 'Waiting for acceptance',
     },
   ];
+
+  useEffect(() => {
+    document.title = 'Home';
+  }, []);
 
   return (
     <div className="admin-home-block">

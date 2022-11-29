@@ -11,6 +11,7 @@ import EditUser from './pages/admin/EditUser/EditUser';
 import AdminPrivateRoute from './routes/AdminPrivateRoute';
 import { adminRoute, userRoute } from './routes/routes';
 import StaffPrivateRoute from './routes/StaffPrivateRoute';
+import CheckFirstLoginRoute from './routes/CheckFirstLoginRoute';
 
 const App = () => {
   return (
@@ -28,12 +29,54 @@ const App = () => {
           <Route index element={<AdminHome />} />
           {/* Add more route here - like format below ... */}
           {/* <Route path={adminRoute.[your-path]} element={[your-component]} /> */}
-          <Route path={adminRoute.manageUser} element={<ManageUser />} />
-          <Route path={`${adminRoute.manageUser}/${adminRoute.createUser}`} element={<CreateUser />} />
-          <Route path={adminRoute.manageAsset} element={<ManageAsset />} />
-          <Route path={`${adminRoute.manageAsset}/${adminRoute.createAsset}`} element={<CreateAsset />} />
-          <Route path={`${adminRoute.manageUser}/${adminRoute.editUser}`} element={<EditUser />} />
-          <Route path={`${adminRoute.manageAsset}/${adminRoute.editAsset}/:id`} element={<EditAsset />} />
+          <Route
+            path={adminRoute.manageUser}
+            element={
+              <CheckFirstLoginRoute>
+                <ManageUser />
+              </CheckFirstLoginRoute>
+            }
+          />
+          <Route
+            path={`${adminRoute.manageUser}/${adminRoute.createUser}`}
+            element={
+              <CheckFirstLoginRoute>
+                <CreateUser />
+              </CheckFirstLoginRoute>
+            }
+          />
+          <Route
+            path={adminRoute.manageAsset}
+            element={
+              <CheckFirstLoginRoute>
+                <ManageAsset />
+              </CheckFirstLoginRoute>
+            }
+          />
+          <Route
+            path={`${adminRoute.manageAsset}/${adminRoute.createAsset}`}
+            element={
+              <CheckFirstLoginRoute>
+                <CreateAsset />
+              </CheckFirstLoginRoute>
+            }
+          />
+          <Route
+            path={`${adminRoute.manageUser}/${adminRoute.editUser}`}
+            element={
+              <CheckFirstLoginRoute>
+                <EditUser />
+              </CheckFirstLoginRoute>
+            }
+          />
+          <Route
+            path={`${adminRoute.manageAsset}/${adminRoute.editAsset}/:id`}
+            element={
+              <CheckFirstLoginRoute>
+                <EditAsset />
+              </CheckFirstLoginRoute>
+            }
+          />
         </Route>
         <Route
           path={userRoute.home}

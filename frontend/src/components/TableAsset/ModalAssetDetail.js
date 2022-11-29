@@ -64,7 +64,7 @@ const ModalAssetDetail = ({ open, onCancel, data, listHistories }) => {
           <div className="title">Asset Name</div>
         </Col>
         <Col span={16} sm={19} md={20}>
-          <div className="content">{data.assetName ?? 'Loading...'}</div>
+          <div className="content">{data?.assetName?.replaceAll(' ', '\u00a0') ?? 'Loading...'}</div>
         </Col>
       </Row>
       <Row>

@@ -36,6 +36,10 @@ const CreateUser = () => {
   const [locationValidate, setLocationValidate] = useState({ ...initialError });
 
   useEffect(() => {
+    document.title = 'Manage User - Create New User';
+  }, []);
+
+  useEffect(() => {
     if (
       firstNameValidate.help ||
       lastNameValidate.help ||

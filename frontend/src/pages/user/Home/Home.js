@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Table } from 'antd';
 import { CaretDownOutlined, CheckOutlined, UndoOutlined, CloseOutlined } from '@ant-design/icons';
 
@@ -113,6 +114,10 @@ const Home = () => {
       state: 'Accepted',
     },
   ];
+
+  useEffect(() => {
+    document.title = 'Home';
+  }, []);
 
   return (
     <div className="staff-home-block">

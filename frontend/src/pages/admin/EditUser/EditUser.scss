@@ -2,12 +2,16 @@
   flex: 1;
   padding: 80px 160px 0;
   
-
+ 
   &__title {
     font-size: 20px;
     color: #cf2338;
     font-weight: bold;
     margin: 4px 0 24px;
+  }
+
+  .ant-form-horizontal .ant-form-item-label {
+    text-align: left;
   }
 
   &__form {
