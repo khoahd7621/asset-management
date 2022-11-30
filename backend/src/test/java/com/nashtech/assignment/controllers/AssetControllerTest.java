@@ -2,7 +2,8 @@ package com.nashtech.assignment.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nashtech.assignment.AssignmentApplication;
@@ -19,11 +20,7 @@ import com.nashtech.assignment.dto.response.asset.AssetResponse;
 import com.nashtech.assignment.dto.response.category.CategoryResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
-import com.nashtech.assignment.services.CreateService;
-import com.nashtech.assignment.services.EditService;
-import com.nashtech.assignment.services.FilterService;
-import com.nashtech.assignment.services.GetService;
-import com.nashtech.assignment.services.SecurityContextService;
+import com.nashtech.assignment.services.*;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,6 +62,8 @@ class AssetControllerTest {
     private EditService editService;
     @MockBean
     private CreateService createService;
+    @MockBean
+    private DeleteService deleteService;
 
     private Date date;
     private AssetResponse assetResponse;
@@ -301,5 +300,81 @@ class AssetControllerTest {
     assertThat(actual.getContentAsString(),
         is("{\"id\":0,\"assetName\":\"assetName\",\"assetCode\":null,\"installedDate\":\"2001-01-01T00:00:00.000+00:00\",\"specification\":\"specification\",\"status\":\"AVAILABLE\",\"location\":\"location\",\"category\":null,\"deleted\":false}"));
   }
+
+    @Test
+    void testCheckAssetIsValidForDeleteOrNot_WhenAssetIdExistAndValidForDelete_ShouldReturnNoContent() throws Exception {
+        long assetId = 1L;
+
+        doNothing().when(getService).checkAssetIsValidForDeleteOrNot(assetId);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset/check-asset/{assetId}", assetId);
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.NO_CONTENT.value()));
+    }
+
+    @Test
+    void testCheckAssetIsValidForDeleteOrNot_WhenAssetIdNotExist_ShouldThrowNotFoundException() throws Exception {
+        long assetId = 1L;
+
+        doThrow(notFoundException).when(getService).checkAssetIsValidForDeleteOrNot(assetId);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset/check-asset/{assetId}", assetId);
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.NOT_FOUND.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"error message\"}"));
+    }
+
+    @Test
+    void testCheckAssetIsValidForDeleteOrNot_WhenAssetIdExistButNotValidForDelete_ShouldThrowBadRequestException() throws Exception {
+        long assetId = 1L;
+
+        doThrow(badRequestException).when(getService).checkAssetIsValidForDeleteOrNot(assetId);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset/check-asset/{assetId}", assetId);
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"error message\"}"));
+    }
+
+    @Test
+    void deleteAssetByAssetId_WhenAssetIdExistAndValidForDelete_ShouldReturnNoContent() throws Exception {
+        long assetId = 1L;
+
+        doNothing().when(deleteService).deleteAssetByAssetId(assetId);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/asset/{assetId}", assetId);
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.NO_CONTENT.value()));
+    }
+
+    @Test
+    void deleteAssetByAssetId_WhenAssetIdNotExist_ShouldThrowNotFoundException() throws Exception {
+        long assetId = 1L;
+
+        doThrow(notFoundException).when(deleteService).deleteAssetByAssetId(assetId);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/asset/{assetId}", assetId);
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.NOT_FOUND.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"error message\"}"));
+    }
+
+    @Test
+    void deleteAssetByAssetId_WhenAssetIdExistButNotValidForDelete_ShouldThrowBadRequestException() throws Exception {
+        long assetId = 1L;
+
+        doThrow(badRequestException).when(deleteService).deleteAssetByAssetId(assetId);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/asset/{assetId}", assetId);
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"error message\"}"));
+    }
 
 }

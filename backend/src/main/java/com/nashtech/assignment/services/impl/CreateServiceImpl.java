@@ -136,7 +136,7 @@ public class CreateServiceImpl implements CreateService {
     String prefixAssetCode = categoryOpt.get().getPrefixAssetCode();
 
     SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
-    NumberFormat formatter = new DecimalFormat("100000");
+    NumberFormat formatter = new DecimalFormat("000000");
     String assetId = formatter.format(asset.getId());
     StringBuilder assetCode = new StringBuilder(prefixAssetCode);
 

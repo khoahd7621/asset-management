@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.nio.charset.StandardCharsets;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -28,6 +30,8 @@ import com.nashtech.assignment.config.CORSConfig;
 import com.nashtech.assignment.config.SecurityConfig;
 import com.nashtech.assignment.data.constants.EGender;
 import com.nashtech.assignment.data.constants.EUserType;
+import com.nashtech.assignment.dto.request.user.ChangePasswordFirstRequest;
+import com.nashtech.assignment.dto.request.user.ChangePasswordRequest;
 import com.nashtech.assignment.dto.request.user.CreateNewUserRequest;
 import com.nashtech.assignment.dto.request.user.EditUserRequest;
 import com.nashtech.assignment.dto.response.user.UserResponse;
@@ -51,12 +55,19 @@ public class UserControllerTest {
     private CreateService createService;
     @MockBean
     private EditService editService;
-    @MockBean 
+    @MockBean
     private DeleteService deleteService;
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @MockBean
     private SecurityContextService securityContextService;
+
+    private BadRequestException badRequestException;
+
+    @BeforeEach
+    void setup() throws Exception {
+        badRequestException = new BadRequestException("error message");
+    }
 
     @Test
     void createNewUser_ShouldReturnResponseEntity_WhenDataValidRequest() throws Exception {
@@ -71,25 +82,25 @@ public class UserControllerTest {
         ArgumentCaptor<CreateNewUserRequest> createNewUserRequestCaptor = ArgumentCaptor
                 .forClass(CreateNewUserRequest.class);
 
-    UserResponse response = UserResponse.builder()
-        .firstName("hau")
-        .lastName("doan")
-        .dateOfBirth("21/12/2001")
-        .joinedDate("17/11/2022")
-        .gender(EGender.MALE)
-        .type(EUserType.ADMIN)
-        .location("hehe")
-        .build();
+        UserResponse response = UserResponse.builder()
+                .firstName("hau")
+                .lastName("doan")
+                .dateOfBirth("21/12/2001")
+                .joinedDate("17/11/2022")
+                .gender(EGender.MALE)
+                .type(EUserType.ADMIN)
+                .location("hehe")
+                .build();
 
-    when(createService.createNewUser(createNewUserRequestCaptor.capture())).thenReturn(response);
+        when(createService.createNewUser(createNewUserRequestCaptor.capture())).thenReturn(response);
 
-    RequestBuilder request = MockMvcRequestBuilders
-        .post("/api/user")
-        .content(objectMapper.writeValueAsString(createNewUserRequest))
-        .characterEncoding(StandardCharsets.UTF_8)
-        .contentType(MediaType.APPLICATION_JSON);
+        RequestBuilder request = MockMvcRequestBuilders
+                .post("/api/user")
+                .content(objectMapper.writeValueAsString(createNewUserRequest))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON);
 
-    MvcResult result = mockMvc.perform(request).andReturn();
+        MvcResult result = mockMvc.perform(request).andReturn();
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
         assertThat(result.getResponse().getContentAsString(),
@@ -206,6 +217,7 @@ public class UserControllerTest {
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.NO_CONTENT.value()));
     }
+
     @Test
     void deleteUser_WhenUserNotFound_ShouldThrowNotFoundException() throws Exception {
 
@@ -218,6 +230,7 @@ public class UserControllerTest {
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.NOT_FOUND.value()));
     }
+
     @Test
     void deleteUser_WhenUserHaveValidAssign_ShouldThrowBadRequestException() throws Exception {
 
@@ -268,5 +281,92 @@ public class UserControllerTest {
         MvcResult result = mockMvc.perform(request).andReturn();
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
+    void testChangePassword_WhenPasswordNoChangeOrIncorrect_ShouldReturnException() throws Exception {
+        ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder()
+                .oldPassword("123456")
+                .newPassword("123456").build();
+
+        ArgumentCaptor<ChangePasswordRequest> changePasswordRequestCaptor = ArgumentCaptor
+                .forClass(ChangePasswordRequest.class);
+
+        when(editService.changePassword(changePasswordRequestCaptor.capture())).thenThrow(badRequestException);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password")
+                .content(objectMapper.writeValueAsString(changePasswordRequest))
+                .contentType(MediaType.APPLICATION_JSON);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"error message\"}"));
+    }
+
+    @Test
+    void testChangePassword_WhenDataValid_ShouldReturnData() throws Exception {
+        ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder()
+                .oldPassword("123456")
+                .newPassword("654321").build();
+
+        ArgumentCaptor<ChangePasswordRequest> changePasswordRequestCaptor = ArgumentCaptor
+                .forClass(ChangePasswordRequest.class);
+
+        UserResponse userResponse = UserResponse.builder().fullName("Test").build();
+
+        when(editService.changePassword(changePasswordRequestCaptor.capture()))
+                .thenReturn(userResponse);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password")
+                .content(objectMapper.writeValueAsString(changePasswordRequest))
+                .contentType(MediaType.APPLICATION_JSON);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getContentAsString(), is(
+                "{\"username\":null,\"staffCode\":null,\"firstName\":null,\"lastName\":null,\"gender\":null,\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":null,\"fullName\":\"Test\"}"));
+    }
+
+    @Test
+    void testChangePasswordFirst_WhenPasswordNoChange_ShouldReturnException() throws Exception {
+        ChangePasswordFirstRequest changeFirstRequest = ChangePasswordFirstRequest.builder().newPassword("123456")
+                .build();
+
+        ArgumentCaptor<ChangePasswordFirstRequest> changeFirstCaptor = ArgumentCaptor
+                .forClass(ChangePasswordFirstRequest.class);
+
+        when(editService.changePasswordFirst(changeFirstCaptor.capture())).thenThrow(badRequestException);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password/first")
+                .content(objectMapper.writeValueAsString(changeFirstRequest))
+                .contentType(MediaType.APPLICATION_JSON);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"error message\"}"));
+    }
+
+    @Test
+    void testChangePasswordFirst_WhenDataValid_ShouldReturnData() throws Exception {
+        ChangePasswordFirstRequest changeFirstRequest = ChangePasswordFirstRequest.builder()
+                .newPassword("654f321").build();
+
+        ArgumentCaptor<ChangePasswordFirstRequest> changeFirstCaptor = ArgumentCaptor
+                .forClass(ChangePasswordFirstRequest.class);
+
+        UserResponse userResponse = UserResponse.builder().fullName("Test").build();
+
+        when(editService.changePasswordFirst(changeFirstCaptor.capture())).thenReturn(userResponse);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password/first")
+                .content(objectMapper.writeValueAsString(changeFirstRequest))
+                .contentType(MediaType.APPLICATION_JSON);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getContentAsString(), is(
+                "{\"username\":null,\"staffCode\":null,\"firstName\":null,\"lastName\":null,\"gender\":null,\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":null,\"fullName\":\"Test\"}"));
     }
 }

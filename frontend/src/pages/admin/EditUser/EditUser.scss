@@ -1,8 +1,7 @@
 .edit-user {
   flex: 1;
   padding: 80px 160px 0;
-  
- 
+
   &__title {
     font-size: 20px;
     color: #cf2338;
@@ -23,7 +22,6 @@
     }
 
     Input {
-      
       border-radius: 6px;
 
       &:disabled {
@@ -84,8 +82,18 @@
         margin-left: 15rem;
 
         & + button {
+          background-color: white;
+          border: 1px solid rgb(183, 183, 183);
+          color: rgb(157, 157, 157);
           margin-left: 1.6rem;
-          border: 0.1rem solid rgb(168, 163, 163);
+        }
+        background-color: #cf2338;
+        color: white;
+        border-color: #cf2338;
+        &[disabled] {
+          background-color: rgb(199, 199, 199);
+          color: rgb(81, 81, 81);
+          border-color: rgb(199, 199, 199);
         }
       }
       .ant-form-item-row {

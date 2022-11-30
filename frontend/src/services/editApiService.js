@@ -19,4 +19,17 @@ const putEditAsset = ({ id, assetName, specification, installedDate, assetStatus
   });
 };
 
-export { postEditUser, putEditAsset };
+const putChangePassword = ({ oldPassword, newPassword }) => {
+  return axios.put('api/user/change-password', {
+    oldPassword,
+    newPassword,
+  });
+};
+
+const putChangePasswordFirst = ({ newPassword }) => {
+  return axios.put('api/user/change-password/first', {
+    newPassword,
+  });
+};
+
+export { postEditUser, putEditAsset, putChangePassword, putChangePasswordFirst };

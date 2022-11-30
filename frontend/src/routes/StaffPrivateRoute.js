@@ -1,6 +1,5 @@
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 const StaffPrivateRoute = ({ children }) => {
   const user = useSelector((state) => state.user.user);
@@ -8,7 +7,6 @@ const StaffPrivateRoute = ({ children }) => {
   if (user.role.toLocaleLowerCase() === 'staff') {
     return <>{children}</>;
   } else {
-    toast.error("You don't have permission to access this tab");
     return <Navigate to={'/'} />;
   }
 };

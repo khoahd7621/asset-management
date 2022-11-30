@@ -12,9 +12,9 @@ import { getAllCategories } from '../../../services/getApiService';
 const ManageAsset = () => {
   const location = useLocation();
   const { Search } = Input;
+  const PAGE_SIZE = 20;
   const LIST_STATUS = ['All', 'Assigned', 'Available', 'Not available', 'Waiting for recycling', 'Recycled'];
 
-  const [pageSize, setPageSize] = useState(20);
   const [totalRow, setTotalRow] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [listAssets, setListAssets] = useState([]);
@@ -36,7 +36,7 @@ const ManageAsset = () => {
       searchKeywords,
       convertListStatus(currentChoosedStatus),
       mapListCategoriesNameToListCategoriesId(currentChoosedCategories),
-      pageSize,
+      PAGE_SIZE,
       currentPage - 1,
       '',
       '',
@@ -154,7 +154,7 @@ const ManageAsset = () => {
         searchKeywords,
         convertListStatus(selection),
         mapListCategoriesNameToListCategoriesId(currentChoosedCategories),
-        pageSize,
+        PAGE_SIZE,
         0,
         '',
         '',
@@ -167,7 +167,7 @@ const ManageAsset = () => {
         searchKeywords,
         convertListStatus(currentChoosedStatus),
         mapListCategoriesNameToListCategoriesId(selection),
-        pageSize,
+        PAGE_SIZE,
         0,
         '',
         '',
@@ -182,7 +182,7 @@ const ManageAsset = () => {
       value,
       convertListStatus(currentChoosedStatus),
       mapListCategoriesNameToListCategoriesId(currentChoosedCategories),
-      pageSize,
+      PAGE_SIZE,
       0,
       '',
       '',
@@ -195,21 +195,7 @@ const ManageAsset = () => {
       searchKeywords,
       convertListStatus(currentChoosedStatus),
       mapListCategoriesNameToListCategoriesId(currentChoosedCategories),
-      pageSize,
-      current - 1,
-      '',
-      '',
-    );
-  };
-
-  const handleChangePageSize = (current, size) => {
-    setCurrentPage(current);
-    setPageSize(size);
-    fetchListAssets(
-      searchKeywords,
-      convertListStatus(currentChoosedStatus),
-      mapListCategoriesNameToListCategoriesId(currentChoosedCategories),
-      size,
+      PAGE_SIZE,
       current - 1,
       '',
       '',
@@ -234,7 +220,13 @@ const ManageAsset = () => {
           onChange={handleChangeFilterMenu}
           checkboxType="ASSET_CATEGORY"
         />
-        <Search allowClear className="search-input" onSearch={handleSubmitSearch} enterButton />
+        <Search
+          allowClear
+          className="search-input"
+          onSearch={handleSubmitSearch}
+          enterButton
+          id="manager-asset__search-asset"
+        />
         <Link
           to={`/${adminRoute.home}/${adminRoute.manageAsset}/${adminRoute.createAsset}`}
           className="create-asset-btn"
@@ -252,9 +244,12 @@ const ManageAsset = () => {
             currentPage={currentPage}
             listAssets={listAssets}
             totalRow={totalRow}
-            pageSize={pageSize}
+            pageSize={PAGE_SIZE}
             handleChangeCurrentPage={handleChangeCurrentPage}
-            handleChangeSizePage={handleChangePageSize}
+            searchKeywords={searchKeywords}
+            statuses={convertListStatus(currentChoosedStatus)}
+            categories={mapListCategoriesNameToListCategoriesId(currentChoosedCategories)}
+            fetchListAssets={fetchListAssets}
           />
         )}
       </div>

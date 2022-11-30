@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.nashtech.assignment.data.constants.EAssetStatus;
@@ -18,6 +19,8 @@ import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.data.repositories.AssetRepository;
 import com.nashtech.assignment.data.repositories.UserRepository;
 import com.nashtech.assignment.dto.request.asset.EditAssetInformationRequest;
+import com.nashtech.assignment.dto.request.user.ChangePasswordFirstRequest;
+import com.nashtech.assignment.dto.request.user.ChangePasswordRequest;
 import com.nashtech.assignment.dto.request.user.EditUserRequest;
 import com.nashtech.assignment.dto.response.asset.AssetResponse;
 import com.nashtech.assignment.dto.response.user.UserResponse;
@@ -26,6 +29,8 @@ import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.mappers.AssetMapper;
 import com.nashtech.assignment.mappers.UserMapper;
 import com.nashtech.assignment.services.EditService;
+import com.nashtech.assignment.services.SecurityContextService;
+import com.nashtech.assignment.utils.GeneratePassword;
 
 import lombok.AllArgsConstructor;
 
@@ -39,9 +44,14 @@ public class EditServiceImpl implements EditService {
     UserMapper userMapper;
     @Autowired
     private AssetRepository assetRepository;
-
+    @Autowired
+    private SecurityContextService securityContextService;
     @Autowired
     private AssetMapper assetMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private GeneratePassword generatePassword;
 
     @Override
     public AssetResponse editAssetInformation(Long idAsset, EditAssetInformationRequest editAssetInformationRequest)
@@ -101,6 +111,34 @@ public class EditServiceImpl implements EditService {
         user.setJoinedDate(joinedDate);
         user.setGender(userRequest.getGender());
         user.setType(userRequest.getType());
+        user = userRepository.save(user);
+        return userMapper.mapEntityToResponseDto(user);
+    }
+
+    @Override
+    public UserResponse changePasswordFirst(ChangePasswordFirstRequest changePasswordFirstRequest) {
+        User user = securityContextService.getCurrentUser();
+        if (passwordEncoder.matches(changePasswordFirstRequest.getNewPassword(), user.getPassword())) {
+            throw new BadRequestException("Password no change");
+        }
+        user.setPassword(passwordEncoder.encode(changePasswordFirstRequest.getNewPassword()));
+        user = userRepository.save(user);
+        return userMapper.mapEntityToResponseDto(user);
+    }
+
+    @Override
+    public UserResponse changePassword(ChangePasswordRequest changePasswordRequest) {
+        User user = securityContextService.getCurrentUser();
+        if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
+            throw new BadRequestException("Password is incorrect");
+        }
+        if (changePasswordRequest.getNewPassword().equals(changePasswordRequest.getOldPassword())) {
+            throw new BadRequestException("Password no change");
+        }
+        if (passwordEncoder.matches(changePasswordRequest.getNewPassword(), generatePassword.firstPassword(user))) {
+            throw new BadRequestException("Password same password generated");
+        }
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         user = userRepository.save(user);
         return userMapper.mapEntityToResponseDto(user);
     }

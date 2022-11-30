@@ -12,12 +12,20 @@ import AdminPrivateRoute from './routes/AdminPrivateRoute';
 import { adminRoute, userRoute } from './routes/routes';
 import StaffPrivateRoute from './routes/StaffPrivateRoute';
 import CheckFirstLoginRoute from './routes/CheckFirstLoginRoute';
+import LoginProtectRoute from './routes/LoginProtectRoute';
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <LoginProtectRoute>
+              <Login />
+            </LoginProtectRoute>
+          }
+        />
         <Route
           path={adminRoute.home}
           element={

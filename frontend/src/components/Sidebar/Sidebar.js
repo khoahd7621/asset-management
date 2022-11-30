@@ -46,7 +46,7 @@ const Sizebar = () => {
     {
       key: 'Home',
       label: 'Home',
-      path: userRoute.home,
+      path: `/${userRoute.home}`,
     },
   ];
 

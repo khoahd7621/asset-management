@@ -7,3 +7,7 @@ export const getAllCategories = () => {
 export const getAssetDetailAndItsHistories = (assetId) => {
   return axios.get(`/api/asset/${assetId}`);
 };
+
+export const getCheckAssetIsValidForDeleteOrNot = (assetId) => {
+  return axios.get(`/api/asset/check-asset/${assetId}`);
+};

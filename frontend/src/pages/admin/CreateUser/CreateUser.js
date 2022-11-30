@@ -100,21 +100,21 @@ const CreateUser = () => {
     if (event.target.value.trim().length === 0) {
       if (type === 'FIRST_NAME') {
         setfirstNameValidate({
-          help: 'First name is required',
+          help: '',
           status: 'error',
         });
         return;
       }
       if (type === 'LAST_NAME') {
         setLastNameValidate({
-          help: 'Last name is required',
+          help: '',
           status: 'error',
         });
         return;
       }
       if (type === 'LOCATION') {
         setLocationValidate({
-          help: 'Location is required',
+          help: '',
           status: 'error',
         });
         return;
@@ -123,21 +123,21 @@ const CreateUser = () => {
     if (event.target.value.trim().length > 100) {
       if (type === 'FIRST_NAME') {
         setfirstNameValidate({
-          help: 'Maximum 100 characters',
+          help: '',
           status: 'error',
         });
         return;
       }
       if (type === 'LAST_NAME') {
         setLastNameValidate({
-          help: 'Maximum 100 characters',
+          help: '',
           status: 'error',
         });
         return;
       }
       if (type === 'LOCATION') {
         setLocationValidate({
-          help: 'Maximum 100 characters',
+          help: '',
           status: 'error',
         });
         return;
@@ -146,7 +146,7 @@ const CreateUser = () => {
     if (type === 'LOCATION') {
       if (!/^[a-zA-Z]+$/.test(event.target.value)) {
         setLocationValidate({
-          help: 'Location only accepts one word and not contains any special characters and number.',
+          help: '',
           status: 'error',
         });
         return;
@@ -156,7 +156,7 @@ const CreateUser = () => {
     if (type === 'FIRST_NAME') {
       if (!/^[a-zA-Z]+$/.test(event.target.value)) {
         setfirstNameValidate({
-          help: 'First name only accepts one word and not contains any special characters and number.',
+          help: '',
           status: 'error',
         });
         return;
@@ -166,7 +166,7 @@ const CreateUser = () => {
     if (type === 'LAST_NAME') {
       if (!/^([a-zA-Z]+\s)*[a-zA-Z]+$/.test(event.target.value)) {
         setLastNameValidate({
-          help: 'Last name not contains any special characters and number.',
+          help: '',
           status: 'error',
         });
         return;
@@ -239,6 +239,8 @@ const CreateUser = () => {
         form={form}
         name="control-hooks"
         onFinish={handleSubmitCreateNewUser}
+        colon={false}
+        labelAlign={'left'}
       >
         <Form.Item name="firstName" label="First Name" help={firstNameValidate.help}>
           <Input
@@ -279,7 +281,7 @@ const CreateUser = () => {
           />
         </Form.Item>
         <Form.Item name="type" label="Type">
-          <Select id="create-user-select__type" placeholder="" allowClear>
+          <Select id="create-user-select__type" placeholder="">
             <Option value="STAFF">Staff</Option>
             <Option value="ADMIN">Admin</Option>
           </Select>

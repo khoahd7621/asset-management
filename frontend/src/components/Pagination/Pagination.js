@@ -2,12 +2,11 @@ import { Pagination } from 'antd';
 
 import './Pagination.scss';
 
-const CustomPagination = ({ onShowSizeChange, onChange, current = 1, defaultPageSize = 20, total = 1, ...props }) => {
+const CustomPagination = ({ onChange, current = 1, defaultPageSize = 20, total = 1, ...props }) => {
   return (
     <Pagination
       className="custom-pagination"
-      showSizeChanger
-      onShowSizeChange={onShowSizeChange}
+      showSizeChange={false}
       onChange={onChange}
       current={current}
       defaultPageSize={defaultPageSize}

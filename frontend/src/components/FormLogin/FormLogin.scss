@@ -31,4 +31,41 @@
     display: inline-block !important;
     text-align: right !important;
   }
+  button {
+    & + button {
+      margin-left: 40px;
+      background-color: white;
+      border: 1px solid rgb(183, 183, 183);
+      color: rgb(157, 157, 157);
+    }
+    background-color: #cf2338;
+    color: white;
+    border-color: #cf2338;
+    &[disabled] {
+      background-color: rgb(199, 199, 199);
+      color: rgb(81, 81, 81);
+      border-color: rgb(199, 199, 199);
+    }
+  }
+  .ant-btn:hover {
+    border-color: #cf2338;
+    background-color: #db3d4f;
+    color: rgb(255, 255, 255);
+  }
+  .ant-btn {
+    [disabled] {
+      background-color: rgb(199, 199, 199);
+      color: rgb(81, 81, 81);
+      border-color: rgb(199, 199, 199);
+    }
+  }
+}
+
+.ant-btn[disabled],
+.ant-btn[disabled]:active,
+.ant-btn[disabled]:focus,
+.ant-btn[disabled]:hover {
+  background-color: rgb(199, 199, 199);
+  color: rgb(81, 81, 81);
+  border-color: rgb(199, 199, 199);
 }
