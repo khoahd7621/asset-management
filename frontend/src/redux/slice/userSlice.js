@@ -23,9 +23,23 @@ export const userSlice = createSlice({
       state.isAuthenticated = true;
       state.isFirstLogin = action.payload.isFirstLogin;
     },
+    updateFirstLogin: (state) => {
+      state.user = {
+        ...state.user,
+        isFirstLogin: '',
+      };
+      state.isFirstLogin = false;
+    },
+    removeDataUserLogout: (state) => {
+      state.user = {
+        ...initialState.user,
+      };
+      state.isAuthenticated = initialState.isAuthenticated;
+      state.isFirstLogin = initialState.isFirstLogin;
+    },
   },
 });
 
-export const { fetchUserLoginSuccess } = userSlice.actions;
+export const { fetchUserLoginSuccess, removeDataUserLogout, updateFirstLogin } = userSlice.actions;
 
 export default userSlice.reducer;

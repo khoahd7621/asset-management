@@ -27,7 +27,7 @@ const putChangePassword = ({ oldPassword, newPassword }) => {
 };
 
 const putChangePasswordFirst = ({ newPassword }) => {
-  return axios.put('api/user/change-password-first', {
+  return axios.put('api/user/change-password/first', {
     newPassword,
   });
 };

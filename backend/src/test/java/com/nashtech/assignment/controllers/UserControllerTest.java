@@ -338,7 +338,7 @@ public class UserControllerTest {
 
         when(editService.changePasswordFirst(changeFirstCaptor.capture())).thenThrow(badRequestException);
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password-first")
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password/first")
                 .content(objectMapper.writeValueAsString(changeFirstRequest))
                 .contentType(MediaType.APPLICATION_JSON);
 
@@ -360,7 +360,7 @@ public class UserControllerTest {
 
         when(editService.changePasswordFirst(changeFirstCaptor.capture())).thenReturn(userResponse);
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password-first")
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password/first")
                 .content(objectMapper.writeValueAsString(changeFirstRequest))
                 .contentType(MediaType.APPLICATION_JSON);
 

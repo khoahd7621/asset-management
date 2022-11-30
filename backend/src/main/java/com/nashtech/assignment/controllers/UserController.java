@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import org.hibernate.type.TrueFalseType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -103,7 +102,7 @@ public class UserController {
                     @Content(mediaType = "application/json") }),
             @ApiResponse(responseCode = "400", description = "Password no change", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) }) })
-    @PutMapping("/change-password-first")
+    @PutMapping("/change-password/first")
     public ResponseEntity<UserResponse> changePasswordFirst(
             @Valid @RequestBody ChangePasswordFirstRequest changePasswordFirstRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(editService.changePasswordFirst(changePasswordFirstRequest));

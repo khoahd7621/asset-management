@@ -11,7 +11,6 @@ import com.nashtech.assignment.config.SecurityConfig;
 import com.nashtech.assignment.dto.request.category.CreateNewCategoryRequest;
 import com.nashtech.assignment.dto.response.category.CategoryResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
-import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.services.CreateService;
 import com.nashtech.assignment.services.GetService;
 import com.nashtech.assignment.services.SecurityContextService;

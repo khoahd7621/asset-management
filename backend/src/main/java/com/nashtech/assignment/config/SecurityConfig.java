@@ -44,7 +44,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable().cors();
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        httpSecurity.authorizeHttpRequests().anyRequest().hasAuthority(EUserType.ADMIN.toString());
+        httpSecurity.authorizeHttpRequests()
+                .antMatchers("/api/user/change-password/**")
+                .hasAnyAuthority(EUserType.ADMIN.toString(), EUserType.STAFF.toString())
+                .anyRequest().hasAuthority(EUserType.ADMIN.toString());
         httpSecurity.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         httpSecurity.addFilterBefore(exceptionHandlerFilter, AuthenticationFilter.class);
         return httpSecurity.build();
@@ -55,4 +58,3 @@ public class SecurityConfig {
         return (web) -> web.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/login");
     }
 }
-

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Dropdown, Layout, Space, Button, Form, Input, Menu } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
+import { removeDataUserLogout } from '../../redux/slice/userSlice';
 
 import './Navbar.scss';
 import CustomModal from '../Modal/Modal';
@@ -14,16 +15,6 @@ import { putChangePassword } from '../../services/editApiService';
 const Navbar = () => {
   const location = useLocation();
   const { Header } = Layout;
-  const items = [
-    {
-      label: 'Change password',
-      key: '0',
-    },
-    {
-      label: 'Logout',
-      key: '1',
-    },
-  ];
   const manageUser = [
     {
       title: 'Manage User',
@@ -67,6 +58,20 @@ const Navbar = () => {
   const newPasswordType = Form.useWatch('newPassword', form);
   const oldPasswordType = Form.useWatch('oldPassword', form);
   const [isSending, setIsSending] = useState(true);
+  const dispatch = useDispatch();
+
+  const [openModalLogout, setOpenModalLogout] = useState(false);
+  const handleLogout = () => {
+    dispatch(removeDataUserLogout());
+  };
+
+  const handleSelectLogout = () => {
+    setOpenModalLogout(true);
+  };
+
+  const handleChangePassword = () => {
+    setOpenModalChangePassword(true);
+  };
 
   const [oldPasswordValidator, setOldPasswordValidator] = useState({ ...initError });
 
@@ -101,10 +106,6 @@ const Navbar = () => {
     if (type === 'OLD_PASSWORD') {
       setOldPasswordValidator({ ...initError });
     }
-  };
-
-  const handleChangePassword = () => {
-    setOpenModalChangePassword(true);
   };
 
   const handleCancel = () => {
@@ -142,7 +143,7 @@ const Navbar = () => {
   const menu = (
     <Menu>
       <Menu.Item onClick={handleChangePassword}>Change Password</Menu.Item>
-      <Menu.Item>Logout</Menu.Item>
+      <Menu.Item onClick={handleSelectLogout}>Logout</Menu.Item>
     </Menu>
   );
 
@@ -235,6 +236,24 @@ const Navbar = () => {
       </div>
       <CustomModal
         className="modal-asset-detail"
+        title="Are you sure?"
+        open={openModalLogout}
+        closable={false}
+        onCancel={() => {}}
+        width="270px"
+      >
+        <p>Do you want to log out?</p>
+
+        <Button onClick={handleLogout} danger type="primary" htmlType="submit">
+          Log out
+        </Button>
+        <Button style={{ marginLeft: '15px' }} htmlType="submit">
+          Cancel
+        </Button>
+      </CustomModal>
+
+      <CustomModal
+        className="modal-asset-detail"
         title="Change Password"
         open={openModalChangePassword}
         closable={false}
@@ -271,6 +290,7 @@ const Navbar = () => {
             help={oldPasswordValidator.help}
           >
             <Input.Password
+              id="oldPassword"
               name="password"
               status={oldPasswordValidator.status}
               onChange={(event) => handleValidString(event, 'OLD_PASSWORD')}
@@ -290,6 +310,7 @@ const Navbar = () => {
             help={newPasswordValidate.help}
           >
             <Input.Password
+              id="newPassword"
               name="password"
               status={newPasswordValidate.status}
               onChange={(event) => handleValidString(event, 'NEW_PASSWORD')}

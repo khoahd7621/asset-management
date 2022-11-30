@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Button, Form, Modal, Input } from 'antd';
-import { toast } from 'react-toastify';
 
-import './PasswordModal.scss';
+import './FirstPasswordModal.scss';
+
 import { putChangePasswordFirst } from '../../services/editApiService';
+import { updateFirstLogin } from '../../redux/slice/userSlice';
 
-const PasswordModal = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const user = useSelector((state) => state.user.user);
-  const [isSending, setIsSending] = useState(true);
-
+const FirstPasswordModal = () => {
   const [form] = Form.useForm();
-
   const initError = {
     help: '',
     status: '',
   };
 
   const newPasswordType = Form.useWatch('newPassword', form);
+
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const [isSending, setIsSending] = useState(true);
   const [newPasswordValidate, setNewPasswordValidate] = useState({ ...initError });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (user.isFirstLogin) {
@@ -60,6 +61,7 @@ const PasswordModal = () => {
       setNewPasswordValidate({
         initError,
       });
+      dispatch(updateFirstLogin());
     } else {
       setNewPasswordValidate({
         help: '',
@@ -110,6 +112,7 @@ const PasswordModal = () => {
             help={newPasswordValidate.help}
           >
             <Input.Password
+              id="newPassword"
               status={newPasswordValidate.status}
               name="password"
               onChange={(event) => handleValidString(event, 'NEW_PASSWORD')}
@@ -123,4 +126,4 @@ const PasswordModal = () => {
     </Modal>
   );
 };
-export default PasswordModal;
+export default FirstPasswordModal;

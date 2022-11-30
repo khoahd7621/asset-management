@@ -4,7 +4,7 @@ import { CaretDownOutlined, CheckOutlined, UndoOutlined, CloseOutlined } from '@
 
 import './Home.scss';
 
-import { PasswordModal } from '../../../components';
+import { FirstPasswordModal } from '../../../components';
 
 const Home = () => {
   const tableColumns = [
@@ -148,7 +148,7 @@ const Home = () => {
           pagination={false}
         />
       </div>
-      <PasswordModal />
+      <FirstPasswordModal />
     </div>
   );
 };
