@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nashtech.assignment.dto.request.user.ChangePasswordFirstRequest;
+import com.nashtech.assignment.dto.request.user.ChangePasswordRequest;
 import com.nashtech.assignment.dto.request.user.CreateNewUserRequest;
 import com.nashtech.assignment.dto.request.user.EditUserRequest;
 import com.nashtech.assignment.dto.response.user.UserResponse;
@@ -93,5 +95,29 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@RequestParam String staffCode) {
         deleteService.deleteUser(staffCode);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Change password when user first login")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Change password successfully", content = {
+                    @Content(mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", description = "Password no change", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) }) })
+    @PutMapping("/change-password-first")
+    public ResponseEntity<UserResponse> changePasswordFirst(
+            @Valid @RequestBody ChangePasswordFirstRequest changePasswordFirstRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(editService.changePasswordFirst(changePasswordFirstRequest));
+    }
+
+    @Operation(summary = "Change password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Change password successfully", content = {
+                    @Content(mediaType = "application/json") }),
+            @ApiResponse(responseCode = "400", description = "Password is incrrect or Password no change", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) }) })
+    @PutMapping("/change-password")
+    public ResponseEntity<UserResponse> changePassword(
+            @Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(editService.changePassword(changePasswordRequest));
     }
 }

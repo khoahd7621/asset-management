@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Dropdown, Layout, Space } from 'antd';
+import { Dropdown, Layout, Space, Button, Form, Input, Menu } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 
 import './Navbar.scss';
+import CustomModal from '../Modal/Modal';
 
 import CustomBreadcrumb from './CustomBreadcrumb';
 import { adminRoute, userRoute } from '../../routes/routes';
+import { putChangePassword } from '../../services/editApiService';
 
 const Navbar = () => {
   const location = useLocation();
@@ -52,6 +54,97 @@ const Navbar = () => {
       link: `/${adminRoute.home}/${adminRoute.report}`,
     },
   ];
+
+  const [form] = Form.useForm();
+  const initError = {
+    help: '',
+    status: '',
+  };
+
+  const [openModalChangePassword, setOpenModalChangePassword] = useState(false);
+  const [openChangeSuccess, setOpenChangeSuccess] = useState(false);
+  const [newPasswordValidate, setNewPasswordValidate] = useState({ ...initError });
+  const newPasswordType = Form.useWatch('newPassword', form);
+  const oldPasswordType = Form.useWatch('oldPassword', form);
+  const [isSending, setIsSending] = useState(true);
+
+  const [oldPasswordValidator, setOldPasswordValidator] = useState({ ...initError });
+
+  useEffect(() => {
+    if (!newPasswordType || !oldPasswordType || newPasswordValidate.help || oldPasswordValidator.help) {
+      setIsSending(true);
+      return;
+    }
+    setIsSending(false);
+  }, [newPasswordType, oldPasswordType]);
+
+  const handleValidString = (event, type) => {
+    if (event.target.value.trim().length === 0) {
+      if (type === 'NEW_PASSWORD') {
+        setNewPasswordValidate({
+          help: '',
+          status: 'error',
+        });
+        return;
+      }
+      if (type === 'OLD_PASSWORD') {
+        setOldPasswordValidator({
+          help: '',
+          status: 'error',
+        });
+        return;
+      }
+    }
+    if (type === 'NEW_PASSWORD') {
+      setNewPasswordValidate({ ...initError });
+    }
+    if (type === 'OLD_PASSWORD') {
+      setOldPasswordValidator({ ...initError });
+    }
+  };
+
+  const handleChangePassword = () => {
+    setOpenModalChangePassword(true);
+  };
+
+  const handleCancel = () => {
+    form.resetFields();
+    setOldPasswordValidator({ ...initError });
+    setNewPasswordValidate({ ...initError });
+    setOpenModalChangePassword(false);
+  };
+
+  const handleCancelWhenChangeSuccess = () => {
+    setOpenChangeSuccess(false);
+  };
+
+  const handleSubmitChange = async () => {
+    const value = form.getFieldsValue();
+    const response = await putChangePassword({
+      oldPassword: value.oldPassword,
+      newPassword: value.newPassword,
+    });
+    if (response && response.status === 200) {
+      form.resetFields();
+      setOpenModalChangePassword(false);
+      setOldPasswordValidator({
+        initError,
+      });
+      setOpenChangeSuccess(true);
+    } else {
+      setOldPasswordValidator({
+        help: '',
+        status: 'error',
+      });
+    }
+  };
+
+  const menu = (
+    <Menu>
+      <Menu.Item onClick={handleChangePassword}>Change Password</Menu.Item>
+      <Menu.Item>Logout</Menu.Item>
+    </Menu>
+  );
 
   const [listTitles, setListTitles] = useState([{ title: '', link: '' }]);
   const user = useSelector((state) => state.user.user);
@@ -132,7 +225,7 @@ const Navbar = () => {
           })}
       </div>
       <div className="navbar-header__right">
-        <Dropdown menu={{ items }} trigger={['click']}>
+        <Dropdown overlay={menu} trigger={['click']}>
           <a onClick={(e) => e.preventDefault()}>
             <Space>
               {user.username} <CaretDownOutlined />
@@ -140,6 +233,94 @@ const Navbar = () => {
           </a>
         </Dropdown>
       </div>
+      <CustomModal
+        className="modal-asset-detail"
+        title="Change Password"
+        open={openModalChangePassword}
+        closable={false}
+        onCancel={() => {}}
+        width="550px"
+      >
+        <Form
+          form={form}
+          name="basic"
+          labelCol={{
+            span: 6,
+          }}
+          wrapperCol={{
+            span: 18,
+          }}
+          initialValues={{
+            remember: true,
+            oldPassword: '',
+            newPassword: '',
+          }}
+          onFinish={() => {}}
+          className="change-password-form"
+        >
+          <Form.Item
+            label="Old Password"
+            name="oldPassword"
+            colon={false}
+            rules={[
+              {
+                required: false,
+                message: '',
+              },
+            ]}
+            help={oldPasswordValidator.help}
+          >
+            <Input.Password
+              name="password"
+              status={oldPasswordValidator.status}
+              onChange={(event) => handleValidString(event, 'OLD_PASSWORD')}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="New Password"
+            name="newPassword"
+            colon={false}
+            rules={[
+              {
+                required: false,
+                message: '',
+              },
+            ]}
+            help={newPasswordValidate.help}
+          >
+            <Input.Password
+              name="password"
+              status={newPasswordValidate.status}
+              onChange={(event) => handleValidString(event, 'NEW_PASSWORD')}
+            />
+          </Form.Item>
+        </Form>
+        <div className="btnChangePassword">
+          <Button onClick={handleSubmitChange} disabled={isSending} danger type="primary" htmlType="submit">
+            Save
+          </Button>
+          <Button onClick={handleCancel} style={{ marginLeft: '15px' }} htmlType="submit">
+            Cancel
+          </Button>
+        </div>
+      </CustomModal>
+
+      <CustomModal
+        className="modal-asset-detail"
+        title="Change Password"
+        open={openChangeSuccess}
+        closable={false}
+        onCancel={() => {}}
+        width="400px"
+      >
+        <p>Your password has been changed successfully!</p>
+        <div className="btnChangePassword">
+          <Button onClick={handleCancelWhenChangeSuccess} style={{ marginRight: '0px' }} htmlType="submit">
+            Close
+          </Button>
+        </div>
+      </CustomModal>
     </Header>
   );
 };

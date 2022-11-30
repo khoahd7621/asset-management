@@ -15,6 +15,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.nashtech.assignment.data.constants.EAssetStatus;
 import com.nashtech.assignment.data.constants.EGender;
@@ -24,6 +26,8 @@ import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.data.repositories.AssetRepository;
 import com.nashtech.assignment.data.repositories.UserRepository;
 import com.nashtech.assignment.dto.request.asset.EditAssetInformationRequest;
+import com.nashtech.assignment.dto.request.user.ChangePasswordFirstRequest;
+import com.nashtech.assignment.dto.request.user.ChangePasswordRequest;
 import com.nashtech.assignment.dto.request.user.EditUserRequest;
 import com.nashtech.assignment.dto.response.asset.AssetResponse;
 import com.nashtech.assignment.dto.response.user.UserResponse;
@@ -31,6 +35,8 @@ import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.mappers.AssetMapper;
 import com.nashtech.assignment.mappers.UserMapper;
+import com.nashtech.assignment.services.SecurityContextService;
+import com.nashtech.assignment.utils.GeneratePassword;
 
 public class EditServiceImplTest {
 
@@ -41,18 +47,27 @@ public class EditServiceImplTest {
     private UserResponse userResponse;
     private AssetRepository assetRepository;
     private Asset asset;
+    private User user;
     private AssetMapper assetMapper;
+    private SecurityContextService securityContextService;
+    private PasswordEncoder passwordEncoder;
+    private GeneratePassword generatePassword;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
+        passwordEncoder = mock(PasswordEncoder.class);
+        securityContextService = mock(SecurityContextService.class);
         assetRepository = mock(AssetRepository.class);
         assetMapper = mock(AssetMapper.class);
         asset = mock(Asset.class);
         userMapper = mock(UserMapper.class);
-        editServiceImpl = new EditServiceImpl(userRepository, userMapper, assetRepository, assetMapper);
+        generatePassword = mock(GeneratePassword.class);
+        editServiceImpl = new EditServiceImpl(userRepository, userMapper, assetRepository, securityContextService,
+                assetMapper, passwordEncoder, generatePassword);
         userRepo = mock(User.class);
         userResponse = mock(UserResponse.class);
+        user = mock(User.class);
     }
 
     @Test
@@ -213,5 +228,114 @@ public class EditServiceImplTest {
         verify(assetRepository).save(asset);
 
         assertThat(actual, is(expected));
+    }
+
+    @Test
+    void testChangePasswordFirst_WhenPasswordNoChange_ShouldReturnException() throws Exception {
+        ChangePasswordFirstRequest changePasswordFirstRequest = ChangePasswordFirstRequest.builder().build();
+
+        when(securityContextService.getCurrentUser()).thenReturn(user);
+        when(passwordEncoder.matches(changePasswordFirstRequest.getNewPassword(), user.getPassword()))
+                .thenReturn(true);
+
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            editServiceImpl.changePasswordFirst(changePasswordFirstRequest);
+        });
+
+        assertThat(actual.getMessage(), is("Password no change"));
+    }
+
+    @Test
+    void testChangePasswordFirst_WhenDataValid_ShouldReturnData() throws Exception {
+        ChangePasswordFirstRequest changePasswordFirstRequest = ChangePasswordFirstRequest.builder()
+                .newPassword("123456").build();
+        ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
+
+        when(securityContextService.getCurrentUser()).thenReturn(user);
+        when(passwordEncoder.matches(changePasswordFirstRequest.getNewPassword(), user.getPassword()))
+                .thenReturn(false);
+        when(userMapper.mapEntityToResponseDto(userArgumentCaptor.capture())).thenReturn(userResponse);
+
+        UserResponse actual = editServiceImpl.changePasswordFirst(changePasswordFirstRequest);
+
+        verify(user).setPassword(passwordEncoder.encode(changePasswordFirstRequest.getNewPassword()));
+        verify(userRepository).save(user);
+
+        assertThat(actual, is(userResponse));
+    }
+
+    @Test
+    void testChangePassword_WhenPasswordIncorrect_ShouldReturnException() throws Exception {
+        ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder().build();
+
+        when(securityContextService.getCurrentUser()).thenReturn(user);
+        when(passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword()))
+                .thenReturn(false);
+
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            editServiceImpl.changePassword(changePasswordRequest);
+        });
+
+        assertThat(actual.getMessage(), is("Password is incorrect"));
+    }
+
+    @Test
+    void testChangePassword_WhenPasswordNoChange_ShouldReturnException() throws Exception {
+        ChangePasswordRequest changePasswordRequest = ChangePasswordRequest
+                .builder()
+                .oldPassword("123456")
+                .newPassword("123456").build();
+
+        when(securityContextService.getCurrentUser()).thenReturn(user);
+        when(passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())).thenReturn(true);
+
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            editServiceImpl.changePassword(changePasswordRequest);
+        });
+
+        assertThat(actual.getMessage(), is("Password no change"));
+    }
+
+    @Test
+    void testChangePassword_WhenPasswordSameGenerated_ShouldReturnException() throws Exception {
+        ChangePasswordRequest changePasswordRequest = ChangePasswordRequest
+                .builder()
+                .oldPassword("123456")
+                .newPassword("anh@01012001").build();
+
+        when(securityContextService.getCurrentUser()).thenReturn(user);
+        when(passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword()))
+                .thenReturn(true);
+        when(passwordEncoder.matches(changePasswordRequest.getNewPassword(), generatePassword.firstPassword(user)))
+                .thenReturn(true);
+
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            editServiceImpl.changePassword(changePasswordRequest);
+        });
+
+        assertThat(actual.getMessage(), is("Password same password generated"));
+    }
+
+    @Test
+    void testChangePassword_WhenDataVaid_ShouldReturnData() throws Exception {
+        ChangePasswordRequest changePasswordRequest = ChangePasswordRequest
+                .builder()
+                .oldPassword("123456")
+                .newPassword("654321").build();
+
+        ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
+
+        when(securityContextService.getCurrentUser()).thenReturn(user);
+        when(passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())).thenReturn(true);
+        when(passwordEncoder.matches(changePasswordRequest.getNewPassword(), generatePassword.firstPassword(user)))
+                .thenReturn(false);
+        when(userMapper.mapEntityToResponseDto(userArgumentCaptor.capture())).thenReturn(userResponse);
+
+        UserResponse actual = editServiceImpl.changePassword(changePasswordRequest);
+
+        verify(user).setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        verify(userRepository).save(user);
+
+        assertThat(actual, is(userResponse));
     }
 }
