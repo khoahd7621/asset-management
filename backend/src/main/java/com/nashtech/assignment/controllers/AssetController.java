@@ -9,10 +9,7 @@ import com.nashtech.assignment.dto.response.asset.AssetAndHistoriesResponse;
 import com.nashtech.assignment.dto.response.asset.AssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
-import com.nashtech.assignment.services.CreateService;
-import com.nashtech.assignment.services.EditService;
-import com.nashtech.assignment.services.FilterService;
-import com.nashtech.assignment.services.GetService;
+import com.nashtech.assignment.services.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,6 +37,8 @@ public class AssetController {
     private GetService getService;
     @Autowired
     private EditService editService;
+    @Autowired
+    private DeleteService deleteService;
 
     @Operation(summary = "Get asset detail and its histories by assetId")
     @ApiResponses(value = {
@@ -107,5 +106,35 @@ public class AssetController {
         @Valid @RequestBody CreateNewAssetRequest createNewAssetRequest) throws ParseException {
       return ResponseEntity.status(HttpStatus.OK)
           .body(createService.createAssetResponse(createNewAssetRequest));
+    }
+
+    @Operation(summary = "Check asset is valid for delete or not by assetId")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Asset is valid for delete.", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssetAndHistoriesResponse.class)) }),
+            @ApiResponse(responseCode = "400", description = "Asset is not valid for delete.", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) }),
+            @ApiResponse(responseCode = "404", description = "Not exist asset with assetId.", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) })
+    })
+    @GetMapping("/check-asset/{assetId}")
+    public ResponseEntity<Void> checkAssetIsValidForDeleteOrNot(@PathVariable Long assetId) {
+        getService.checkAssetIsValidForDeleteOrNot(assetId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @Operation(summary = "Delete asset by assetId")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Delete successfully.", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssetAndHistoriesResponse.class)) }),
+            @ApiResponse(responseCode = "400", description = "Asset is not valid for delete.", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) }),
+            @ApiResponse(responseCode = "404", description = "Not exist asset with assetId.", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) })
+    })
+    @DeleteMapping("/{assetId}")
+    public ResponseEntity<Void> deleteAssetByAssetId(@PathVariable Long assetId) {
+        deleteService.deleteAssetByAssetId(assetId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

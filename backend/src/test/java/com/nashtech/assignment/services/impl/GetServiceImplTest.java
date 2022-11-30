@@ -6,12 +6,15 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
 
+import com.nashtech.assignment.data.constants.EAssignStatus;
 import com.nashtech.assignment.data.entities.Asset;
 import com.nashtech.assignment.data.entities.Category;
 import com.nashtech.assignment.data.repositories.AssetRepository;
+import com.nashtech.assignment.data.repositories.AssignAssetRepository;
 import com.nashtech.assignment.data.repositories.CategoryRepository;
 import com.nashtech.assignment.dto.response.asset.AssetAndHistoriesResponse;
 import com.nashtech.assignment.dto.response.category.CategoryResponse;
+import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.mappers.AssetMapper;
 import com.nashtech.assignment.mappers.CategoryMapper;
@@ -32,6 +35,7 @@ class GetServiceImplTest {
     private AssetMapper assetMapper;
     private Category category;
     private Asset asset;
+    private AssignAssetRepository assignAssetRepository;
 
     @BeforeEach
     void setup() {
@@ -39,11 +43,13 @@ class GetServiceImplTest {
         categoryMapper = mock(CategoryMapper.class);
         assetRepository = mock(AssetRepository.class);
         assetMapper = mock(AssetMapper.class);
+        assignAssetRepository = mock(AssignAssetRepository.class);
         getServiceImpl = GetServiceImpl.builder()
                 .categoryRepository(categoryRepository)
                 .categoryMapper(categoryMapper)
                 .assetRepository(assetRepository)
-                .assetMapper(assetMapper).build();
+                .assetMapper(assetMapper)
+                .assignAssetRepository(assignAssetRepository).build();
         category = mock(Category.class);
         asset = mock(Asset.class);
     }
@@ -86,5 +92,33 @@ class GetServiceImplTest {
         AssetAndHistoriesResponse actual = getServiceImpl.getAssetAndItsHistoriesByAssetId(1L);
 
         assertThat(actual, is(expected));
+    }
+
+    @Test
+    void checkAssetIsValidForDeleteOrNot_WhenAssetIdNotExist_ShouldThrowNotFoundException() {
+        long assetId = 1L;
+
+        when(assetRepository.findByIdAndIsDeletedFalse(assetId)).thenReturn(Optional.empty());
+
+        NotFoundException actual = assertThrows(NotFoundException.class, () -> {
+            getServiceImpl.checkAssetIsValidForDeleteOrNot(assetId);
+        });
+
+        assertThat(actual.getMessage(), is("Don't exist asset with this assetId."));
+    }
+
+    @Test
+    void checkAssetIsValidForDeleteOrNot_WhenAssetIdExistButNotValidForDelete_ShouldThrowBadRequestException() {
+        long assetId = 1L;
+
+        when(assetRepository.findByIdAndIsDeletedFalse(assetId)).thenReturn(Optional.of(asset));
+        when(assignAssetRepository.existsByAssetIdAndStatusAndIsDeletedFalse(assetId, EAssignStatus.ACCEPTED))
+                .thenReturn(true);
+
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            getServiceImpl.checkAssetIsValidForDeleteOrNot(assetId);
+        });
+
+        assertThat(actual.getMessage(), is("Asset already assigned. Invalid for delete."));
     }
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Table } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 
@@ -6,12 +7,23 @@ import './TableAsset.scss';
 
 import Pagination from '../Pagination/Pagination';
 import ModalAssetDetail from './ModalAssetDetail';
+import ModalAssetConfirmation from './ModalAssetConfirmation';
+import ModalAssetNotification from './ModalAssetNotification';
 import { DeleteIcon, EditIcon } from '../../assets/CustomIcon';
-import { getAssetDetailAndItsHistories } from '../../services/getApiService';
-import { Link } from 'react-router-dom';
+import { getAssetDetailAndItsHistories, getCheckAssetIsValidForDeleteOrNot } from '../../services/getApiService';
 import { adminRoute } from '../../routes/routes';
 
-const TableAsset = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize = 20, handleChangeCurrentPage }) => {
+const TableAsset = ({
+  listAssets = [],
+  currentPage = 1,
+  totalRow = 1,
+  pageSize = 20,
+  handleChangeCurrentPage,
+  searchKeywords,
+  statuses,
+  categories,
+  fetchListAssets,
+}) => {
   const TableAssetColumns = [
     {
       title: (
@@ -107,7 +119,11 @@ const TableAsset = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize =
               </button>
             </Link>
 
-            <button className="delete-btn" disabled={record.state === 'Assigned'}>
+            <button
+              className="delete-btn"
+              disabled={record.state === 'Assigned'}
+              onClick={() => handleCheckDeleteAsset(record.assetId)}
+            >
               <DeleteIcon />
             </button>
           </div>
@@ -119,6 +135,20 @@ const TableAsset = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize =
   const [isShowModalAssetDetail, setIsShowModalAssetDetail] = useState(false);
   const [modalData, setModalData] = useState({});
   const [listHistory, setListHistory] = useState([]);
+  const [isShowModalConfirmation, setIsShowModalConfirmation] = useState(false);
+  const [currentAssetId, setCurrentAssetId] = useState(0);
+  const [isShowModalNotification, setIsShowModalNotification] = useState(false);
+
+  const handleCheckDeleteAsset = async (assetId) => {
+    setCurrentAssetId(assetId);
+    const response = await getCheckAssetIsValidForDeleteOrNot(assetId);
+    if (response && response.status === 204) {
+      setIsShowModalConfirmation(true);
+    }
+    if (response && response.response && response.response.status === 400) {
+      setIsShowModalNotification(true);
+    }
+  };
 
   const handleClickRecord = async (assetId) => {
     const response = await getAssetDetailAndItsHistories(assetId);
@@ -177,6 +207,28 @@ const TableAsset = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize =
         }}
         data={modalData}
         listHistories={listHistory}
+      />
+      <ModalAssetConfirmation
+        open={isShowModalConfirmation}
+        onCancel={() => {
+          setIsShowModalConfirmation(false);
+          setCurrentAssetId(0);
+        }}
+        data={currentAssetId}
+        searchKeywords={searchKeywords}
+        statuses={statuses}
+        categories={categories}
+        fetchListAssets={fetchListAssets}
+        pageSize={pageSize}
+        handleChangePage={handleChangeCurrentPage}
+      />
+      <ModalAssetNotification
+        open={isShowModalNotification}
+        onCancel={() => {
+          setIsShowModalNotification(false);
+          setCurrentAssetId(0);
+        }}
+        data={currentAssetId}
       />
     </>
   );

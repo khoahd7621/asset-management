@@ -246,6 +246,10 @@ const ManageAsset = () => {
             totalRow={totalRow}
             pageSize={PAGE_SIZE}
             handleChangeCurrentPage={handleChangeCurrentPage}
+            searchKeywords={searchKeywords}
+            statuses={convertListStatus(currentChoosedStatus)}
+            categories={mapListCategoriesNameToListCategoriesId(currentChoosedCategories)}
+            fetchListAssets={fetchListAssets}
           />
         )}
       </div>
