@@ -1,10 +1,6 @@
 .manage-user {
   flex: 1;
   padding: 80px 50px 0 96px;
-  min-height: 700px;
-  height: calc(100vh - var(--nav-bar-height));
-  overflow-x: auto;
-  overflow-y: auto;
 
   .title-manage-user {
     font-size: 20px;
@@ -58,9 +54,7 @@
   .ant-pagination-item-active {
     font-weight: 500;
     color: #ffffff;
-    // background: #cf2338;
     border-color: #cf2338;
-    // background: #cf2338;
   }
 
   .ant-table-column-sorter {
@@ -81,8 +75,7 @@
     }
   }
 
-  //modal
-
+  // modal
   .ant-modal-content {
     border-radius: 10px;
     border-color: black;
@@ -112,8 +105,8 @@
     padding-left: 45px;
     line-height: 1.2;
   }
-  // close icon
 
+  // close icon
   .ant-modal-close {
     fill: #d62136;
     margin-right: 30px;
@@ -126,8 +119,7 @@
     }
   }
 
-  //edit icon
-
+  // edit icon
   .edit-icon svg {
     padding-top: 3px;
     fill: #585c5f;

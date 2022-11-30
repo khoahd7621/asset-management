@@ -11,14 +11,7 @@ import { getAssetDetailAndItsHistories } from '../../services/getApiService';
 import { Link } from 'react-router-dom';
 import { adminRoute } from '../../routes/routes';
 
-const TableAsset = ({
-  listAssets = [],
-  currentPage = 1,
-  totalRow = 1,
-  pageSize = 20,
-  handleChangeCurrentPage,
-  handleChangeSizePage,
-}) => {
+const TableAsset = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize = 20, handleChangeCurrentPage }) => {
   const TableAssetColumns = [
     {
       title: (
@@ -153,10 +146,6 @@ const TableAsset = ({
     handleChangeCurrentPage(current);
   };
 
-  const handleChangePageSize = (current, pageSize) => {
-    handleChangeSizePage(current, pageSize);
-  };
-
   const convertStrDate = (dateStr) => {
     const date = new Date(dateStr);
     return (
@@ -178,13 +167,7 @@ const TableAsset = ({
         dataSource={listAssets}
         pagination={false}
       />
-      <Pagination
-        onShowSizeChange={handleChangePageSize}
-        onChange={handleChangePage}
-        current={currentPage}
-        defaultPageSize={pageSize}
-        total={totalRow}
-      />
+      <Pagination onChange={handleChangePage} current={currentPage} defaultPageSize={pageSize} total={totalRow} />
       <ModalAssetDetail
         open={isShowModalAssetDetail}
         onCancel={() => {

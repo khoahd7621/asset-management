@@ -47,11 +47,9 @@ const FormLogin = () => {
 
   const handleSubmitLogin = async () => {
     if (!Validation.isMinLength(user.password, 6)) {
-      toast.error('Password must be at least 6 characters');
       return;
     }
     if (!Validation.isMaxLength(user.password, 24)) {
-      toast.error('Password must be at most 24 characters');
       return;
     }
     setIsSending(true);
@@ -100,15 +98,13 @@ const FormLogin = () => {
         rules={[
           {
             required: true,
-            message: 'Please input your username!',
           },
           {
             pattern: /^[a-zA-Z0-9]*$/,
-            message: 'Username just contains letters and numbers',
           },
         ]}
       >
-        <Input name="username" onChange={(event) => handleChangeInput(event)} />
+        <Input name="username" onChange={(event) => handleChangeInput(event)} id="username" />
       </Form.Item>
 
       <Form.Item
@@ -117,11 +113,10 @@ const FormLogin = () => {
         rules={[
           {
             required: true,
-            message: 'Please input your password!',
           },
         ]}
       >
-        <Input.Password name="password" onChange={(event) => handleChangeInput(event)} />
+        <Input.Password name="password" onChange={(event) => handleChangeInput(event)} id="password" />
       </Form.Item>
 
       <Form.Item
@@ -130,7 +125,7 @@ const FormLogin = () => {
           span: 18,
         }}
       >
-        <Button disabled={isSending} danger type="primary" htmlType="submit">
+        <Button disabled={isSending} htmlType="submit">
           Login
         </Button>
       </Form.Item>

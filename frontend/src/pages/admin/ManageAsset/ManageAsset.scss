@@ -1,10 +1,6 @@
 .manage-asset-block {
   flex: 1;
   padding: 80px 50px 0 96px;
-  min-height: 700px;
-  height: calc(100vh - var(--nav-bar-height));
-  overflow-x: auto;
-  overflow-y: auto;
 
   .manage-asset-block__title {
     font-size: 20px;

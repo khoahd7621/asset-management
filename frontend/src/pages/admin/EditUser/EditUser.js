@@ -156,10 +156,10 @@ const EditUser = () => {
         colon={false}
       >
         <Form.Item name="firstname" label="First Name" disable>
-          <Input disabled />
+          <Input id="edit-user__first-name" disabled />
         </Form.Item>
         <Form.Item name="lastname" label="Last Name" disable>
-          <Input disabled />
+          <Input id="edit-user__last-name" disabled />
         </Form.Item>
         <Form.Item name="dateOfBirth" label="Date of Birth" help={dateOfBirthValidate.help}>
           <DatePicker
@@ -188,13 +188,7 @@ const EditUser = () => {
           />
         </Form.Item>
         <Form.Item name="type" label="Type">
-          <Select
-            id="edit-user-select__type"
-            placeholder=""
-            allowClear
-            bordered={false}
-            suffixIcon={<CaretDownOutlined />}
-          >
+          <Select id="edit-user-select__type" placeholder="" bordered={false} suffixIcon={<CaretDownOutlined />}>
             <Option value="STAFF">Staff</Option>
             <Option value="ADMIN">Admin</Option>
           </Select>

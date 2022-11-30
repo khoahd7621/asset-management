@@ -65,11 +65,10 @@ const PasswordModal = () => {
             rules={[
               {
                 required: false,
-                message: 'Please input your password!',
               },
             ]}
           >
-            <Input.Password name="password" onChange={(event) => handleChangeInput(event)} />
+            <Input.Password name="password" onChange={(event) => handleChangeInput(event)} id="new-password" />
           </Form.Item>
           <Button style={{ background: '#cf2338', borderColor: '#cf2338' }} type="primary" htmlType="submit">
             Save

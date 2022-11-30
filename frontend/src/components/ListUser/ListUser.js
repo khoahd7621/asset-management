@@ -379,6 +379,7 @@ const ListUser = () => {
               allowClear
               onSearch={onSearch}
               style={{ width: 220 }}
+              id="search-user"
             ></Search>
           </Col>
           <Col xs={2} sm={4} md={6} lg={4} xl={4}>
@@ -480,7 +481,7 @@ const ListUser = () => {
 
       <Modal
         className="user-list__disable-modal"
-        title={'Can not disable yourself'}
+        title={'Can not disable user'}
         centered
         open={disablePopUp}
         onCancel={() => setDisablePopUp(false)}

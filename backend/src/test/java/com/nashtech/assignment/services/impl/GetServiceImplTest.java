@@ -17,6 +17,7 @@ import com.nashtech.assignment.mappers.AssetMapper;
 import com.nashtech.assignment.mappers.CategoryMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,7 @@ class GetServiceImplTest {
         List<CategoryResponse> expected = new ArrayList<>();
         expected.add(categoryResponse);
 
-        when(categoryRepository.findAll()).thenReturn(categoryList);
+        when(categoryRepository.findAll(Sort.by("name").ascending())).thenReturn(categoryList);
         when(categoryMapper.toListCategoriesResponse(categoryList)).thenReturn(expected);
 
         List<CategoryResponse> actual = getServiceImpl.getAllCategories();

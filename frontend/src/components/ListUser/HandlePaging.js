@@ -21,6 +21,7 @@ const Paging = ({ total, current, onChange }) => {
       current={current}
       total={total}
       itemRender={itemRender}
+      showSizeChanger={false}
     />
   );
 };

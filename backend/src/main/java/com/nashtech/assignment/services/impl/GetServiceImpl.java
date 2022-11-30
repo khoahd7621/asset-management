@@ -12,6 +12,7 @@ import com.nashtech.assignment.mappers.CategoryMapper;
 import com.nashtech.assignment.services.GetService;
 import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class GetServiceImpl implements GetService {
 
     @Override
     public List<CategoryResponse> getAllCategories() {
-        List<Category> categoryList = categoryRepository.findAll();
+        List<Category> categoryList = categoryRepository.findAll(Sort.by("name").ascending());
         return categoryMapper.toListCategoriesResponse(categoryList);
     }
 

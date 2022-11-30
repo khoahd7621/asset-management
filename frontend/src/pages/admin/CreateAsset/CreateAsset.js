@@ -141,28 +141,28 @@ const CreateAsset = () => {
     if (event.target.value.trim().length === 0) {
       if (type === 'ASSET_NAME') {
         setAssetNameValidate({
-          help: 'Asset name is required',
+          help: '',
           status: 'error',
         });
         return;
       }
       if (type === 'SPECIFICATION') {
         setSpecificationValidate({
-          help: 'Specification is required',
+          help: '',
           status: 'error',
         });
         return;
       }
       if (type === 'CATEGORY_NAME') {
         setCategoryNameValidate({
-          help: 'Category name is required',
+          help: '',
           status: 'error',
         });
         return;
       }
       if (type === 'CATEGORY_PREFIX') {
         setCategoryNameValidate({
-          help: 'Category prefix is required',
+          help: '',
           status: '',
         });
         setCategoryPrefixValidate({
@@ -172,46 +172,11 @@ const CreateAsset = () => {
         return;
       }
     }
-    if (event.target.value.trim().length > 100) {
-      if (type === 'ASSET_NAME') {
-        setAssetNameValidate({
-          help: 'Maximum 100 characters',
-          status: 'error',
-        });
-        return;
-      }
-      if (type === 'CATEGORY_NAME') {
-        setCategoryNameValidate({
-          help: 'Maximum 100 characters',
-          status: 'error',
-        });
-        return;
-      }
-      if (type === 'CATEGORY_PREFIX') {
-        setCategoryNameValidate({
-          help: 'Maximum 100 characters',
-          status: '',
-        });
-        setCategoryPrefixValidate({
-          help: '',
-          status: 'error',
-        });
-        return;
-      }
-    }
-    if (event.target.value.trim().length > 500) {
-      if (type === 'SPECIFICATION') {
-        setSpecificationValidate({
-          help: 'Maximum 500 characters',
-          status: 'error',
-        });
-        return;
-      }
-    }
+
     if (type === 'ASSET_NAME') {
-      if (!/^([A-Za-z0-9\s]+)+[A-Za-z0-9\s]+$/.test(event.target.value)) {
+      if (!/^([A-Za-z0-9\s])*[A-Za-z0-9\s]+$/.test(event.target.value)) {
         setAssetNameValidate({
-          help: 'Asset name only accepts not contains any special characters .',
+          help: '',
           status: 'error',
         });
         return;
@@ -225,7 +190,7 @@ const CreateAsset = () => {
     if (type === 'CATEGORY_NAME') {
       if (!/^[a-zA-Z0-9]+$/.test(event.target.value)) {
         setCategoryNameValidate({
-          help: 'Category name only accepts one word and not contains any special characters and number',
+          help: '',
           status: 'error',
         });
         return;
@@ -235,7 +200,7 @@ const CreateAsset = () => {
     if (type === 'CATEGORY_PREFIX') {
       if (!/^[a-zA-Z]+$/.test(event.target.value)) {
         setCategoryNameValidate({
-          help: 'Category prefix only accepts one word and not contains any special characters and number',
+          help: '',
           status: '',
         });
         setCategoryPrefixValidate({
@@ -264,6 +229,8 @@ const CreateAsset = () => {
         form={form}
         name="control-hooks"
         onFinish={handleSubmitCreateNewAsset}
+        labelAlign={'left'}
+        colon={false}
       >
         <Form.Item name="assetName" label="Asset Name" help={assetNameValidate.help}>
           <Input
@@ -277,7 +244,6 @@ const CreateAsset = () => {
             id="create-asset-select__type"
             placeholder=""
             onDropdownVisibleChange={handleVisibleInputAddCategory}
-            allowClear
             dropdownRender={(menu) => (
               <>
                 {menu}
@@ -305,6 +271,7 @@ const CreateAsset = () => {
                             placeholder="Bluetool Mouse"
                             style={{ width: '10rem' }}
                             status={categoryNameValidate.status}
+                            id="create-category-name"
                             onChange={(event) => handleValidString(event, 'CATEGORY_NAME')}
                           />
                         </Form.Item>
@@ -312,6 +279,7 @@ const CreateAsset = () => {
                           <Input
                             placeholder="BM"
                             style={{ maxWidth: '4rem' }}
+                            id="create-category-prefix"
                             onChange={(event) => handleValidString(event, 'CATEGORY_PREFIX')}
                             status={categoryPrefixValidate.status}
                           />
@@ -354,6 +322,7 @@ const CreateAsset = () => {
         </Form.Item>
         <Form.Item name="specification" label="Specification" help={specificationValidate.help}>
           <TextArea
+            id="create-asset-specification"
             rows={4}
             placeholder=""
             maxLength={200}
@@ -378,7 +347,7 @@ const CreateAsset = () => {
           </Radio.Group>
         </Form.Item>
         <div className="create-asset__form-action">
-          <Button type="primary" danger htmlType="submit" disabled={isDisabled}>
+          <Button type="primary" htmlType="submit" disabled={isDisabled}>
             Save
           </Button>
           <Button htmlType="button" onClick={handleClickClose}>

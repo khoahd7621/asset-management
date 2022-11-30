@@ -114,41 +114,24 @@ const EditAsset = () => {
     if (event.target.value.trim().length === 0) {
       if (type === 'ASSET_NAME') {
         setAssetNameValidate({
-          help: 'Asset name is required',
+          help: '',
           status: 'error',
         });
         return;
       }
       if (type === 'SPECIFICATION') {
         setSpecificationValidate({
-          help: 'Specification is required',
+          help: '',
           status: 'error',
         });
         return;
       }
     }
-    if (event.target.value.trim().length > 100) {
-      if (type === 'ASSET_NAME') {
-        setAssetNameValidate({
-          help: 'Maximum 100 characters',
-          status: 'error',
-        });
-        return;
-      }
-    }
-    if (event.target.value.trim().length > 500) {
-      if (type === 'SPECIFICATION') {
-        setSpecificationValidate({
-          help: 'Maximum 500 characters',
-          status: 'error',
-        });
-        return;
-      }
-    }
+
     if (type === 'ASSET_NAME') {
-      if (!/^([A-Za-z0-9\s]+)+[A-Za-z0-9\s]+$/.test(event.target.value)) {
+      if (!/^([A-Za-z0-9\s])*[A-Za-z0-9\s]+$/.test(event.target.value)) {
         setAssetNameValidate({
-          help: 'Asset name only accepts not contains any special characters and number.',
+          help: '',
           status: 'error',
         });
         return;
@@ -176,18 +159,19 @@ const EditAsset = () => {
             name="control-hooks"
             onFinish={handleSubmitEditAsset}
           >
-            <Form.Item name="assetName" label="Name" help={assetNameValidate.help}>
+            <Form.Item name="assetName" label="Name" help={assetNameValidate.help} colon={false}>
               <Input
                 id="edit-asset-input__asset-name"
                 onChange={(event) => handleValidString(event, 'ASSET_NAME')}
                 status={assetNameValidate.status}
               />
             </Form.Item>
-            <Form.Item name="category" label="Category">
+            <Form.Item name="category" label="Category" colon={false}>
               <Select id="edit-asset-select__type" placeholder={category} allowClear value={'LD'} disabled></Select>
             </Form.Item>
-            <Form.Item name="specification" label="Specification" help={specificationValidate.help}>
+            <Form.Item name="specification" label="Specification" help={specificationValidate.help} colon={false}>
               <TextArea
+                id="edit-asset-specification"
                 rows={4}
                 placeholder=""
                 maxLength={200}
@@ -196,14 +180,14 @@ const EditAsset = () => {
                 style={{ maxHeight: '7rem', minHeight: '7rem' }}
               />
             </Form.Item>
-            <Form.Item name="installedDate" label="Installed Date">
+            <Form.Item name="installedDate" label="Installed Date" colon={false}>
               <DatePicker
                 id="edit-asset-date-picker__joined-date"
                 placeholder=""
                 format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
               />
             </Form.Item>
-            <Form.Item name="assetStatus" label="State">
+            <Form.Item name="assetStatus" label="State" colon={false}>
               <Radio.Group id="edit-asset-radio__gender" value={stateType} style={{ paddingTop: '0.4rem' }}>
                 <Space direction="vertical">
                   <Radio value={'AVAILABLE'}>Available</Radio>
