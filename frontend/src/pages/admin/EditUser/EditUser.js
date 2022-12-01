@@ -3,11 +3,13 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { adminRoute } from '../../../routes/routes';
 import { CaretDownOutlined } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import './EditUser.scss';
 import { CalendarIcon } from '../../../assets/CustomIcon';
 import { postEditUser } from '../../../services/editApiService';
 import moment from 'moment';
+import { removeDataUserLogout } from '../../../redux/slice/userSlice';
+
 
 const EditUser = () => {
   const location = useLocation();
@@ -26,6 +28,7 @@ const EditUser = () => {
   const [dateOfBirthValidate, setDateOfBirthValidate] = useState({ ...initialError });
   const [joinedDateValidate, setJoinedDateValidate] = useState({ ...initialError });
   const [isDisabled, setIsDisabled] = useState(true);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     document.title = 'Manage User - Edit User';
@@ -61,9 +64,10 @@ const EditUser = () => {
       joinedDate: values.joinedDate.format('DD/MM/YYYY'),
       staffCode: userDetails.staffCode,
     });
-    if (response && +response.status === 200) {
+
+    if (response.status === 200) {
       if (user.username === userDetails.username && values.type === 'STAFF') {
-        navigate(`/`);
+        dispatch(removeDataUserLogout());
       } else {
         resetFileds();
         navigate(`/${adminRoute.home}/${adminRoute.manageUser}`, {

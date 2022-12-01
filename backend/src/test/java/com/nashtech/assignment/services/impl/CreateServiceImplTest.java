@@ -11,7 +11,9 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -43,242 +45,246 @@ import com.nashtech.assignment.services.SecurityContextService;
 
 class CreateServiceImplTest {
 
-  private CreateServiceImpl createService;
-  private UserRepository userRepository;
-  private CategoryRepository categoryRepository;
-  private AssetRepository assetRepository;
-  private AssetMapper assetMapper;
-  private UserMapper userMapper;
-  private CategoryMapper categoryMapper;
-  private PasswordEncoder passwordEncoder;
-  private SecurityContextService securityContextService;
-  private User user;
-  private Category category;
-  private Asset asset;
+    private CreateServiceImpl createService;
+    private UserRepository userRepository;
+    private CategoryRepository categoryRepository;
+    private AssetRepository assetRepository;
+    private AssetMapper assetMapper;
+    private UserMapper userMapper;
+    private CategoryMapper categoryMapper;
+    private PasswordEncoder passwordEncoder;
+    private SecurityContextService securityContextService;
+    private User user;
+    private Category category;
+    private Asset asset;
 
-  @BeforeEach
-  void beforeEach() {
-    userRepository = mock(UserRepository.class);
-    categoryRepository = mock(CategoryRepository.class);
-    assetRepository = mock(AssetRepository.class);
-    userMapper = mock(UserMapper.class);
-    categoryMapper = mock(CategoryMapper.class);
-    assetMapper = mock(AssetMapper.class);
-    passwordEncoder = mock(PasswordEncoder.class);
-    securityContextService = mock(SecurityContextService.class);
-    createService = CreateServiceImpl.builder()
-        .userRepository(userRepository)
-        .userMapper(userMapper)
-        .passwordEncoder(passwordEncoder)
-        .securityContextService(securityContextService)
-        .categoryRepository(categoryRepository)
-        .categoryMapper(categoryMapper)
-        .assetRepository(assetRepository)
-        .assetMapper(assetMapper)
-        .build();
-    user = mock(User.class);
-    asset = mock(Asset.class);
-    category = mock(Category.class);
-  }
+    @BeforeEach
+    void beforeEach() {
+        userRepository = mock(UserRepository.class);
+        categoryRepository = mock(CategoryRepository.class);
+        assetRepository = mock(AssetRepository.class);
+        userMapper = mock(UserMapper.class);
+        categoryMapper = mock(CategoryMapper.class);
+        assetMapper = mock(AssetMapper.class);
+        passwordEncoder = mock(PasswordEncoder.class);
+        securityContextService = mock(SecurityContextService.class);
+        createService = CreateServiceImpl.builder()
+                .userRepository(userRepository)
+                .userMapper(userMapper)
+                .passwordEncoder(passwordEncoder)
+                .securityContextService(securityContextService)
+                .categoryRepository(categoryRepository)
+                .categoryMapper(categoryMapper)
+                .assetRepository(assetRepository)
+                .assetMapper(assetMapper)
+                .build();
+        user = mock(User.class);
+        asset = mock(Asset.class);
+        category = mock(Category.class);
+    }
 
-  @Test
-  void createNewUser_WhenAgeLessThan18_ShouldThrowBadRequestException() {
-    CreateNewUserRequest createNewUserRequest = CreateNewUserRequest.builder()
-        .dateOfBirth("20/12/2004")
-        .build();
+    @Test
+    void createNewUser_WhenAgeLessThan18_ShouldThrowBadRequestException() {
+        CreateNewUserRequest createNewUserRequest = CreateNewUserRequest.builder()
+                .dateOfBirth("20/12/2004")
+                .build();
 
-    BadRequestException actual = assertThrows(BadRequestException.class, () -> {
-      createService.createNewUser(createNewUserRequest);
-    });
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            createService.createNewUser(createNewUserRequest);
+        });
 
-    assertThat(actual.getMessage(), is("Age cannot below 18."));
-  }
+        assertThat(actual.getMessage(), is("Age cannot below 18."));
+    }
 
-  @Test
-  void createNewUser_WhenBirthAfterJoinDate_ShouldThrowBadRequestException() {
-    CreateNewUserRequest createNewUserRequest = CreateNewUserRequest.builder()
-        .dateOfBirth("21/12/2001")
-        .joinedDate("20/12/2001")
-        .build();
+    @Test
+    void createNewUser_WhenBirthAfterJoinDate_ShouldThrowBadRequestException() {
+        CreateNewUserRequest createNewUserRequest = CreateNewUserRequest.builder()
+                .dateOfBirth("21/12/2001")
+                .joinedDate("20/12/2001")
+                .build();
 
-    BadRequestException actual = assertThrows(BadRequestException.class, () -> {
-      createService.createNewUser(createNewUserRequest);
-    });
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            createService.createNewUser(createNewUserRequest);
+        });
 
-    assertThat(actual.getMessage(), is("Joined date cannot be after birth date."));
-  }
+        assertThat(actual.getMessage(), is("Joined date cannot be after birth date."));
+    }
 
-  @Test
-  void createNewUser_WhenJoinDateIsSunday_ShouldThrowBadRequestException() {
-    CreateNewUserRequest createNewUserRequest = CreateNewUserRequest.builder()
-        .dateOfBirth("21/12/2001")
-        .joinedDate("20/11/2022")
-        .build();
+    @Test
+    void createNewUser_WhenJoinDateIsSunday_ShouldThrowBadRequestException() {
+        CreateNewUserRequest createNewUserRequest = CreateNewUserRequest.builder()
+                .dateOfBirth("21/12/2001")
+                .joinedDate("20/11/2022")
+                .build();
 
-    BadRequestException actual = assertThrows(BadRequestException.class, () -> {
-      createService.createNewUser(createNewUserRequest);
-    });
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            createService.createNewUser(createNewUserRequest);
+        });
 
-    assertThat(actual.getMessage(), is("Joined date cannot be Saturday or Sunday."));
-  }
+        assertThat(actual.getMessage(), is("Joined date cannot be Saturday or Sunday."));
+    }
 
-  @Test
-  void createNewUser_WhenJoinDateIsSaturday_ShouldThrowBadRequestException() {
-    CreateNewUserRequest createNewUserRequest = CreateNewUserRequest.builder()
-        .dateOfBirth("21/12/2001")
-        .joinedDate("19/11/2022")
-        .build();
+    @Test
+    void createNewUser_WhenJoinDateIsSaturday_ShouldThrowBadRequestException() {
+        CreateNewUserRequest createNewUserRequest = CreateNewUserRequest.builder()
+                .dateOfBirth("21/12/2001")
+                .joinedDate("19/11/2022")
+                .build();
 
-    BadRequestException actual = assertThrows(BadRequestException.class, () -> {
-      createService.createNewUser(createNewUserRequest);
-    });
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            createService.createNewUser(createNewUserRequest);
+        });
 
-    assertThat(actual.getMessage(), is("Joined date cannot be Saturday or Sunday."));
-  }
+        assertThat(actual.getMessage(), is("Joined date cannot be Saturday or Sunday."));
+    }
 
-  @Test
-  void createNewUser_WhenCreateAdminButLocationIsNull_ShouldThrowBadRequestException() {
-    CreateNewUserRequest createNewUserRequest = CreateNewUserRequest.builder()
-        .dateOfBirth("21/12/2001")
-        .joinedDate("17/11/2022")
-        .type(EUserType.ADMIN)
-        .location(null)
-        .build();
+    @Test
+    void createNewUser_WhenCreateAdminButLocationIsNull_ShouldThrowBadRequestException() {
+        CreateNewUserRequest createNewUserRequest = CreateNewUserRequest.builder()
+                .dateOfBirth("21/12/2001")
+                .joinedDate("17/11/2022")
+                .type(EUserType.ADMIN)
+                .location(null)
+                .build();
 
-    when(userMapper.toUser(createNewUserRequest)).thenReturn(user);
+        when(userMapper.toUser(createNewUserRequest)).thenReturn(user);
 
-    BadRequestException actual = assertThrows(BadRequestException.class, () -> {
-      createService.createNewUser(createNewUserRequest);
-    });
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            createService.createNewUser(createNewUserRequest);
+        });
 
-    assertThat(actual.getMessage(), is("User type of ADMIN so location cannot be blank."));
-  }
+        assertThat(actual.getMessage(), is("User type of ADMIN so location cannot be blank."));
+    }
 
-  @Test
-  void createNewUser_WhenDataValid_ShouldReturnData() throws ParseException {
-    CreateNewUserRequest createNewUserRequest = CreateNewUserRequest.builder()
-        .firstName("hau")
-        .lastName("doan")
-        .dateOfBirth("21/12/2001")
-        .joinedDate("17/11/2022")
-        .gender(EGender.MALE)
-        .type(EUserType.ADMIN)
-        .location("hehe")
-        .build();
-    ArgumentCaptor<String> staffCodeCaptor = ArgumentCaptor.forClass(String.class);
-    SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
-    Date dateOfBirth = formatterDate.parse(createNewUserRequest.getDateOfBirth());
-    Date joinedDate = formatterDate.parse(createNewUserRequest.getJoinedDate());
-    UserResponse expected = mock(UserResponse.class);
+    @Test
+    void createNewUser_WhenDataValid_ShouldReturnData() throws ParseException {
+        CreateNewUserRequest createNewUserRequest = CreateNewUserRequest.builder()
+                .firstName("hau")
+                .lastName("doan")
+                .dateOfBirth("21/12/2001")
+                .joinedDate("17/11/2022")
+                .gender(EGender.MALE)
+                .type(EUserType.ADMIN)
+                .location("hehe")
+                .build();
+        ArgumentCaptor<String> staffCodeCaptor = ArgumentCaptor.forClass(String.class);
+        SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
+        Date dateOfBirth = formatterDate.parse(createNewUserRequest.getDateOfBirth());
+        Date joinedDate = formatterDate.parse(createNewUserRequest.getJoinedDate());
+        UserResponse expected = mock(UserResponse.class);
 
-    when(userRepository.save(user)).thenReturn(user);
-    when(user.getFirstName()).thenReturn(createNewUserRequest.getFirstName());
-    when(userMapper.toUser(createNewUserRequest)).thenReturn(user);
-    when(user.getUsername()).thenReturn("haud");
-    when(userMapper.mapEntityToResponseDto(user)).thenReturn(expected);
+        when(userRepository.save(user)).thenReturn(user);
+        when(user.getFirstName()).thenReturn(createNewUserRequest.getFirstName());
+        when(userMapper.toUser(createNewUserRequest)).thenReturn(user);
+        when(user.getUsername()).thenReturn("haud");
+        when(userMapper.mapEntityToResponseDto(user)).thenReturn(expected);
 
-    UserResponse actual = createService.createNewUser(createNewUserRequest);
+        UserResponse actual = createService.createNewUser(createNewUserRequest);
 
-    verify(user).setStaffCode(staffCodeCaptor.capture());
-    verify(user).setUsername("haud");
-    verify(user).setDateOfBirth(dateOfBirth);
-    verify(user).setJoinedDate(joinedDate);
-    verify(user).setPassword(passwordEncoder.encode("haud@21122001"));
-    assertThat(staffCodeCaptor.getValue(), is("SD0000"));
-    assertThat(actual, is(expected));
-  }
+        verify(user).setStaffCode(staffCodeCaptor.capture());
+        verify(user).setUsername("haud");
+        verify(user).setDateOfBirth(dateOfBirth);
+        verify(user).setJoinedDate(joinedDate);
+        verify(user).setPassword(passwordEncoder.encode("haud@21122001"));
+        assertThat(staffCodeCaptor.getValue(), is("SD0000"));
+        assertThat(actual, is(expected));
+    }
 
-  @Test
-  void testCreateNewCategory_WhenCategoryNameExisted_ShouldReturnException() {
-    CreateNewCategoryRequest createNewCategoryRequest = CreateNewCategoryRequest.builder()
-        .categoryName("categoryName")
-        .prefixAssetCode("CN")
-        .build();
+    @Test
+    void testCreateNewCategory_WhenCategoryNameExisted_ShouldReturnException() {
+        CreateNewCategoryRequest createNewCategoryRequest = CreateNewCategoryRequest.builder()
+                .categoryName("categoryName")
+                .prefixAssetCode("CN")
+                .build();
 
-    when(categoryRepository.findByName(createNewCategoryRequest.getCategoryName())).thenReturn(Optional.of(category));
+        when(categoryRepository.findByName(createNewCategoryRequest.getCategoryName()))
+                .thenReturn(Optional.of(category));
 
-    BadRequestException actualException = Assertions.assertThrows(BadRequestException.class,
-        () -> createService.createNewCategory(createNewCategoryRequest));
+        BadRequestException actualException = Assertions.assertThrows(BadRequestException.class,
+                () -> createService.createNewCategory(createNewCategoryRequest));
 
-    Assertions.assertEquals("Category name is existed", actualException.getMessage());
-  }
+        Assertions.assertEquals("Category is already existed. Please enter a different category", actualException.getMessage());
+    }
 
-  @Test
-  void testCreateNewCategory_WhenAssetCodeExisted_ShouldReturnException() {
-    CreateNewCategoryRequest createNewCategoryRequest = CreateNewCategoryRequest.builder()
-        .categoryName("categoryName")
-        .prefixAssetCode("CN")
-        .build();
+    @Test
+    void testCreateNewCategory_WhenAssetCodeExisted_ShouldReturnException() {
+        CreateNewCategoryRequest createNewCategoryRequest = CreateNewCategoryRequest.builder()
+                .categoryName("categoryName")
+                .prefixAssetCode("CN")
+                .build();
 
-    when(categoryRepository.findByName(createNewCategoryRequest.getCategoryName())).thenReturn(Optional.empty());
-    when(categoryRepository.findByPrefixAssetCode(createNewCategoryRequest.getPrefixAssetCode()))
-        .thenReturn(Optional.of(category));
+        when(categoryRepository.findByName(createNewCategoryRequest.getCategoryName())).thenReturn(Optional.empty());
+        when(categoryRepository.findByPrefixAssetCode(createNewCategoryRequest.getPrefixAssetCode()))
+                .thenReturn(Optional.of(category));
 
-    BadRequestException actualException = Assertions.assertThrows(BadRequestException.class,
-        () -> createService.createNewCategory(createNewCategoryRequest));
+        BadRequestException actualException = Assertions.assertThrows(BadRequestException.class,
+                () -> createService.createNewCategory(createNewCategoryRequest));
 
-    Assertions.assertEquals("Prefix asset code is existed", actualException.getMessage());
-  }
+        Assertions.assertEquals("Prefix is already existed. Please enter a different prefix", actualException.getMessage());
+    }
 
-  @Test
-  void testCreateNewCategory_WhenDataValid_ShouldReturnData() throws BadRequestException {
-    CreateNewCategoryRequest createNewCategoryRequest = CreateNewCategoryRequest.builder()
-        .categoryName("categoryName")
-        .prefixAssetCode("CN")
-        .build();
+    @Test
+    void testCreateNewCategory_WhenDataValid_ShouldReturnData() throws BadRequestException {
+        CreateNewCategoryRequest createNewCategoryRequest = CreateNewCategoryRequest.builder()
+                .categoryName("categoryName")
+                .prefixAssetCode("CN")
+                .build();
 
-    CategoryResponse expected = mock(CategoryResponse.class);
+        CategoryResponse expected = mock(CategoryResponse.class);
 
-    when(categoryRepository.findByName(createNewCategoryRequest.getCategoryName())).thenReturn(Optional.empty());
-    when(categoryRepository.findByPrefixAssetCode(createNewCategoryRequest.getPrefixAssetCode()))
-        .thenReturn(Optional.empty());
-    when(categoryMapper.mapCategoryRequestToEntity(createNewCategoryRequest)).thenReturn(category);
-    when(categoryRepository.save(category)).thenReturn(category);
-    when(categoryMapper.toCategoryResponse(category)).thenReturn(expected);
+        when(categoryRepository.findByName(createNewCategoryRequest.getCategoryName())).thenReturn(Optional.empty());
+        when(categoryRepository.findByPrefixAssetCode(createNewCategoryRequest.getPrefixAssetCode()))
+                .thenReturn(Optional.empty());
+        when(categoryMapper.mapCategoryRequestToEntity(createNewCategoryRequest)).thenReturn(category);
+        when(categoryRepository.save(category)).thenReturn(category);
+        when(categoryMapper.toCategoryResponse(category)).thenReturn(expected);
 
-    CategoryResponse actual = createService.createNewCategory(createNewCategoryRequest);
+        CategoryResponse actual = createService.createNewCategory(createNewCategoryRequest);
 
-    assertThat(actual, is(expected));
-  }
+        assertThat(actual, is(expected));
+    }
 
-  @Test
-  void testCreateAssetResponse_WhenDataValid_ShouldReturnData() throws ParseException {
-    String prefixAssetCode = "CN";
-    User currentUser = User.builder().staffCode("currentUser").build();
+    @Test
+    void testCreateAssetResponse_WhenDataValid_ShouldReturnData() throws ParseException {
+        String prefixAssetCode = "CN";
+        User currentUser = User.builder().staffCode("currentUser").build();
 
-    CreateNewAssetRequest createNewAssetRequest = CreateNewAssetRequest.builder()
-        .assetName("assetName")
-        .categoryName("categoryName")
-        .specification("specification")
-        .installedDate("01/01/2022")
-        .assetStatus(EAssetStatus.AVAILABLE)
-        .build();
+        CreateNewAssetRequest createNewAssetRequest = CreateNewAssetRequest.builder()
+                .assetName("assetName")
+                .categoryName("categoryName")
+                .specification("specification")
+                .installedDate("01/01/2022")
+                .assetStatus(EAssetStatus.AVAILABLE)
+                .build();
 
-    AssetResponse expected = mock(AssetResponse.class);
+        AssetResponse expected = mock(AssetResponse.class);
+        List<Asset> assets = new ArrayList<Asset>();
 
-    when(assetMapper.mapAssetRequestToEntity(createNewAssetRequest)).thenReturn(asset);
-    when(assetRepository.save(asset)).thenReturn(asset);
+        when(assetMapper.mapAssetRequestToEntity(createNewAssetRequest)).thenReturn(asset);
+        when(assetRepository.save(asset)).thenReturn(asset);
 
-    when(categoryRepository.findByName(createNewAssetRequest.getCategoryName())).thenReturn(Optional.of(category));
-    when(category.getPrefixAssetCode()).thenReturn(prefixAssetCode);
-    when(assetMapper.toAssetResponse(asset)).thenReturn(expected);
-    when(securityContextService.getCurrentUser()).thenReturn(currentUser);
+        when(categoryRepository.findByName(createNewAssetRequest.getCategoryName())).thenReturn(Optional.of(category));
+        when(category.getPrefixAssetCode()).thenReturn(prefixAssetCode);
+        when(assetMapper.toAssetResponse(asset)).thenReturn(expected);
+        when(securityContextService.getCurrentUser()).thenReturn(currentUser);
+        when(assetRepository.findAssetsByCategoryId(category.getId())).thenReturn(assets);
 
-    SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
-    NumberFormat formatter = new DecimalFormat("000000");
-    String assetId = formatter.format(asset.getId());
-    StringBuilder assetCode = new StringBuilder(prefixAssetCode);
-    Date installedDate = formatterDate.parse(createNewAssetRequest.getInstalledDate());
+        SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
+        NumberFormat formatter = new DecimalFormat("000000");
 
-    AssetResponse actual = createService.createAssetResponse(createNewAssetRequest);
+        String assetId = formatter.format(assets.size() + 1);
+        StringBuilder assetCode = new StringBuilder(prefixAssetCode);
+        Date installedDate = formatterDate.parse(createNewAssetRequest.getInstalledDate());
 
-    verify(asset).setAssetCode(assetCode.append(assetId).toString());
-    verify(asset).setName(createNewAssetRequest.getAssetName());
-    verify(asset).setSpecification(createNewAssetRequest.getSpecification());
-    verify(asset).setLocation(securityContextService.getCurrentUser().getLocation());
-    verify(asset).setInstalledDate(installedDate);
-    verify(asset).setStatus(EAssetStatus.AVAILABLE);
+        AssetResponse actual = createService.createAssetResponse(createNewAssetRequest);
 
-    assertThat(actual, is(expected));
-  }
+        verify(asset).setAssetCode(assetCode.append(assetId).toString());
+        verify(asset).setName(createNewAssetRequest.getAssetName());
+        verify(asset).setSpecification(createNewAssetRequest.getSpecification());
+        verify(asset).setLocation(securityContextService.getCurrentUser().getLocation());
+        verify(asset).setInstalledDate(installedDate);
+        verify(asset).setStatus(EAssetStatus.AVAILABLE);
+
+        assertThat(actual, is(expected));
+    }
 }

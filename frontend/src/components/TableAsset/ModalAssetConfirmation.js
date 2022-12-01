@@ -24,7 +24,7 @@ const ModalAssetConfirmation = ({
   };
 
   return (
-    <Modal className="modal-asset-confirmation" title={'Are you sure?'} open={open} closable={false}>
+    <Modal className="modal-asset-confirmation" title={'Are you sure?'} open={open} closable={false} width="350px">
       <div className="content">Do you want to delete this asset?</div>
       <div className="action">
         <button className="delete" onClick={() => handleSubmitDeleteAsset()}>

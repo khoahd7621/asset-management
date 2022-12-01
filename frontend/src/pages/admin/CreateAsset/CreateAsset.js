@@ -101,8 +101,14 @@ const CreateAsset = () => {
         ...initialError,
       });
     } else {
+      
       setCategoryNameValidate({
-        help: response.response.data.message,
+        help:
+          response.response.data.message === 'Category is already existed. Please enter a different category'
+            ? response.response.data.message
+            : '' || response.response.data.message === 'Prefix is already existed. Please enter a different prefix'
+            ? response.response.data.message
+            : '',
         status: '',
       });
     }

@@ -98,9 +98,11 @@ const FormLogin = () => {
         rules={[
           {
             required: true,
+            message: '',
           },
           {
             pattern: /^[a-zA-Z0-9]*$/,
+            message: '',
           },
         ]}
       >
@@ -113,6 +115,7 @@ const FormLogin = () => {
         rules={[
           {
             required: true,
+            message: '',
           },
         ]}
       >

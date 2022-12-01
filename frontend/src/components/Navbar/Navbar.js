@@ -115,6 +115,10 @@ const Navbar = () => {
     setOpenModalChangePassword(false);
   };
 
+  const handleCancelLogout = () => {
+    setOpenModalLogout(false);
+  };
+
   const handleCancelWhenChangeSuccess = () => {
     setOpenChangeSuccess(false);
   };
@@ -244,30 +248,37 @@ const Navbar = () => {
       >
         <p>Do you want to log out?</p>
 
-        <Button onClick={handleLogout} danger type="primary" htmlType="submit">
+        <Button className="change-password-button" onClick={handleLogout} htmlType="submit">
           Log out
         </Button>
-        <Button style={{ marginLeft: '15px' }} htmlType="submit">
+        <Button
+          className="cancel-change-password-button"
+          onClick={handleCancelLogout}
+          style={{ marginLeft: '15px' }}
+          htmlType="submit"
+        >
           Cancel
         </Button>
       </CustomModal>
 
       <CustomModal
+        
         className="modal-asset-detail"
         title="Change Password"
         open={openModalChangePassword}
         closable={false}
         onCancel={() => {}}
-        width="550px"
+        width="400px"
       >
         <Form
+          labelAlign='left'
           form={form}
           name="basic"
           labelCol={{
-            span: 6,
+            span: 8,
           }}
           wrapperCol={{
-            span: 18,
+            span: 16,
           }}
           initialValues={{
             remember: true,
@@ -278,6 +289,7 @@ const Navbar = () => {
           className="change-password-form"
         >
           <Form.Item
+            className='old-password'
             label="Old Password"
             name="oldPassword"
             colon={false}
@@ -290,6 +302,7 @@ const Navbar = () => {
             help={oldPasswordValidator.help}
           >
             <Input.Password
+            className='change-password--input'
               id="oldPassword"
               name="password"
               status={oldPasswordValidator.status}
@@ -307,10 +320,11 @@ const Navbar = () => {
                 message: '',
               },
             ]}
-            help={newPasswordValidate.help}
+            help={newPasswordValidate.help} 
           >
             <Input.Password
               id="newPassword"
+              className='change-password--input'
               name="password"
               status={newPasswordValidate.status}
               onChange={(event) => handleValidString(event, 'NEW_PASSWORD')}
@@ -318,10 +332,10 @@ const Navbar = () => {
           </Form.Item>
         </Form>
         <div className="btnChangePassword">
-          <Button onClick={handleSubmitChange} disabled={isSending} danger type="primary" htmlType="submit">
+          <Button className='change-password-button' onClick={handleSubmitChange} disabled={isSending} type="primary" htmlType="submit">
             Save
           </Button>
-          <Button onClick={handleCancel} style={{ marginLeft: '15px' }} htmlType="submit">
+          <Button className='cancel-change-password-button' onClick={handleCancel} style={{ marginLeft: '15px' }} htmlType="submit">
             Cancel
           </Button>
         </div>
@@ -336,8 +350,9 @@ const Navbar = () => {
         width="400px"
       >
         <p>Your password has been changed successfully!</p>
+        <br></br>
         <div className="btnChangePassword">
-          <Button onClick={handleCancelWhenChangeSuccess} style={{ marginRight: '0px' }} htmlType="submit">
+          <Button className='cancel-change-password-button' onClick={handleCancelWhenChangeSuccess} style={{ marginRight: '0px' }} htmlType="submit">
             Close
           </Button>
         </div>

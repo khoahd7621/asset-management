@@ -198,10 +198,10 @@ const EditAsset = () => {
               </Radio.Group>
             </Form.Item>
             <div className="edit-asset__form-action">
-              <Button type="primary" danger htmlType="submit" disabled={isDisabled}>
+              <Button className='edit-asset-button' htmlType="submit" disabled={isDisabled}>
                 Save
               </Button>
-              <Button htmlType="button" onClick={handleClickClose}>
+              <Button className='cancel-edit-asset-button' htmlType="button" onClick={handleClickClose}>
                 Cancel
               </Button>
             </div>
