@@ -10,7 +10,6 @@ import { postEditUser } from '../../../services/editApiService';
 import moment from 'moment';
 import { removeDataUserLogout } from '../../../redux/slice/userSlice';
 
-
 const EditUser = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -102,9 +101,9 @@ const EditUser = () => {
         setDateOfBirthValidate({ ...initialError });
       }
       if (joinedDateType) {
-        if (date.diff(joinedDateType, 'days') >= 6574) {
+        if (date.diff(joinedDateType, 'days') >= 0) {
           setJoinedDateValidate({
-            help: 'Joined date is under 18 year than Date of Birth. Please select a different date',
+            help: 'Joined date is not later than Date of Birth. Please select a different date',
             status: 'error',
           });
         } else {
@@ -126,9 +125,9 @@ const EditUser = () => {
         return;
       }
       if (dateOfBirthType) {
-        if (date.diff(dateOfBirthType, 'days') <= 6574) {
+        if (date.diff(dateOfBirthType, 'days') <= 0) {
           setJoinedDateValidate({
-            help: 'Joined date is under 18 year than Date of Birth. Please select a different date',
+            help: 'Joined date is not later than Date of Birth. Please select a different date',
             status: 'error',
           });
           return;

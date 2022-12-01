@@ -356,6 +356,7 @@ const ListUser = () => {
         <Row>
           <Col xs={20} sm={4} md={6} lg={10} xl={11}>
             <Popover
+              id="filter-user-type"
               content={content}
               placement="bottom"
               trigger="click"

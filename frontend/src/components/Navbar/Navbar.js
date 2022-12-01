@@ -144,12 +144,24 @@ const Navbar = () => {
     }
   };
 
-  const menu = (
-    <Menu>
-      <Menu.Item onClick={handleChangePassword}>Change Password</Menu.Item>
-      <Menu.Item onClick={handleSelectLogout}>Logout</Menu.Item>
-    </Menu>
-  );
+  const items = [
+    {
+      key: 'change-password-btn',
+      label: (
+        <span id="change-password-btn" onClick={handleChangePassword}>
+          Change Password
+        </span>
+      ),
+    },
+    {
+      key: 'logout-btn',
+      label: (
+        <span id="logout-btn" onClick={handleSelectLogout}>
+          Logout
+        </span>
+      ),
+    },
+  ];
 
   const [listTitles, setListTitles] = useState([{ title: '', link: '' }]);
   const user = useSelector((state) => state.user.user);
@@ -230,8 +242,8 @@ const Navbar = () => {
           })}
       </div>
       <div className="navbar-header__right">
-        <Dropdown overlay={menu} trigger={['click']}>
-          <a onClick={(e) => e.preventDefault()}>
+        <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
+          <a id="username-btn" onClick={(e) => e.preventDefault()}>
             <Space>
               {user.username} <CaretDownOutlined />
             </Space>
@@ -262,7 +274,6 @@ const Navbar = () => {
       </CustomModal>
 
       <CustomModal
-        
         className="modal-asset-detail"
         title="Change Password"
         open={openModalChangePassword}
@@ -271,7 +282,7 @@ const Navbar = () => {
         width="400px"
       >
         <Form
-          labelAlign='left'
+          labelAlign="left"
           form={form}
           name="basic"
           labelCol={{
@@ -289,7 +300,7 @@ const Navbar = () => {
           className="change-password-form"
         >
           <Form.Item
-            className='old-password'
+            className="old-password"
             label="Old Password"
             name="oldPassword"
             colon={false}
@@ -302,7 +313,7 @@ const Navbar = () => {
             help={oldPasswordValidator.help}
           >
             <Input.Password
-            className='change-password--input'
+              className="change-password--input"
               id="oldPassword"
               name="password"
               status={oldPasswordValidator.status}
@@ -320,11 +331,11 @@ const Navbar = () => {
                 message: '',
               },
             ]}
-            help={newPasswordValidate.help} 
+            help={newPasswordValidate.help}
           >
             <Input.Password
               id="newPassword"
-              className='change-password--input'
+              className="change-password--input"
               name="password"
               status={newPasswordValidate.status}
               onChange={(event) => handleValidString(event, 'NEW_PASSWORD')}
@@ -332,10 +343,21 @@ const Navbar = () => {
           </Form.Item>
         </Form>
         <div className="btnChangePassword">
-          <Button className='change-password-button' onClick={handleSubmitChange} disabled={isSending} type="primary" htmlType="submit">
+          <Button
+            className="change-password-button"
+            onClick={handleSubmitChange}
+            disabled={isSending}
+            type="primary"
+            htmlType="submit"
+          >
             Save
           </Button>
-          <Button className='cancel-change-password-button' onClick={handleCancel} style={{ marginLeft: '15px' }} htmlType="submit">
+          <Button
+            className="cancel-change-password-button"
+            onClick={handleCancel}
+            style={{ marginLeft: '15px' }}
+            htmlType="submit"
+          >
             Cancel
           </Button>
         </div>
@@ -352,7 +374,12 @@ const Navbar = () => {
         <p>Your password has been changed successfully!</p>
         <br></br>
         <div className="btnChangePassword">
-          <Button className='cancel-change-password-button' onClick={handleCancelWhenChangeSuccess} style={{ marginRight: '0px' }} htmlType="submit">
+          <Button
+            className="cancel-change-password-button"
+            onClick={handleCancelWhenChangeSuccess}
+            style={{ marginRight: '0px' }}
+            htmlType="submit"
+          >
             Close
           </Button>
         </div>

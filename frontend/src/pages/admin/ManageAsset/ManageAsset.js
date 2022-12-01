@@ -207,6 +207,7 @@ const ManageAsset = () => {
       <div className="manage-asset-block__title">Asset List</div>
       <div className="manage-asset-block__action">
         <FilterMenu
+          id="filter-asset-status"
           options={LIST_STATUS}
           value={currentChoosedStatus}
           onChange={handleChangeFilterMenu}
@@ -214,6 +215,7 @@ const ManageAsset = () => {
           checkboxType="ASSET_STATE"
         />
         <FilterMenu
+          id="filter-asset-category"
           options={listCategoriesOption}
           value={currentChoosedCategories}
           title="Category"

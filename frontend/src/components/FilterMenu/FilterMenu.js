@@ -22,6 +22,7 @@ const FilterMenu = ({
   onChange,
   checkboxType = 'Checkbox',
   title = 'Checkbox',
+  ...props
 }) => {
   const [Icon, setIcon] = useState(FilterOutlined);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -62,6 +63,7 @@ const FilterMenu = ({
       trigger="click"
       placement="bottomRight"
       overlayClassName="checkbox-popover"
+      {...props}
     >
       <Button className="checkbox-menu__button">
         <p>{title}</p>

@@ -41,7 +41,7 @@ public class FindServiceImplTest {
 
     @Test
     void filterByType_WhenDataValid_ShouldReturnPaginationResponse() {
-        Pageable pageable = PageRequest.of(0, 19,Sort.by("firstName"));
+        Pageable pageable = PageRequest.of(0, 20,Sort.by("firstName"));
         Page<User> page = mock(Page.class);
         List<UserResponse> users = mock(List.class);
 
@@ -54,7 +54,7 @@ public class FindServiceImplTest {
     }
     @Test
     void filterByType_WhenDataValid_ShouldReturnEmptyCollection() {
-        Pageable pageable = PageRequest.of(0, 19);
+        Pageable pageable = PageRequest.of(0, 20);
         Page<User> page = mock(Page.class);
         List<UserResponse> users = mock(List.class);
 
@@ -68,7 +68,7 @@ public class FindServiceImplTest {
 
     @Test
     void filterByType_WhenTypeAll_ShouldReturnPaginationResponse() {
-        Pageable pageable = PageRequest.of(0, 19,Sort.by("firstName"));
+        Pageable pageable = PageRequest.of(0, 20,Sort.by("firstName"));
 
         Page<User> page = mock(Page.class);
         List<UserResponse> users = mock(List.class);
@@ -82,7 +82,7 @@ public class FindServiceImplTest {
     }
     @Test
     void filterByType_WhenTypeAll_ShouldReturnEmpty() {
-        Pageable pageable = PageRequest.of(0, 19,Sort.by("firstName"));
+        Pageable pageable = PageRequest.of(0, 20,Sort.by("firstName"));
 
         Page<User> page = mock(Page.class);
         List<UserResponse> users = mock(List.class);
@@ -97,7 +97,7 @@ public class FindServiceImplTest {
 
     @Test
     void findByLocation_WhenDataValid_ShouldReturnPainationResponse() {
-        Pageable page = PageRequest.of(0, 19);
+        Pageable page = PageRequest.of(0, 20);
         Page<User> pages = mock(Page.class);
         List<UserResponse> expected = mock(List.class);
 
@@ -111,7 +111,7 @@ public class FindServiceImplTest {
     }
     @Test
     void findByLocation_WhenDataNull_ShouldReturnEmptyCollections() {
-        Pageable page = PageRequest.of(0, 19);
+        Pageable page = PageRequest.of(0, 20);
         Page<User> pages = mock(Page.class);
         List<UserResponse> expected = mock(List.class);
 
@@ -125,7 +125,7 @@ public class FindServiceImplTest {
     }
     @Test
     void findByLocation_WhenDataisEmpty_ShouldReturnEmptyCollections() {
-        Pageable page = PageRequest.of(0, 19);
+        Pageable page = PageRequest.of(0, 20);
         Page<User> pages = new PageImpl<>(Collections.emptyList());
         List<UserResponse> expected = mock(List.class);
 
@@ -141,7 +141,7 @@ public class FindServiceImplTest {
     @Test
     void searchByNameOrStaffCodeAndFilterByTypeAndLocation_WhenDataValid_ShouldReturnList() {
         List<UserResponse> expected = mock(List.class);
-        Pageable page = PageRequest.of(0, 19);
+        Pageable page = PageRequest.of(0, 20);
         Page<User> pages = mock(Page.class);
 
         when(userRepository.search("%test%", "test", "test", EUserType.ADMIN, page)).thenReturn(pages);
@@ -153,7 +153,7 @@ public class FindServiceImplTest {
     @Test
     void searchByNameOrStaffCodeAndFilterByTypeAndLocation_WhenStaffNull_ShouldReturnList() {
         List<UserResponse> expected = mock(List.class);
-        Pageable page = PageRequest.of(0, 19);
+        Pageable page = PageRequest.of(0, 20);
         Page<User> pages = mock(Page.class);
 
         when(userRepository.search("%test%", "test", "test",null, page)).thenReturn(pages);
@@ -166,7 +166,7 @@ public class FindServiceImplTest {
     void searchByNameOrStaffCodeAndFilterByTypeAndLocation_WhenDataNotExist_ShouldReturnEmpty() {
         List<UserResponse> expected = mock(List.class);
         Page<User> pages = new PageImpl<>(Collections.emptyList());
-        Pageable page = PageRequest.of(0, 19);
+        Pageable page = PageRequest.of(0, 20);
         when(userRepository.search("test", "test", "test", null, page)).thenReturn(pages);
         when(userMapper.mapListEntityUserResponses(pages.getContent())).thenReturn(expected);
 
@@ -176,7 +176,7 @@ public class FindServiceImplTest {
     @Test
     void searchByNameOrStaffCodeAndFilterByTypeAndLocation_WhenDataNull_ShouldReturnEmpty() {
         List<UserResponse> expected = mock(List.class);
-        Pageable page = PageRequest.of(0, 19);
+        Pageable page = PageRequest.of(0, 20);
         Page<User> pages = new PageImpl<>(Collections.emptyList());
         when(userRepository.search("test", "test", "test", null, page)).thenReturn(pages);
         when(userMapper.mapListEntityUserResponses(pages.getContent())).thenReturn(expected);

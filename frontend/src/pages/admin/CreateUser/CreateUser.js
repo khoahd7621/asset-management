@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, DatePicker, Form, Input, Radio, Select } from 'antd';
+import moment from 'moment';
+
 import './CreateUser.scss';
 
 import { postCreateNewUser } from '../../../services/createApiService';
@@ -265,6 +267,10 @@ const CreateUser = () => {
             format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
             onChange={handleValidateDateOfBirth}
             status={dateOfBirthValidate.status}
+            disabledDate={(current) => {
+              let customDate = moment('01/01/1900', 'DD/MM/YYYY');
+              return current && current < moment(customDate, 'DD/MM/YYYY');
+            }}
           />
         </Form.Item>
         <Form.Item name="gender" label="Gender">
@@ -280,6 +286,10 @@ const CreateUser = () => {
             format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
             onChange={handleValidateJoinedDate}
             status={joinedDateValidate.status}
+            disabledDate={(current) => {
+              let customDate = moment('01/01/1900', 'DD/MM/YYYY');
+              return current && current < moment(customDate, 'DD/MM/YYYY');
+            }}
           />
         </Form.Item>
         <Form.Item name="type" label="Type">
