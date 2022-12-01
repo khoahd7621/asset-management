@@ -33,7 +33,7 @@ public class FindServiceImpl implements FindService {
 
     @Override
     public PaginationResponse<List<UserResponse>> findByLocation(String location, Integer pageNumber) {
-        Pageable pageWithNumberAndSize = PageRequest.of(pageNumber, 19);
+        Pageable pageWithNumberAndSize = PageRequest.of(pageNumber, 20);
 
         Page<User> user = userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc(location, pageWithNumberAndSize);
 
@@ -59,7 +59,7 @@ public class FindServiceImpl implements FindService {
     @Override
     public PaginationResponse<List<UserResponse>> searchByNameOrStaffCodeAndFilterByTypeAndLocation(
             Integer page, String name, String staffCode, EUserType type, String location) {
-        Pageable pageable = PageRequest.of(page, 19);
+        Pageable pageable = PageRequest.of(page, 20);
         Page<User> result = null;
         name = "%" + name + "%";
         if (type != EUserType.ADMIN && type != EUserType.STAFF) {
@@ -79,13 +79,13 @@ public class FindServiceImpl implements FindService {
         }
         return new PaginationResponse<>(
             userMapper.mapListEntityUserResponses(result.getContent()), 
-            result.getTotalPages(), 
+            result.getTotalPages(),
             result.getTotalElements());
     }
 
     @Override
     public PaginationResponse<List<UserResponse>> filterByType(EUserType type, int page, String location) {
-        Pageable pagination = PageRequest.of(page, 19, Sort.by("firstName"));
+        Pageable pagination = PageRequest.of(page, 20, Sort.by("firstName"));
         Page<User> users = null;
         PaginationResponse<List<UserResponse>> result = null;
         if (type != EUserType.ADMIN && type != EUserType.STAFF) {

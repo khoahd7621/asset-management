@@ -190,6 +190,7 @@ const TableAsset = ({
   return (
     <>
       <Table
+        id="table-asset"
         className="table-asset"
         showSorterTooltip={false}
         rowSelection={false}

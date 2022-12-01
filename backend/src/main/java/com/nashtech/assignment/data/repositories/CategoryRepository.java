@@ -13,6 +13,6 @@ import com.nashtech.assignment.data.entities.Category;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     public Optional<Category> findByName(String name);
 
-    @Query(value = "select * from category_tbl as c where c.prefix_asset_code ~ :prefixAssetCode", nativeQuery = true)
+    @Query(value = "select * from category_tbl as c where c.prefix_asset_code = :prefixAssetCode", nativeQuery = true)
     public Optional<Category> findByPrefixAssetCode(@Param("prefixAssetCode") String prefixAssetCode);
 }
