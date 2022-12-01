@@ -164,6 +164,7 @@ const EditAsset = () => {
                 id="edit-asset-input__asset-name"
                 onChange={(event) => handleValidString(event, 'ASSET_NAME')}
                 status={assetNameValidate.status}
+                maxLength={100}
               />
             </Form.Item>
             <Form.Item name="category" label="Category" colon={false}>

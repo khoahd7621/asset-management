@@ -243,6 +243,7 @@ const CreateAsset = () => {
             id="create-asset-input__asset-name"
             onChange={(event) => handleValidString(event, 'ASSET_NAME')}
             status={assetNameValidate.status}
+            maxLength={100}
           />
         </Form.Item>
         <Form.Item name="categoryName" label="Category">
@@ -279,6 +280,7 @@ const CreateAsset = () => {
                             status={categoryNameValidate.status}
                             id="create-category-name"
                             onChange={(event) => handleValidString(event, 'CATEGORY_NAME')}
+                            maxLength={100}
                           />
                         </Form.Item>
                         <Form.Item name="prefixAssetCode" style={{ marginBottom: '0px' }}>
@@ -288,6 +290,7 @@ const CreateAsset = () => {
                             id="create-category-prefix"
                             onChange={(event) => handleValidString(event, 'CATEGORY_PREFIX')}
                             status={categoryPrefixValidate.status}
+                            maxLength={100}
                           />
                         </Form.Item>
                         <Button
@@ -300,7 +303,10 @@ const CreateAsset = () => {
                         ></Button>
                         <CloseOutlined style={{ minWidth: '1rem' }} onClick={handleVisibleInputAddCategory} />
                       </Space>
-                      <div className="create-asset__massage-category-error" style={{ padding: '0.5rem' }}>
+                      <div
+                        className="create-asset__massage-category-error"
+                        style={{ padding: '0.5rem', wordBreak: 'break-word', width: '17rem' }}
+                      >
                         {categoryNameValidate.help}
                       </div>
                     </Form>

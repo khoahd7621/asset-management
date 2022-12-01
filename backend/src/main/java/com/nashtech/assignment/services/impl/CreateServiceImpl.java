@@ -114,43 +114,43 @@ public class CreateServiceImpl implements CreateService {
         return userMapper.mapEntityToResponseDto(user);
     }
 
-    @Override
-    public CategoryResponse createNewCategory(CreateNewCategoryRequest createNewCategoryRequest) {
-        if (!categoryRepository.findByName(createNewCategoryRequest.getCategoryName()).isEmpty()) {
-            throw new BadRequestException("Category is already existed. Please enter a different category");
-        }
-        if (!categoryRepository.findByPrefixAssetCode(createNewCategoryRequest.getPrefixAssetCode()).isEmpty()) {
-            throw new BadRequestException("Prefix is already existed. Please enter a different prefix");
-        }
-        Category category = categoryMapper.mapCategoryRequestToEntity(createNewCategoryRequest);
-        categoryRepository.save(category);
-        return categoryMapper.toCategoryResponse(category);
+  @Override
+  public CategoryResponse createNewCategory(CreateNewCategoryRequest createNewCategoryRequest) {
+    if (!categoryRepository.findByName(createNewCategoryRequest.getCategoryName()).isEmpty()) {
+      throw new BadRequestException("Category is already existed. Please enter a different category");
     }
-
-    @Override
-    public AssetResponse createAssetResponse(CreateNewAssetRequest createNewAssetRequest) throws ParseException {
-        Optional<Category> categoryOpt = categoryRepository.findByName(createNewAssetRequest.getCategoryName());
-        List<Asset> assets = assetRepository.findAssetsByCategoryId(categoryOpt.get().getId());
-
-        Asset asset = assetMapper.mapAssetRequestToEntity(createNewAssetRequest);
-        asset = assetRepository.save(asset);
-        String prefixAssetCode = categoryOpt.get().getPrefixAssetCode();
-
-        SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
-        NumberFormat formatter = new DecimalFormat("000000");
-        String assetId = formatter.format(assets.size() + 1);
-        StringBuilder assetCode = new StringBuilder(prefixAssetCode);
-
-        Date installedDate = formatterDate.parse(createNewAssetRequest.getInstalledDate());
-
-        asset.setAssetCode(assetCode.append(assetId).toString());
-        asset.setName(createNewAssetRequest.getAssetName());
-        asset.setSpecification(createNewAssetRequest.getSpecification());
-        asset.setLocation(securityContextService.getCurrentUser().getLocation());
-        asset.setStatus(createNewAssetRequest.getAssetStatus());
-        asset.setInstalledDate(installedDate);
-
-        assetRepository.save(asset);
-        return assetMapper.toAssetResponse(asset);
+    if (!categoryRepository.findByPrefixAssetCode(createNewCategoryRequest.getPrefixAssetCode()).isEmpty()){
+      throw new BadRequestException("Prefix is already existed. Please enter a different prefix");
     }
+    Category category = categoryMapper.mapCategoryRequestToEntity(createNewCategoryRequest);
+    categoryRepository.save(category);
+    return categoryMapper.toCategoryResponse(category);
+  }
+
+  @Override
+  public AssetResponse createAssetResponse(CreateNewAssetRequest createNewAssetRequest) throws ParseException {
+    Optional<Category> categoryOpt = categoryRepository.findByName(createNewAssetRequest.getCategoryName());
+    List<Asset> assets = assetRepository.findAssetsByCategoryId(categoryOpt.get().getId());
+
+    Asset asset = assetMapper.mapAssetRequestToEntity(createNewAssetRequest);
+    asset = assetRepository.save(asset);
+    String prefixAssetCode = categoryOpt.get().getPrefixAssetCode();
+
+    SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
+    NumberFormat formatter = new DecimalFormat("000000");
+    String assetId = formatter.format(assets.size() + 1);
+    StringBuilder assetCode = new StringBuilder(prefixAssetCode);
+
+    Date installedDate = formatterDate.parse(createNewAssetRequest.getInstalledDate());
+
+    asset.setAssetCode(assetCode.append(assetId).toString());
+    asset.setName(createNewAssetRequest.getAssetName());
+    asset.setSpecification(createNewAssetRequest.getSpecification());
+    asset.setLocation(securityContextService.getCurrentUser().getLocation());
+    asset.setStatus(createNewAssetRequest.getAssetStatus());
+    asset.setInstalledDate(installedDate);
+
+    assetRepository.save(asset);
+    return assetMapper.toAssetResponse(asset);
+  }
 }
