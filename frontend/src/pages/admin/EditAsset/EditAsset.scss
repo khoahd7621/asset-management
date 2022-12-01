@@ -50,7 +50,7 @@
     .edit-asset__form-action {
       display: flex;
       justify-content: end;
-
+      
       button {
         & + button {
           margin-left: 40px;
@@ -92,5 +92,31 @@
   .ant-form-item-explain {
     padding: 8px 0;
     color: #cf2338 !important;
+  }
+}
+
+.edit-asset-button {
+  background-color: #cf2338;
+  border-color: #cf2338;
+  color: #fff;
+  border-radius: 0.3rem;
+
+  &:hover {
+    background-color: #d24a5a;
+    border: 1px solid #d24a5a;
+    color: white;
+  }
+}
+
+.cancel-edit-asset-button {
+  border-radius: 0.3rem;
+  background-color: white;
+  border: 0.11rem solid rgb(183, 183, 183);
+  color: rgb(148, 147, 147);
+
+  &:hover {
+    background-color: white;
+    border: 0.11rem solid rgb(148, 148, 148);
+    color: rgb(148, 147, 147);
   }
 }

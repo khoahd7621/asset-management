@@ -104,6 +104,8 @@
 }
 
 .list-user-pagination {
+  padding-bottom: 64px;
+
   // paging
   .ant-pagination-item a {
     display: block;
@@ -125,16 +127,14 @@
   white-space: nowrap;
 }
 
-.user-list > :disabled{
-  
-    filter:opacity(30%);
-} 
+.user-list > :disabled {
+  filter: opacity(30%);
+}
 .user-list button:disabled {
   filter: opacity(30%);
 }
 
 .user-list__disable-modal {
-
   .ant-modal-content {
     border-radius: 10px;
     border-color: black;
@@ -174,7 +174,7 @@
     padding-left: 38px;
     padding-bottom: 20px;
     display: flex;
-    flex-direction: row-reverse ;
+    flex-direction: row-reverse;
     justify-content: flex-end;
     column-gap: 8px;
 
@@ -241,23 +241,20 @@
     padding-left: 45px;
     padding-bottom: 20px;
     display: flex;
-    flex-direction: row-reverse ;
+    flex-direction: row-reverse;
     justify-content: flex-end;
     column-gap: 8px;
 
     button {
       border-radius: 5px;
-      
     }
 
     .ant-btn.ant-btn-default {
       border: 1px solid rgb(121, 110, 110);
       background-color: #fff;
       color: rgb(121, 110, 110);
-
     }
     .ant-btn.ant-btn-primary {
-     
       background-color: #e5273d;
       color: #fff;
     }
@@ -322,23 +319,20 @@
     padding-left: 45px;
     padding-bottom: 20px;
     display: flex;
-    flex-direction: row-reverse ;
+    flex-direction: row-reverse;
     justify-content: flex-end;
     column-gap: 8px;
 
     button {
       border-radius: 5px;
-      
     }
 
     .ant-btn.ant-btn-default {
       border: 1px solid rgb(121, 110, 110);
       background-color: #fff;
       color: rgb(121, 110, 110);
-
     }
     .ant-btn.ant-btn-primary {
-     
       background-color: #e5273d;
       color: #fff;
     }

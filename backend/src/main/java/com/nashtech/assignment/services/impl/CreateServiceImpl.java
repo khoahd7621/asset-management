@@ -42,85 +42,85 @@ import lombok.Builder;
 @Builder
 public class CreateServiceImpl implements CreateService {
 
-  @Autowired
-  private UserMapper userMapper;
-  @Autowired
-  private UserRepository userRepository;
-  @Autowired
-  private PasswordEncoder passwordEncoder;
-  @Autowired
-  private SecurityContextService securityContextService;
-  @Autowired
-  private CategoryRepository categoryRepository;
-  @Autowired
-  private CategoryMapper categoryMapper;
-  @Autowired
-  private AssetRepository assetRepository;
-  @Autowired
-  private AssetMapper assetMapper;
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private SecurityContextService securityContextService;
+    @Autowired
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private CategoryMapper categoryMapper;
+    @Autowired
+    private AssetRepository assetRepository;
+    @Autowired
+    private AssetMapper assetMapper;
 
-  public UserResponse createNewUser(CreateNewUserRequest createNewUserRequest) throws ParseException {
-    SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
-    Date dateOfBirth = formatterDate.parse(createNewUserRequest.getDateOfBirth());
-    LocalDate birth = LocalDate.ofInstant(dateOfBirth.toInstant(), ZoneId.systemDefault());
-    long age = LocalDate.from(birth).until(LocalDate.now(), ChronoUnit.YEARS);
-    if (age < 18) {
-      throw new BadRequestException("Age cannot below 18.");
+    public UserResponse createNewUser(CreateNewUserRequest createNewUserRequest) throws ParseException {
+        SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
+        Date dateOfBirth = formatterDate.parse(createNewUserRequest.getDateOfBirth());
+        LocalDate birth = LocalDate.ofInstant(dateOfBirth.toInstant(), ZoneId.systemDefault());
+        long age = LocalDate.from(birth).until(LocalDate.now(), ChronoUnit.YEARS);
+        if (age < 18) {
+            throw new BadRequestException("Age cannot below 18.");
+        }
+
+        Date joinedDate = formatterDate.parse(createNewUserRequest.getJoinedDate());
+        LocalDate joinedDay = LocalDate.ofInstant(joinedDate.toInstant(), ZoneId.systemDefault());
+        if (dateOfBirth.after(joinedDate)) {
+            throw new BadRequestException("Joined date cannot be after birth date.");
+        }
+
+        DayOfWeek day = joinedDay.getDayOfWeek();
+        if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
+            throw new BadRequestException("Joined date cannot be Saturday or Sunday.");
+        }
+
+        User user = userMapper.toUser(createNewUserRequest);
+        if (createNewUserRequest.getType() == EUserType.STAFF) {
+            user.setLocation(securityContextService.getCurrentUser().getLocation());
+        } else {
+            if (createNewUserRequest.getLocation() == null || createNewUserRequest.getLocation().trim().equals(""))
+                throw new BadRequestException("User type of ADMIN so location cannot be blank.");
+            user.setLocation(createNewUserRequest.getLocation());
+        }
+        user = userRepository.save(user);
+
+        NumberFormat formatter = new DecimalFormat("0000");
+        String numberId = formatter.format(user.getId());
+        StringBuilder staffCode = new StringBuilder("SD");
+        StringBuilder userNameCode = new StringBuilder(createNewUserRequest.getFirstName());
+        String[] listSingleWordLastName = createNewUserRequest.getLastName().split(" ");
+        for (String word : listSingleWordLastName) {
+            userNameCode.append(word.toLowerCase().charAt(0));
+        }
+        List<User> list = userRepository.findAllByUsernameMatchRegex(userNameCode.toString().toLowerCase() + "[0-9]?");
+        if (list.size() > 0) {
+            userNameCode.append(list.size());
+        }
+
+        user.setStaffCode(staffCode.append(numberId).toString());
+        user.setUsername(userNameCode.toString().toLowerCase());
+        user.setDateOfBirth(dateOfBirth);
+        user.setJoinedDate(joinedDate);
+        String birthPassword = createNewUserRequest.getDateOfBirth().replace("/", "");
+        String password = user.getUsername() + "@" + birthPassword;
+        user.setPassword(passwordEncoder.encode(password));
+
+        userRepository.save(user);
+        return userMapper.mapEntityToResponseDto(user);
     }
-
-    Date joinedDate = formatterDate.parse(createNewUserRequest.getJoinedDate());
-    LocalDate joinedDay = LocalDate.ofInstant(joinedDate.toInstant(), ZoneId.systemDefault());
-    if (dateOfBirth.after(joinedDate)) {
-      throw new BadRequestException("Joined date cannot be after birth date.");
-    }
-
-    DayOfWeek day = joinedDay.getDayOfWeek();
-    if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
-      throw new BadRequestException("Joined date cannot be Saturday or Sunday.");
-    }
-
-    User user = userMapper.toUser(createNewUserRequest);
-    if (createNewUserRequest.getType() == EUserType.STAFF) {
-      user.setLocation(securityContextService.getCurrentUser().getLocation());
-    } else {
-      if (createNewUserRequest.getLocation() == null || createNewUserRequest.getLocation().trim().equals(""))
-        throw new BadRequestException("User type of ADMIN so location cannot be blank.");
-      user.setLocation(createNewUserRequest.getLocation());
-    }
-    user = userRepository.save(user);
-
-    NumberFormat formatter = new DecimalFormat("0000");
-    String numberId = formatter.format(user.getId());
-    StringBuilder staffCode = new StringBuilder("SD");
-    StringBuilder userNameCode = new StringBuilder(createNewUserRequest.getFirstName());
-    String[] listSingleWordLastName = createNewUserRequest.getLastName().split(" ");
-    for (String word : listSingleWordLastName) {
-      userNameCode.append(word.toLowerCase().charAt(0));
-    }
-    List<User> list = userRepository.findAllByUsernameMatchRegex(userNameCode.toString().toLowerCase() + "[0-9]?");
-    if (list.size() > 0) {
-      userNameCode.append(list.size());
-    }
-
-    user.setStaffCode(staffCode.append(numberId).toString());
-    user.setUsername(userNameCode.toString().toLowerCase());
-    user.setDateOfBirth(dateOfBirth);
-    user.setJoinedDate(joinedDate);
-    String birthPassword = createNewUserRequest.getDateOfBirth().replace("/", "");
-    String password = user.getUsername() + "@" + birthPassword;
-    user.setPassword(passwordEncoder.encode(password));
-
-    userRepository.save(user);
-    return userMapper.mapEntityToResponseDto(user);
-  }
 
   @Override
   public CategoryResponse createNewCategory(CreateNewCategoryRequest createNewCategoryRequest) {
     if (!categoryRepository.findByName(createNewCategoryRequest.getCategoryName()).isEmpty()) {
-      throw new BadRequestException("Category name is existed");
+      throw new BadRequestException("Category is already existed. Please enter a different category");
     }
     if (!categoryRepository.findByPrefixAssetCode(createNewCategoryRequest.getPrefixAssetCode()).isEmpty()){
-      throw new BadRequestException("Prefix asset code is existed");
+      throw new BadRequestException("Prefix is already existed. Please enter a different prefix");
     }
     Category category = categoryMapper.mapCategoryRequestToEntity(createNewCategoryRequest);
     categoryRepository.save(category);
@@ -129,15 +129,16 @@ public class CreateServiceImpl implements CreateService {
 
   @Override
   public AssetResponse createAssetResponse(CreateNewAssetRequest createNewAssetRequest) throws ParseException {
+    Optional<Category> categoryOpt = categoryRepository.findByName(createNewAssetRequest.getCategoryName());
+    List<Asset> assets = assetRepository.findAssetsByCategoryId(categoryOpt.get().getId());
+
     Asset asset = assetMapper.mapAssetRequestToEntity(createNewAssetRequest);
     asset = assetRepository.save(asset);
-
-    Optional<Category> categoryOpt = categoryRepository.findByName(createNewAssetRequest.getCategoryName());
     String prefixAssetCode = categoryOpt.get().getPrefixAssetCode();
 
     SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
     NumberFormat formatter = new DecimalFormat("000000");
-    String assetId = formatter.format(asset.getId());
+    String assetId = formatter.format(assets.size() + 1);
     StringBuilder assetCode = new StringBuilder(prefixAssetCode);
 
     Date installedDate = formatterDate.parse(createNewAssetRequest.getInstalledDate());
@@ -149,7 +150,7 @@ public class CreateServiceImpl implements CreateService {
     asset.setStatus(createNewAssetRequest.getAssetStatus());
     asset.setInstalledDate(installedDate);
 
-        assetRepository.save(asset);
-        return assetMapper.toAssetResponse(asset);
-    }
+    assetRepository.save(asset);
+    return assetMapper.toAssetResponse(asset);
+  }
 }

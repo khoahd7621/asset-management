@@ -1,4 +1,4 @@
-@import '~antd/dist/antd.css';
+@import "~antd/dist/antd.css";
 .navbar-header {
   background-color: #cf2338;
   display: flex;
@@ -56,16 +56,50 @@
     width: 70px;
     height: 70px;
   }
-  
 }
-.change-password-form{
-    .ant-form-item-explain{
-        color: #cf2338 !important;
-    }
-    }
+.change-password-form {
+  .ant-form-item-explain {
+    color: #cf2338 !important;
+  }
 
-.btnChangePassword{
-    display: flex;
-    justify-content: flex-end;
+  label {
+    top: 0.5rem;
+    color: rgb(28, 27, 27);
+  }
 }
 
+.btnChangePassword {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.change-password-button {
+  background-color: #cf2338;
+  border-color: #cf2338;
+  color: #fff;
+  border-radius: 0.3rem;
+
+  &:hover {
+    background-color: #d24a5a;
+    border: 1px solid #d24a5a;
+    color: white;
+  }
+}
+
+.cancel-change-password-button {
+  border-radius: 0.3rem;
+  background-color: white;
+  border: 0.11rem solid rgb(183, 183, 183);
+  color: rgb(148, 147, 147);
+
+  &:hover {
+    background-color: white;
+    border: 0.11rem solid rgb(148, 148, 148);
+    color: rgb(148, 147, 147);
+  }
+}
+
+.change-password--input {
+  border-radius: 0.3rem;
+  border: 0.11rem solid rgb(148, 148, 148);
+}

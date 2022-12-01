@@ -8,10 +8,10 @@ import { getItems } from '../../services/findApiService';
 import { adminRoute } from '../../routes/routes';
 
 import { CloseIcon, EditIcon, SortIcon, FilterIcon } from '../../assets/CustomIcon';
-import Paging from './HandlePaging';
 
 import './ListUser.scss';
 import { checkValid, disableUser } from '../../services/disableApiService';
+import CustomPagination from '../Pagination/Pagination';
 
 const ListUser = () => {
   const user = useSelector((state) => state.user.user);
@@ -410,7 +410,7 @@ const ListUser = () => {
           />
           <br></br>
           <div className="user-list">
-            <Paging total={userList['totalRow']} current={current} onChange={setCurrent} />
+            <CustomPagination total={userList['totalRow']} current={current} onChange={setCurrent} />
           </div>
         </>
       )}

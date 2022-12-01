@@ -118,7 +118,7 @@ const FirstPasswordModal = () => {
               onChange={(event) => handleValidString(event, 'NEW_PASSWORD')}
             />
           </Form.Item>
-          <Button danger type="primary" htmlType="submit" disabled={isSending}>
+          <Button type="primary" htmlType="submit" disabled={isSending}>
             Save
           </Button>
         </Form>

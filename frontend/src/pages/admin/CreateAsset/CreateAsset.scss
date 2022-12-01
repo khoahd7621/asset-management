@@ -76,8 +76,7 @@
 }
 .create-asset__massage-category-error {
   color: red;
-  word-break: 'break-word';
-  max-width: '16rem';
+  word-break: 'break-word' !important;
   padding-left: '0.5rem' !important;
   margin-top: '0.5rem' !important;
 }

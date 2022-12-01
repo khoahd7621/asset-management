@@ -247,6 +247,7 @@ const CreateUser = () => {
             id="create-user-input__first-name"
             onChange={(event) => handleValidString(event, 'FIRST_NAME')}
             status={firstNameValidate.status}
+            maxLength={100}
           />
         </Form.Item>
         <Form.Item name="lastName" label="Last Name" help={lastNameValidate.help}>
@@ -254,6 +255,7 @@ const CreateUser = () => {
             id="create-user-input__last-name"
             onChange={(event) => handleValidString(event, 'LAST_NAME')}
             status={lastNameValidate.status}
+            maxLength={100}
           />
         </Form.Item>
         <Form.Item name="dateOfBirth" label="Date of Birth" help={dateOfBirthValidate.help}>
