@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface GetUserService {
     List<UserResponse> getAllUsers();
+
+    UserResponse viewUserDetails(String staffCode);
 }

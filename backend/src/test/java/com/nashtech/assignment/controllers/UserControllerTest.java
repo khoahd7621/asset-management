@@ -1,19 +1,24 @@
 package com.nashtech.assignment.controllers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nashtech.assignment.AssignmentApplication;
+import com.nashtech.assignment.config.CORSConfig;
+import com.nashtech.assignment.config.SecurityConfig;
+import com.nashtech.assignment.data.constants.EGender;
+import com.nashtech.assignment.data.constants.EUserType;
+import com.nashtech.assignment.dto.request.user.ChangePasswordFirstRequest;
+import com.nashtech.assignment.dto.request.user.ChangePasswordRequest;
+import com.nashtech.assignment.dto.request.user.CreateNewUserRequest;
+import com.nashtech.assignment.dto.request.user.EditUserRequest;
+import com.nashtech.assignment.dto.response.user.UserResponse;
+import com.nashtech.assignment.exceptions.BadRequestException;
+import com.nashtech.assignment.exceptions.NotFoundException;
+import com.nashtech.assignment.services.auth.SecurityContextService;
+import com.nashtech.assignment.services.create.CreateUserService;
+import com.nashtech.assignment.services.delete.DeleteUserService;
+import com.nashtech.assignment.services.edit.EditUserService;
 import com.nashtech.assignment.services.get.GetUserService;
+import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -30,24 +35,16 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nashtech.assignment.AssignmentApplication;
-import com.nashtech.assignment.config.CORSConfig;
-import com.nashtech.assignment.config.SecurityConfig;
-import com.nashtech.assignment.data.constants.EGender;
-import com.nashtech.assignment.data.constants.EUserType;
-import com.nashtech.assignment.dto.request.user.ChangePasswordFirstRequest;
-import com.nashtech.assignment.dto.request.user.ChangePasswordRequest;
-import com.nashtech.assignment.dto.request.user.CreateNewUserRequest;
-import com.nashtech.assignment.dto.request.user.EditUserRequest;
-import com.nashtech.assignment.dto.response.user.UserResponse;
-import com.nashtech.assignment.exceptions.BadRequestException;
-import com.nashtech.assignment.exceptions.NotFoundException;
-import com.nashtech.assignment.services.CreateService;
-import com.nashtech.assignment.services.DeleteService;
-import com.nashtech.assignment.services.EditService;
-import com.nashtech.assignment.services.SecurityContextService;
-import com.nashtech.assignment.utils.JwtTokenUtil;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.*;
 
 @WebMvcTest(value = UserController.class)
 @ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class, CORSConfig.class})
@@ -59,13 +56,13 @@ public class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
     @MockBean
-    private CreateService createService;
+    private EditUserService editUserService;
     @MockBean
-    private EditService editService;
-    @MockBean
-    private DeleteService deleteService;
+    private DeleteUserService deleteUserService;
     @MockBean
     private GetUserService getUserService;
+    @MockBean
+    private CreateUserService createUserService;
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @MockBean
@@ -110,7 +107,7 @@ public class UserControllerTest {
                 .location("hehe")
                 .build();
 
-        when(createService.createNewUser(createNewUserRequestCaptor.capture())).thenReturn(response);
+        when(createUserService.createNewUser(createNewUserRequestCaptor.capture())).thenReturn(response);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .post("/api/user")
@@ -153,7 +150,7 @@ public class UserControllerTest {
                 .type(EUserType.STAFF)
                 .build();
 
-        when(editService.editUserInformation(userRequestCaptor.capture())).thenReturn(userResponse);
+        when(editUserService.editUserInformation(userRequestCaptor.capture())).thenReturn(userResponse);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .put("/api/user/edit")
@@ -186,7 +183,7 @@ public class UserControllerTest {
         ArgumentCaptor<EditUserRequest> userRequestCaptor = ArgumentCaptor.forClass(EditUserRequest.class);
 
         NotFoundException notFoundException = new NotFoundException("Message");
-        when(editService.editUserInformation(userRequestCaptor.capture())).thenThrow(notFoundException);
+        when(editUserService.editUserInformation(userRequestCaptor.capture())).thenThrow(notFoundException);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .put("/api/user/edit")
@@ -215,7 +212,7 @@ public class UserControllerTest {
         ArgumentCaptor<EditUserRequest> userRequestCaptor = ArgumentCaptor.forClass(EditUserRequest.class);
 
         BadRequestException badRequestException = new BadRequestException("Message");
-        when(editService.editUserInformation(userRequestCaptor.capture())).thenThrow(badRequestException);
+        when(editUserService.editUserInformation(userRequestCaptor.capture())).thenThrow(badRequestException);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .put("/api/user/edit")
@@ -232,9 +229,9 @@ public class UserControllerTest {
     }
 
     @Test
-    void deleteUser_WhenSuccesfull_ShouldReturnStatusCode201() throws Exception {
+    void deleteUser_WhenSuccessfully_ShouldReturnStatusCode201() throws Exception {
 
-        doNothing().when(deleteService).deleteUser("test");
+        doNothing().when(deleteUserService).deleteUser("test");
         RequestBuilder request = MockMvcRequestBuilders
                 .delete("/api/user")
                 .param("staffCode", "test");
@@ -247,7 +244,7 @@ public class UserControllerTest {
     @Test
     void deleteUser_WhenUserNotFound_ShouldThrowNotFoundException() throws Exception {
 
-        doThrow(NotFoundException.class).when(deleteService).deleteUser("test");
+        doThrow(NotFoundException.class).when(deleteUserService).deleteUser("test");
         RequestBuilder request = MockMvcRequestBuilders
                 .delete("/api/user")
                 .param("staffCode", "test");
@@ -260,7 +257,7 @@ public class UserControllerTest {
     @Test
     void deleteUser_WhenUserHaveValidAssign_ShouldThrowBadRequestException() throws Exception {
 
-        doThrow(BadRequestException.class).when(deleteService).deleteUser("test");
+        doThrow(BadRequestException.class).when(deleteUserService).deleteUser("test");
         RequestBuilder request = MockMvcRequestBuilders
                 .delete("/api/user")
                 .param("staffCode", "test");
@@ -272,7 +269,7 @@ public class UserControllerTest {
 
     @Test
     void checkValidUserForDelete_ShouldReturnTrue_WhenDataValid() throws Exception {
-        when(deleteService.checkValidUser("test")).thenReturn(true);
+        when(deleteUserService.checkValidUser("test")).thenReturn(true);
         RequestBuilder request = MockMvcRequestBuilders
                 .get("/api/user/check-user")
                 .param("staffCode", "test");
@@ -286,7 +283,7 @@ public class UserControllerTest {
     @Test
     void checkValidUserForDelete_WhenUserHaveValidAssign_ShouldThrowBadRequestException() throws Exception {
 
-        doThrow(BadRequestException.class).when(deleteService).checkValidUser("test");
+        doThrow(BadRequestException.class).when(deleteUserService).checkValidUser("test");
         RequestBuilder request = MockMvcRequestBuilders
                 .get("/api/user/check-user")
                 .param("staffCode", "test");
@@ -299,7 +296,7 @@ public class UserControllerTest {
     @Test
     void checkValidUser_WhenUserNotFound_ShouldThrowNotFoundException() throws Exception {
 
-        doThrow(NotFoundException.class).when(deleteService).checkValidUser("test");
+        doThrow(NotFoundException.class).when(deleteUserService).checkValidUser("test");
         RequestBuilder request = MockMvcRequestBuilders
                 .get("/api/user/check-user")
                 .param("staffCode", "test");
@@ -318,7 +315,7 @@ public class UserControllerTest {
         ArgumentCaptor<ChangePasswordRequest> changePasswordRequestCaptor = ArgumentCaptor
                 .forClass(ChangePasswordRequest.class);
 
-        when(editService.changePassword(changePasswordRequestCaptor.capture())).thenThrow(badRequestException);
+        when(editUserService.changePassword(changePasswordRequestCaptor.capture())).thenThrow(badRequestException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password")
                 .content(objectMapper.writeValueAsString(changePasswordRequest))
@@ -341,7 +338,7 @@ public class UserControllerTest {
 
         UserResponse userResponse = UserResponse.builder().fullName("Test").build();
 
-        when(editService.changePassword(changePasswordRequestCaptor.capture()))
+        when(editUserService.changePassword(changePasswordRequestCaptor.capture()))
                 .thenReturn(userResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password")
@@ -365,7 +362,7 @@ public class UserControllerTest {
         ArgumentCaptor<ChangePasswordFirstRequest> changeFirstCaptor = ArgumentCaptor
                 .forClass(ChangePasswordFirstRequest.class);
 
-        when(editService.changePasswordFirst(changeFirstCaptor.capture())).thenThrow(badRequestException);
+        when(editUserService.changePasswordFirst(changeFirstCaptor.capture())).thenThrow(badRequestException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password/first")
                 .content(objectMapper.writeValueAsString(changeFirstRequest))
@@ -387,7 +384,7 @@ public class UserControllerTest {
 
         UserResponse userResponse = UserResponse.builder().fullName("Test").build();
 
-        when(editService.changePasswordFirst(changeFirstCaptor.capture())).thenReturn(userResponse);
+        when(editUserService.changePasswordFirst(changeFirstCaptor.capture())).thenReturn(userResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password/first")
                 .content(objectMapper.writeValueAsString(changeFirstRequest))

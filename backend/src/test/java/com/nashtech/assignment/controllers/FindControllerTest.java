@@ -1,24 +1,19 @@
 package com.nashtech.assignment.controllers;
 
-import static org.mockito.Mockito.when;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import com.nashtech.assignment.AssignmentApplication;
 import com.nashtech.assignment.config.CORSConfig;
 import com.nashtech.assignment.config.SecurityConfig;
-import com.nashtech.assignment.services.SecurityContextService;
-import com.nashtech.assignment.utils.JwtTokenUtil;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import com.nashtech.assignment.data.constants.EGender;
 import com.nashtech.assignment.data.constants.EUserType;
 import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.user.UserResponse;
 import com.nashtech.assignment.exceptions.NotFoundException;
-import com.nashtech.assignment.services.FindService;
-
+import com.nashtech.assignment.services.auth.SecurityContextService;
+import com.nashtech.assignment.services.get.GetUserService;
+import com.nashtech.assignment.services.search.SearchUserService;
+import com.nashtech.assignment.utils.JwtTokenUtil;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -33,19 +28,26 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.when;
+
 @WebMvcTest(FindController.class)
 @ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class, CORSConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
 public class FindControllerTest {
 
-    @MockBean
-    private FindService findService;
     @Autowired
     private MockMvc mockMvc;
+    @MockBean
+    private SearchUserService searchUserService;
+    @MockBean
+    private GetUserService getUserService;
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @MockBean
     private SecurityContextService securityContextService;
+
     private UserResponse userResponse;
 
     @BeforeEach
@@ -64,7 +66,7 @@ public class FindControllerTest {
         List<UserResponse> users = new ArrayList<>();
         users.add(userResponse);
         PaginationResponse<List<UserResponse>> test = new PaginationResponse<List<UserResponse>>(users, 1, 1);
-        when(findService.filterByType(EUserType.ADMIN, 1, "HCM")).thenReturn(test);
+        when(searchUserService.filterByType(EUserType.ADMIN, 1, "HCM")).thenReturn(test);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/find/filter/{page}", 1)
@@ -84,7 +86,7 @@ public class FindControllerTest {
     void filterByType_ShouldReturnEmptyList() throws Exception {
         List<UserResponse> users = new ArrayList<>();
         PaginationResponse<List<UserResponse>> test = new PaginationResponse<List<UserResponse>>(users, 1, 1);
-        when(findService.filterByType(EUserType.ADMIN, 1, "HCM")).thenReturn(test);
+        when(searchUserService.filterByType(EUserType.ADMIN, 1, "HCM")).thenReturn(test);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/find/filter/{page}", 1)
@@ -102,7 +104,7 @@ public class FindControllerTest {
         users.add(userResponse);
         PaginationResponse<List<UserResponse>> test = new PaginationResponse<List<UserResponse>>(users, 1, 1);
 
-        when(findService.findByLocation("Location", 1)).thenReturn(test);
+        when(searchUserService.findByLocation("Location", 1)).thenReturn(test);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/find")
@@ -123,7 +125,7 @@ public class FindControllerTest {
         users.add(userResponse);
         PaginationResponse<List<UserResponse>> test = new PaginationResponse<List<UserResponse>>(users, 1, 1);
 
-        when(findService.searchByNameOrStaffCodeAndFilterByTypeAndLocation(1, "name", "staff code", EUserType.STAFF, "location")).thenReturn(test);
+        when(searchUserService.searchByNameOrStaffCodeAndFilterByTypeAndLocation(1, "name", "staff code", EUserType.STAFF, "location")).thenReturn(test);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/find/search")
@@ -144,7 +146,7 @@ public class FindControllerTest {
 
     @Test
     void viewUserDetails_ShouldReturnUserResponse() throws Exception {
-        when(findService.viewUserDetails("test")).thenReturn(userResponse);
+        when(getUserService.viewUserDetails("test")).thenReturn(userResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/find/get/{staffCode}", "test");
@@ -161,7 +163,7 @@ public class FindControllerTest {
     void viewUserDetails_ShouldThrowNotFoundException() throws Exception {
         NotFoundException notFoundException = new NotFoundException("Message");
 
-        when(findService.viewUserDetails("test")).thenThrow(notFoundException);
+        when(getUserService.viewUserDetails("test")).thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/find/get/{staffCode}", "test");

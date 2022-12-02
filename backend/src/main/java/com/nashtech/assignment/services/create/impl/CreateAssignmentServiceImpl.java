@@ -13,7 +13,7 @@ import com.nashtech.assignment.dto.response.assignment.AssignAssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.mappers.AssignAssetMapper;
-import com.nashtech.assignment.services.SecurityContextService;
+import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.services.create.CreateAssignmentService;
 import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;

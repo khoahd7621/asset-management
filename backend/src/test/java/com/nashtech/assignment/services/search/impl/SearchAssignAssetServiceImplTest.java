@@ -23,7 +23,7 @@ import com.nashtech.assignment.data.repositories.AssignAssetRepository;
 import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.assignment.AssignAssetResponse;
 import com.nashtech.assignment.mappers.AssignAssetMapper;
-import com.nashtech.assignment.services.SecurityContextService;
+import com.nashtech.assignment.services.auth.SecurityContextService;
 
 public class SearchAssignAssetServiceImplTest {
     private SearchAssignAssetServiceImpl searchAssignAssetServiceImpl;

@@ -1,9 +1,5 @@
 package com.nashtech.assignment.controllers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nashtech.assignment.AssignmentApplication;
 import com.nashtech.assignment.config.CORSConfig;
@@ -11,9 +7,9 @@ import com.nashtech.assignment.config.SecurityConfig;
 import com.nashtech.assignment.dto.request.category.CreateNewCategoryRequest;
 import com.nashtech.assignment.dto.response.category.CategoryResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
-import com.nashtech.assignment.services.CreateService;
-import com.nashtech.assignment.services.GetService;
-import com.nashtech.assignment.services.SecurityContextService;
+import com.nashtech.assignment.services.auth.SecurityContextService;
+import com.nashtech.assignment.services.create.CreateCategoryService;
+import com.nashtech.assignment.services.get.GetCategoryService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +29,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.when;
+
 @WebMvcTest(value = CategoryController.class)
 @ContextConfiguration(classes = { AssignmentApplication.class, SecurityConfig.class, CORSConfig.class })
 @AutoConfigureMockMvc(addFilters = false)
@@ -43,9 +43,9 @@ class CategoryControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
   @MockBean
-  private GetService getService;
+  private GetCategoryService getCategoryService;
   @MockBean
-  private CreateService createService;
+  private CreateCategoryService createCategoryService;
   @MockBean
   private JwtTokenUtil jwtTokenUtil;
   @MockBean
@@ -68,7 +68,7 @@ class CategoryControllerTest {
     List<CategoryResponse> response = new ArrayList<>();
     response.add(categoryResponse);
 
-    when(getService.getAllCategories()).thenReturn(response);
+    when(getCategoryService.getAllCategories()).thenReturn(response);
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/category");
     MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -94,7 +94,7 @@ class CategoryControllerTest {
         .prefixAssetCode("CN")
         .build();
 
-    when(createService.createNewCategory(categoryCaptor.capture())).thenReturn(response);
+    when(createCategoryService.createNewCategory(categoryCaptor.capture())).thenReturn(response);
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/category")
         .content(objectMapper.writeValueAsString(request))
@@ -114,7 +114,7 @@ class CategoryControllerTest {
         .prefixAssetCode("CN")
         .build();
 
-    when(createService.createNewCategory(request)).thenThrow(badRequestException);
+    when(createCategoryService.createNewCategory(request)).thenThrow(badRequestException);
 
     RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/category");
     MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();

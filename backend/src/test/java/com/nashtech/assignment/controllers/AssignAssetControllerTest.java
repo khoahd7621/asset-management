@@ -11,6 +11,7 @@ import java.util.*;
 import com.nashtech.assignment.dto.request.assignment.CreateNewAssignmentRequest;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.services.create.CreateAssignmentService;
+import com.nashtech.assignment.services.get.GetAssignAssetService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -35,9 +36,7 @@ import com.nashtech.assignment.data.constants.EAssignStatus;
 import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.assignment.AssignAssetResponse;
 import com.nashtech.assignment.exceptions.NotFoundException;
-import com.nashtech.assignment.services.FilterService;
-import com.nashtech.assignment.services.GetService;
-import com.nashtech.assignment.services.SecurityContextService;
+import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.services.search.SearchAssignAssetService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 
@@ -54,7 +53,7 @@ public class AssignAssetControllerTest {
         @MockBean
         private SearchAssignAssetService searchAssignAssetService;
         @MockBean
-        private GetService getService;
+        private GetAssignAssetService getAssignAssetService;
         @MockBean
         private CreateAssignmentService createAssignmentService;
         @MockBean
@@ -143,7 +142,7 @@ public class AssignAssetControllerTest {
         void getAssignmentDetails_WhenDataValid_ShouldReturnAssignAssetRespone() throws Exception {
                 AssignAssetResponse expected = AssignAssetResponse.builder()
                                 .assetCode("test").assetId(1l).build();
-                when(getService.getAssignAssetDetails(1l)).thenReturn(expected);
+                when(getAssignAssetService.getAssignAssetDetails(1l)).thenReturn(expected);
 
                 RequestBuilder requestBuilder = MockMvcRequestBuilders
                                 .get("/api/assignment/details").param("id", "1");
@@ -156,7 +155,7 @@ public class AssignAssetControllerTest {
         @Test
         void getAssignmentDetails_WhenAssignNotFound_ShouldThrowNotFoundException() throws Exception {
                 NotFoundException exception = new NotFoundException("Mess");
-                when(getService.getAssignAssetDetails(1l)).thenThrow(exception);
+                when(getAssignAssetService.getAssignAssetDetails(1l)).thenThrow(exception);
 
                 RequestBuilder requestBuilder = MockMvcRequestBuilders
                                 .get("/api/assignment/details").param("id", "1");

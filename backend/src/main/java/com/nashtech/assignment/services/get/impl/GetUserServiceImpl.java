@@ -3,8 +3,9 @@ package com.nashtech.assignment.services.get.impl;
 import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.data.repositories.UserRepository;
 import com.nashtech.assignment.dto.response.user.UserResponse;
+import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.mappers.UserMapper;
-import com.nashtech.assignment.services.SecurityContextService;
+import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.services.get.GetUserService;
 import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,14 @@ public class GetUserServiceImpl implements GetUserService {
         User user = securityContextService.getCurrentUser();
         List<User> userList = userRepository.findAllByLocationAndIsDeletedFalse(user.getLocation());
         return userMapper.mapListEntityUserResponses(userList);
+    }
+
+    @Override
+    public UserResponse viewUserDetails(String staffCode) {
+        User user = userRepository.findByStaffCode(staffCode);
+        if (user == null) {
+            throw new NotFoundException("Cannot Found Staff With Code: " + staffCode);
+        }
+        return userMapper.mapEntityToResponseDto(user);
     }
 }

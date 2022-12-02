@@ -1,37 +1,28 @@
 package com.nashtech.assignment.controllers;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.nashtech.assignment.data.constants.EUserType;
 import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.user.UserResponse;
-import com.nashtech.assignment.services.FindService;
-
+import com.nashtech.assignment.services.get.GetUserService;
+import com.nashtech.assignment.services.search.SearchUserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/find")
 public class FindController {
-    
-    FindService findService;
 
     @Autowired
-    public FindController(FindService findService) {
-        this.findService = findService;
-    }
+    private SearchUserService searchUserService;
+    @Autowired
+    private GetUserService getUserService;
 
     @Operation(summary = "Find all users by location. Receive user location and page")
     @ApiResponses(value = {
@@ -41,7 +32,7 @@ public class FindController {
     public ResponseEntity<PaginationResponse<List<UserResponse>>> findByLocation(
             @RequestParam String location, @RequestParam Integer pageNumber) {
         return ResponseEntity.status(HttpStatus.OK).body(
-            findService.findByLocation(location, pageNumber)
+                searchUserService.findByLocation(location, pageNumber)
         );
     }
 
@@ -51,7 +42,7 @@ public class FindController {
     })
     @GetMapping("/get/{staffCode}")
     public UserResponse viewUserDetails(@PathVariable String staffCode) {
-        return findService.viewUserDetails(staffCode);
+        return getUserService.viewUserDetails(staffCode);
     }
 
     @Operation(summary = "Filter user by receive admin location, user type, page")
@@ -63,7 +54,7 @@ public class FindController {
             @RequestParam(required = false) EUserType type,
             @RequestParam String location,
             @PathVariable int page) {
-        return findService.filterByType(type, page,location);
+        return searchUserService.filterByType(type, page, location);
     }
 
     @Operation(summary = "Search user by receive admin location, user type, name or staffcode, page")
@@ -77,6 +68,6 @@ public class FindController {
             @RequestParam(required = false) String staffCode,
             @RequestParam(required = false) EUserType type,
             @RequestParam String location) {
-        return findService.searchByNameOrStaffCodeAndFilterByTypeAndLocation(page,name, staffCode, type, location);
+        return searchUserService.searchByNameOrStaffCodeAndFilterByTypeAndLocation(page, name, staffCode, type, location);
     }
 }
