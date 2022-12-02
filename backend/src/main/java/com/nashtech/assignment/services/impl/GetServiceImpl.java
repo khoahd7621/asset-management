@@ -2,15 +2,18 @@ package com.nashtech.assignment.services.impl;
 
 import com.nashtech.assignment.data.constants.EAssignStatus;
 import com.nashtech.assignment.data.entities.Asset;
+import com.nashtech.assignment.data.entities.AssignAsset;
 import com.nashtech.assignment.data.entities.Category;
 import com.nashtech.assignment.data.repositories.AssetRepository;
 import com.nashtech.assignment.data.repositories.AssignAssetRepository;
 import com.nashtech.assignment.data.repositories.CategoryRepository;
 import com.nashtech.assignment.dto.response.asset.AssetAndHistoriesResponse;
+import com.nashtech.assignment.dto.response.assignment.AssignAssetResponse;
 import com.nashtech.assignment.dto.response.category.CategoryResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.mappers.AssetMapper;
+import com.nashtech.assignment.mappers.AssignAssetMapper;
 import com.nashtech.assignment.mappers.CategoryMapper;
 import com.nashtech.assignment.services.GetService;
 import lombok.Builder;
@@ -28,13 +31,16 @@ public class GetServiceImpl implements GetService {
     @Autowired
     private CategoryRepository categoryRepository;
     @Autowired
-    private CategoryMapper categoryMapper;
+    private AssignAssetRepository assignAssetRepository;
     @Autowired
     private AssetRepository assetRepository;
     @Autowired
+    private CategoryMapper categoryMapper;
+    @Autowired
     private AssetMapper assetMapper;
     @Autowired
-    private AssignAssetRepository assignAssetRepository;
+    private AssignAssetMapper assignAssetMapper;
+    
 
     @Override
     public List<CategoryResponse> getAllCategories() {
@@ -62,5 +68,14 @@ public class GetServiceImpl implements GetService {
         if (isAssigned) {
             throw new BadRequestException("Asset already assigned. Invalid for delete.");
         }
+    }
+
+    @Override
+    public AssignAssetResponse getAssignAssetDetails(Long id) {
+        Optional<AssignAsset> assignAssetOtp = assignAssetRepository.findById(id);
+        if(assignAssetOtp.isEmpty()){
+            throw new NotFoundException("Cannot find assignment with id: " + id);
+        }
+        return assignAssetMapper.toAssignAssetResponse(assignAssetOtp.get());
     }
 }

@@ -1,5 +1,8 @@
 package com.nashtech.assignment.dto.response.user;
 
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nashtech.assignment.data.constants.EGender;
 import com.nashtech.assignment.data.constants.EUserType;
 
@@ -16,8 +19,8 @@ public class UserResponse {
     private String firstName;
     private String lastName;
     private EGender gender;
-    private String joinedDate;
-    private String dateOfBirth;
+    private Date joinedDate;
+    private Date dateOfBirth;
     private EUserType type;
     private String location;
     private String fullName;

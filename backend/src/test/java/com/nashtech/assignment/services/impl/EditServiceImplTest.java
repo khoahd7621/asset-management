@@ -169,6 +169,22 @@ public class EditServiceImplTest {
     }
 
     @Test
+    void editUserInformation_WhenJoinDateIsLagerThan100Years_ShouldThrowBadRequestException() throws ParseException {
+        EditUserRequest user = EditUserRequest.builder()
+                .dateOfBirth("21/9/2001")
+                .joinedDate("29/11/2900")
+                .staffCode("test")
+                .build();
+        when(userRepository.findByStaffCode("test")).thenReturn(userRepo);
+
+        BadRequestException actual = assertThrows(BadRequestException.class,
+                () -> editServiceImpl.editUserInformation(user));
+
+        assertThat(actual.getMessage(), is("Joined date cannot lager than 100 years."));
+
+    }
+
+    @Test
     void testEditAssetInformation_WhenFindAssetNull_ShouldReturnException() throws NotFoundException {
         long idAsset = 1L;
         EditAssetInformationRequest editAssetInformationRequest = EditAssetInformationRequest.builder().build();

@@ -12,6 +12,7 @@ import AdminPrivateRoute from './routes/AdminPrivateRoute';
 import { adminRoute, userRoute } from './routes/routes';
 import StaffPrivateRoute from './routes/StaffPrivateRoute';
 import CheckFirstLoginRoute from './routes/CheckFirstLoginRoute';
+import ManageAssignment from './pages/admin/ManageAssignment/ManageAssignment';
 import LoginProtectRoute from './routes/LoginProtectRoute';
 
 const App = () => {
@@ -82,6 +83,14 @@ const App = () => {
             element={
               <CheckFirstLoginRoute>
                 <EditAsset />
+              </CheckFirstLoginRoute>
+            }
+          />
+          <Route
+            path={adminRoute.manageAssignment}
+            element={
+              <CheckFirstLoginRoute>
+                <ManageAssignment />
               </CheckFirstLoginRoute>
             }
           />

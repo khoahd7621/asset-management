@@ -39,9 +39,9 @@ import lombok.AllArgsConstructor;
 public class EditServiceImpl implements EditService {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
     @Autowired
     private AssetRepository assetRepository;
     @Autowired
@@ -54,7 +54,8 @@ public class EditServiceImpl implements EditService {
     private GeneratePassword generatePassword;
 
     @Override
-    public AssetResponse editAssetInformation(Long idAsset, EditAssetInformationRequest editAssetInformationRequest)
+    public AssetResponse editAssetInformation(Long idAsset,
+                                              EditAssetInformationRequest editAssetInformationRequest)
             throws ParseException {
         Optional<Asset> assetOpt = assetRepository.findById(idAsset);
 
@@ -68,7 +69,8 @@ public class EditServiceImpl implements EditService {
             throw new BadRequestException("Asset have state is assigned");
         }
         SimpleDateFormat sourceFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date installedDate = sourceFormat.parse(editAssetInformationRequest.getInstalledDate());
+        Date installedDate = sourceFormat
+                .parse(editAssetInformationRequest.getInstalledDate());
 
         asset.setName(editAssetInformationRequest.getAssetName());
         asset.setSpecification(editAssetInformationRequest.getSpecification());
@@ -79,18 +81,21 @@ public class EditServiceImpl implements EditService {
     }
 
     @Override
-    public UserResponse editUserInformation(EditUserRequest userRequest) throws ParseException {
+    public UserResponse editUserInformation(EditUserRequest userRequest)
+            throws ParseException {
         User user = userRepository.findByStaffCode(userRequest.getStaffCode());
 
         if (user == null) {
-            throw new NotFoundException("Cannot found staff with Id " + userRequest.getStaffCode());
+            throw new NotFoundException(
+                    "Cannot found staff with Id " + userRequest.getStaffCode());
         }
 
         SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
         formatterDate.setLenient(false);
 
         Date dateOfBirth = formatterDate.parse(userRequest.getDateOfBirth());
-        LocalDate birth = LocalDate.ofInstant(dateOfBirth.toInstant(), ZoneId.systemDefault());
+        LocalDate birth = LocalDate.ofInstant(dateOfBirth.toInstant(),
+                ZoneId.systemDefault());
         long age = LocalDate.from(birth).until(LocalDate.now(), ChronoUnit.YEARS);
 
         if (age < 18) {
@@ -98,14 +103,22 @@ public class EditServiceImpl implements EditService {
         }
 
         Date joinedDate = formatterDate.parse(userRequest.getJoinedDate());
-        LocalDate joinedDay = LocalDate.ofInstant(joinedDate.toInstant(), ZoneId.systemDefault());
-        if (LocalDate.from(joinedDay).until(LocalDate.now(), ChronoUnit.YEARS) > 18) {
-            throw new BadRequestException("Joined date must lager or equal 18 years.");
+        LocalDate joinedDay = LocalDate.ofInstant(joinedDate.toInstant(),
+                ZoneId.systemDefault());
+        if (LocalDate.from(joinedDay).until(LocalDate.now(),
+                ChronoUnit.YEARS) > 18) {
+            throw new BadRequestException(
+                    "Joined date must lager or equal 18 years.");
+        }
+        if (LocalDate.from(joinedDay).until(LocalDate.now(), ChronoUnit.YEARS) < 0) {
+            throw new BadRequestException(
+                    "Joined date cannot lager than 100 years.");
         }
 
         DayOfWeek day = joinedDay.getDayOfWeek();
         if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
-            throw new BadRequestException("Joined date cannot be Saturday or Sunday.");
+            throw new BadRequestException(
+                    "Joined date cannot be Saturday or Sunday.");
         }
         user.setDateOfBirth(dateOfBirth);
         user.setJoinedDate(joinedDate);
@@ -116,12 +129,15 @@ public class EditServiceImpl implements EditService {
     }
 
     @Override
-    public UserResponse changePasswordFirst(ChangePasswordFirstRequest changePasswordFirstRequest) {
+    public UserResponse changePasswordFirst(
+            ChangePasswordFirstRequest changePasswordFirstRequest) {
         User user = securityContextService.getCurrentUser();
-        if (passwordEncoder.matches(changePasswordFirstRequest.getNewPassword(), user.getPassword())) {
+        if (passwordEncoder.matches(changePasswordFirstRequest.getNewPassword(),
+                user.getPassword())) {
             throw new BadRequestException("Password no change");
         }
-        user.setPassword(passwordEncoder.encode(changePasswordFirstRequest.getNewPassword()));
+        user.setPassword(
+                passwordEncoder.encode(changePasswordFirstRequest.getNewPassword()));
         user = userRepository.save(user);
         return userMapper.mapEntityToResponseDto(user);
     }
@@ -129,16 +145,20 @@ public class EditServiceImpl implements EditService {
     @Override
     public UserResponse changePassword(ChangePasswordRequest changePasswordRequest) {
         User user = securityContextService.getCurrentUser();
-        if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(),
+                user.getPassword())) {
             throw new BadRequestException("Password is incorrect");
         }
-        if (changePasswordRequest.getNewPassword().equals(changePasswordRequest.getOldPassword())) {
+        if (changePasswordRequest.getNewPassword()
+                .equals(changePasswordRequest.getOldPassword())) {
             throw new BadRequestException("Password no change");
         }
-        if (passwordEncoder.matches(changePasswordRequest.getNewPassword(), generatePassword.firstPassword(user))) {
+        if (passwordEncoder.matches(changePasswordRequest.getNewPassword(),
+                generatePassword.firstPassword(user))) {
             throw new BadRequestException("Password same password generated");
         }
-        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        user.setPassword(
+                passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         user = userRepository.save(user);
         return userMapper.mapEntityToResponseDto(user);
     }

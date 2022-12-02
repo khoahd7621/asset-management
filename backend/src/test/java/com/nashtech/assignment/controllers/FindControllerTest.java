@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @WebMvcTest(FindController.class)
-@ContextConfiguration(classes = { AssignmentApplication.class, SecurityConfig.class, CORSConfig.class })
+@ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class, CORSConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
 public class FindControllerTest {
 
@@ -48,15 +48,15 @@ public class FindControllerTest {
     private SecurityContextService securityContextService;
     private UserResponse userResponse;
 
-    @BeforeEach 
+    @BeforeEach
     void setup() {
         userResponse = UserResponse.builder()
-        .firstName("First Name")
-        .lastName("Last Name")
-        .gender(EGender.OTHERS)
-        .staffCode("staffCode")
-        .username("Username")
-        .location("test").build();
+                .firstName("First Name")
+                .lastName("Last Name")
+                .gender(EGender.OTHERS)
+                .staffCode("staffCode")
+                .username("Username")
+                .location("test").build();
     }
 
     @Test
@@ -64,8 +64,8 @@ public class FindControllerTest {
         List<UserResponse> users = new ArrayList<>();
         users.add(userResponse);
         PaginationResponse<List<UserResponse>> test = new PaginationResponse<List<UserResponse>>(users, 1, 1);
-        when(findService.filterByType(EUserType.ADMIN, 1,"HCM")).thenReturn(test);
-        
+        when(findService.filterByType(EUserType.ADMIN, 1, "HCM")).thenReturn(test);
+
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/find/filter/{page}", 1)
                 .param("type", "ADMIN")
@@ -74,12 +74,13 @@ public class FindControllerTest {
 
         assertThat(result.getResponse().getContentAsString(), is("{\"data\":[{\"username\":\"Username\",\"staffCode\":\"staffCode\",\"firstName\":\"First Name\",\"lastName\":\"Last Name\",\"gender\":\"OTHERS\",\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":\"test\",\"fullName\":null}],\"totalPage\":1,\"totalRow\":1}"));
     }
+
     @Test
     void filterByType_ShouldReturnEmptyList() throws Exception {
         List<UserResponse> users = new ArrayList<>();
         PaginationResponse<List<UserResponse>> test = new PaginationResponse<List<UserResponse>>(users, 1, 1);
-        when(findService.filterByType(EUserType.ADMIN, 1,"HCM")).thenReturn(test);
-        
+        when(findService.filterByType(EUserType.ADMIN, 1, "HCM")).thenReturn(test);
+
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/find/filter/{page}", 1)
                 .param("type", "ADMIN")
@@ -97,7 +98,7 @@ public class FindControllerTest {
         PaginationResponse<List<UserResponse>> test = new PaginationResponse<List<UserResponse>>(users, 1, 1);
 
         when(findService.findByLocation("Location", 1)).thenReturn(test);
-        
+
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/find")
                 .param("pageNumber", String.valueOf(1))
@@ -114,7 +115,7 @@ public class FindControllerTest {
         users.add(userResponse);
         PaginationResponse<List<UserResponse>> test = new PaginationResponse<List<UserResponse>>(users, 1, 1);
 
-        when(findService.searchByNameOrStaffCodeAndFilterByTypeAndLocation(1,"name", "staff code", EUserType.STAFF, "location")).thenReturn(test);
+        when(findService.searchByNameOrStaffCodeAndFilterByTypeAndLocation(1, "name", "staff code", EUserType.STAFF, "location")).thenReturn(test);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/find/search")
@@ -132,22 +133,23 @@ public class FindControllerTest {
     @Test
     void viewUserDetails_ShouldReturnUserResponse() throws Exception {
         when(findService.viewUserDetails("test")).thenReturn(userResponse);
-        
+
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get("/api/find/get/{staffCode}","test");
+                .get("/api/find/get/{staffCode}", "test");
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
         assertThat(result.getResponse().getContentAsString(),
                 is("{\"username\":\"Username\",\"staffCode\":\"staffCode\",\"firstName\":\"First Name\",\"lastName\":\"Last Name\",\"gender\":\"OTHERS\",\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":\"test\",\"fullName\":null}"));
     }
+
     @Test
     void viewUserDetails_ShouldThrowNotFoundException() throws Exception {
         NotFoundException notFoundException = new NotFoundException("Message");
 
         when(findService.viewUserDetails("test")).thenThrow(notFoundException);
-        
+
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get("/api/find/get/{staffCode}","test");
+                .get("/api/find/get/{staffCode}", "test");
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.NOT_FOUND.value()));

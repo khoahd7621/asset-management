@@ -24,3 +24,7 @@ export const filterAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination = ({
       `sort-type=${sortType}`,
   );
 };
+
+export const filterAssignmentList = (name, statuses, assigndate, page) => {
+  return axios.get(`/api/assignment?name=${name}&status=${statuses}&date=${assigndate}&page=${page}`);
+};

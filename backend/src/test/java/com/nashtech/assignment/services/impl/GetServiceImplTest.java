@@ -8,15 +8,18 @@ import static org.mockito.Mockito.mock;
 
 import com.nashtech.assignment.data.constants.EAssignStatus;
 import com.nashtech.assignment.data.entities.Asset;
+import com.nashtech.assignment.data.entities.AssignAsset;
 import com.nashtech.assignment.data.entities.Category;
 import com.nashtech.assignment.data.repositories.AssetRepository;
 import com.nashtech.assignment.data.repositories.AssignAssetRepository;
 import com.nashtech.assignment.data.repositories.CategoryRepository;
 import com.nashtech.assignment.dto.response.asset.AssetAndHistoriesResponse;
+import com.nashtech.assignment.dto.response.assignment.AssignAssetResponse;
 import com.nashtech.assignment.dto.response.category.CategoryResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.mappers.AssetMapper;
+import com.nashtech.assignment.mappers.AssignAssetMapper;
 import com.nashtech.assignment.mappers.CategoryMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,14 +31,16 @@ import java.util.Optional;
 
 class GetServiceImplTest {
 
-    private GetServiceImpl getServiceImpl;
     private CategoryRepository categoryRepository;
-    private CategoryMapper categoryMapper;
+    private AssignAssetRepository assignAssetRepository;
     private AssetRepository assetRepository;
+    private GetServiceImpl getServiceImpl;
+    private CategoryMapper categoryMapper;
+    private AssignAssetMapper assignAssetMapper;
     private AssetMapper assetMapper;
     private Category category;
     private Asset asset;
-    private AssignAssetRepository assignAssetRepository;
+
 
     @BeforeEach
     void setup() {
@@ -43,12 +48,14 @@ class GetServiceImplTest {
         categoryMapper = mock(CategoryMapper.class);
         assetRepository = mock(AssetRepository.class);
         assetMapper = mock(AssetMapper.class);
+        assignAssetMapper = mock(AssignAssetMapper.class);
         assignAssetRepository = mock(AssignAssetRepository.class);
         getServiceImpl = GetServiceImpl.builder()
                 .categoryRepository(categoryRepository)
                 .categoryMapper(categoryMapper)
                 .assetRepository(assetRepository)
                 .assetMapper(assetMapper)
+                .assignAssetMapper(assignAssetMapper)
                 .assignAssetRepository(assignAssetRepository).build();
         category = mock(Category.class);
         asset = mock(Asset.class);
@@ -120,5 +127,30 @@ class GetServiceImplTest {
         });
 
         assertThat(actual.getMessage(), is("Asset already assigned. Invalid for delete."));
+    }
+
+    @Test
+    void getAssignAssetDetails_WhenDataValid_ShouldReturnAssignAssetResponse() {
+        AssignAsset assignAsset = mock(AssignAsset.class);
+        Optional<AssignAsset> assignAssetOtp = Optional.of(assignAsset);
+        AssignAssetResponse expected = mock(AssignAssetResponse.class);
+
+        when(assignAssetRepository.findById(1l)).thenReturn(assignAssetOtp);
+        when(assignAssetMapper.toAssignAssetResponse(assignAssetOtp.get())).thenReturn(expected);
+
+        AssignAssetResponse actual = getServiceImpl.getAssignAssetDetails(1l);
+
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    void getAssignAssetDetails_WhenUserNotExist_ShouldThrowNotFoundException() {
+        AssignAsset assignAsset = mock(AssignAsset.class);
+
+        when(assignAssetRepository.findById(1l)).thenReturn(Optional.empty());
+
+        NotFoundException actual = assertThrows(NotFoundException.class, () -> getServiceImpl.getAssignAssetDetails(1L));
+
+        assertThat(actual.getMessage(), is("Cannot find assignment with id: 1"));
     }
 }

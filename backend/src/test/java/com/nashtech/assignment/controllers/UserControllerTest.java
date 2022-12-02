@@ -7,6 +7,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,9 +67,17 @@ public class UserControllerTest {
 
     private BadRequestException badRequestException;
 
+    private Date dateOfBirth;
+
+    private Date joinedDate;
+
     @BeforeEach
     void setup() throws Exception {
         badRequestException = new BadRequestException("error message");
+        SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
+        formatterDate.setTimeZone(TimeZone.getTimeZone("GMT"));
+        dateOfBirth = formatterDate.parse("21/12/2001");;
+        joinedDate = formatterDate.parse("17/11/2022");
     }
 
     @Test
@@ -85,8 +96,8 @@ public class UserControllerTest {
         UserResponse response = UserResponse.builder()
                 .firstName("hau")
                 .lastName("doan")
-                .dateOfBirth("21/12/2001")
-                .joinedDate("17/11/2022")
+                .dateOfBirth(dateOfBirth)
+                .joinedDate(joinedDate)
                 .gender(EGender.MALE)
                 .type(EUserType.ADMIN)
                 .location("hehe")
@@ -104,7 +115,7 @@ public class UserControllerTest {
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
         assertThat(result.getResponse().getContentAsString(),
-                is("{\"username\":null,\"staffCode\":null,\"firstName\":\"hau\",\"lastName\":\"doan\",\"gender\":\"MALE\",\"joinedDate\":\"17/11/2022\",\"dateOfBirth\":\"21/12/2001\",\"type\":\"ADMIN\",\"location\":\"hehe\",\"fullName\":null}"));
+                is("{\"username\":null,\"staffCode\":null,\"firstName\":\"hau\",\"lastName\":\"doan\",\"gender\":\"MALE\",\"joinedDate\":\"2022-11-17T00:00:00.000+00:00\",\"dateOfBirth\":\"2001-12-21T00:00:00.000+00:00\",\"type\":\"ADMIN\",\"location\":\"hehe\",\"fullName\":null}"));
     }
 
     @Test
@@ -120,8 +131,8 @@ public class UserControllerTest {
         ArgumentCaptor<EditUserRequest> userRequestCaptor = ArgumentCaptor.forClass(EditUserRequest.class);
 
         UserResponse userResponse = UserResponse.builder()
-                .dateOfBirth("11/26/2001")
-                .joinedDate("28/11/2022")
+                .dateOfBirth(dateOfBirth)
+                .joinedDate(joinedDate)
                 .gender(EGender.FEMALE)
                 .staffCode("test")
                 .fullName("Linh Ngoc Dam")
@@ -143,7 +154,7 @@ public class UserControllerTest {
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
         assertThat(result.getResponse().getContentAsString(),
-                is("{\"username\":null,\"staffCode\":\"test\",\"firstName\":\"Linh\",\"lastName\":\"Ngoc Dam\",\"gender\":\"FEMALE\",\"joinedDate\":\"28/11/2022\",\"dateOfBirth\":\"11/26/2001\",\"type\":\"STAFF\",\"location\":\"HCM\",\"fullName\":\"Linh Ngoc Dam\"}"));
+                is("{\"username\":null,\"staffCode\":\"test\",\"firstName\":\"Linh\",\"lastName\":\"Ngoc Dam\",\"gender\":\"FEMALE\",\"joinedDate\":\"2022-11-17T00:00:00.000+00:00\",\"dateOfBirth\":\"2001-12-21T00:00:00.000+00:00\",\"type\":\"STAFF\",\"location\":\"HCM\",\"fullName\":\"Linh Ngoc Dam\"}"));
 
     }
 

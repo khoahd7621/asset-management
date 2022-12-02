@@ -56,7 +56,19 @@ const ListUser = () => {
     return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
   };
 
+  const convertStrDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return (
+      (date.getDate() > 9 ? date.getDate() : '0' + date.getDate()) +
+      '/' +
+      (date.getMonth() > 8 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)) +
+      '/' +
+      date.getFullYear()
+    );
+  };
+
   const onChange = async (list) => {
+    console.log(list.map(toUpper));
     let url = `/api/find/filter/0?location=${user.location}`;
     setType(list.map(toUpper));
     setIsFilter(true);
@@ -229,6 +241,7 @@ const ListUser = () => {
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => formatDate(a.joinedDate) - formatDate(b.joinedDate),
+      render: (text) => convertStrDate(text),
     },
     {
       width: '5em',
@@ -241,7 +254,7 @@ const ListUser = () => {
       render: (text) => toTitle(text),
     },
     {
-      align: 'center',
+      align: 'left',
       key: 'options',
       dataIndex: 'status',
       title: '',
@@ -409,7 +422,7 @@ const ListUser = () => {
             dataSource={userList.data}
             columns={columns}
           />
-          <br></br>
+
           <div className="user-list">
             <CustomPagination total={userList['totalRow']} current={current} onChange={setCurrent} />
           </div>
@@ -442,9 +455,9 @@ const ListUser = () => {
             <p>{userDetail?.staffCode}</p>
             <p>{userDetail?.fullName}</p>
             <p>{userDetail?.username}</p>
-            <p>{userDetail?.dateOfBirth}</p>
+            <p>{userDetail?.dateOfBirth ? convertStrDate(userDetail?.dateOfBirth) : '...loading'}</p>
             <p>{!userDetail?.gender ? userDetail?.gender : toTitle(userDetail?.gender)}</p>
-            <p>{userDetail?.joinedDate}</p>
+            <p>{userDetail?.joinedDate ? convertStrDate(userDetail?.joinedDate) : '...loading'}</p>
             <p>{!userDetail?.type ? userDetail?.type : toTitle(userDetail?.type)}</p>
             <p>{userDetail?.location}</p>
           </Col>
