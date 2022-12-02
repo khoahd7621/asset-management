@@ -10,9 +10,9 @@ import com.nashtech.assignment.dto.response.user.UserResponse;
 import java.text.ParseException;
 
 public interface CreateService {
-    public UserResponse createNewUser(CreateNewUserRequest createNewUserRequest) throws ParseException;
+    UserResponse createNewUser(CreateNewUserRequest createNewUserRequest) throws ParseException;
 
-    public AssetResponse createAssetResponse(CreateNewAssetRequest createNewAssetRequest) throws ParseException;
+    AssetResponse createAssetResponse(CreateNewAssetRequest createNewAssetRequest) throws ParseException;
 
-    public CategoryResponse createNewCategory(CreateNewCategoryRequest createNewCategoryRequest);
+    CategoryResponse createNewCategory(CreateNewCategoryRequest createNewCategoryRequest);
 }

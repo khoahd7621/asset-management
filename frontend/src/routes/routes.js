@@ -7,6 +7,7 @@ export const adminRoute = {
   createAsset: 'create-asset',
   editAsset: 'edit-asset',
   manageAssignment: 'manage-assignment',
+  createAssignment: 'create-assignment',
   requestForReturning: 'request-for-returning',
   report: 'report',
 };

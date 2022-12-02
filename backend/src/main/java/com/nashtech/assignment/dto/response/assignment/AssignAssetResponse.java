@@ -2,7 +2,6 @@ package com.nashtech.assignment.dto.response.assignment;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nashtech.assignment.data.constants.EAssignStatus;
 
 import lombok.Builder;

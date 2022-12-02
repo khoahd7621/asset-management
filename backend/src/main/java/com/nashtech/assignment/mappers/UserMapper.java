@@ -16,6 +16,7 @@ import com.nashtech.assignment.dto.response.user.UserResponse;
 public class UserMapper {
     public UserResponse mapEntityToResponseDto(User user) {
         return UserResponse.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())

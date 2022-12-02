@@ -8,9 +8,12 @@ import static org.mockito.Mockito.when;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
+import com.nashtech.assignment.services.get.GetUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -47,9 +50,10 @@ import com.nashtech.assignment.services.SecurityContextService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 
 @WebMvcTest(value = UserController.class)
-@ContextConfiguration(classes = { AssignmentApplication.class, SecurityConfig.class, CORSConfig.class })
+@ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class, CORSConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
 public class UserControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -61,23 +65,26 @@ public class UserControllerTest {
     @MockBean
     private DeleteService deleteService;
     @MockBean
+    private GetUserService getUserService;
+    @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @MockBean
     private SecurityContextService securityContextService;
 
     private BadRequestException badRequestException;
-
     private Date dateOfBirth;
-
     private Date joinedDate;
+    private Date date;
 
     @BeforeEach
     void setup() throws Exception {
         badRequestException = new BadRequestException("error message");
         SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
         formatterDate.setTimeZone(TimeZone.getTimeZone("GMT"));
-        dateOfBirth = formatterDate.parse("21/12/2001");;
+        dateOfBirth = formatterDate.parse("21/12/2001");
+        ;
         joinedDate = formatterDate.parse("17/11/2022");
+        date = formatterDate.parse("01/01/2001");
     }
 
     @Test
@@ -114,8 +121,12 @@ public class UserControllerTest {
         MvcResult result = mockMvc.perform(request).andReturn();
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
-        assertThat(result.getResponse().getContentAsString(),
-                is("{\"username\":null,\"staffCode\":null,\"firstName\":\"hau\",\"lastName\":\"doan\",\"gender\":\"MALE\",\"joinedDate\":\"2022-11-17T00:00:00.000+00:00\",\"dateOfBirth\":\"2001-12-21T00:00:00.000+00:00\",\"type\":\"ADMIN\",\"location\":\"hehe\",\"fullName\":null}"));
+        assertThat(result.getResponse().getContentAsString(), is(
+                "{\"id\":0,\"username\":null,\"staffCode\":null,\"firstName\":\"hau\",\"lastName\":\"doan\"," +
+                        "\"gender\":\"MALE\",\"joinedDate\":\"2022-11-17T00:00:00.000+00:00\"," +
+                        "\"dateOfBirth\":\"2001-12-21T00:00:00.000+00:00\",\"type\":\"ADMIN\"," +
+                        "\"location\":\"hehe\",\"fullName\":null}"
+        ));
     }
 
     @Test
@@ -153,8 +164,12 @@ public class UserControllerTest {
         MvcResult result = mockMvc.perform(request).andReturn();
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
-        assertThat(result.getResponse().getContentAsString(),
-                is("{\"username\":null,\"staffCode\":\"test\",\"firstName\":\"Linh\",\"lastName\":\"Ngoc Dam\",\"gender\":\"FEMALE\",\"joinedDate\":\"2022-11-17T00:00:00.000+00:00\",\"dateOfBirth\":\"2001-12-21T00:00:00.000+00:00\",\"type\":\"STAFF\",\"location\":\"HCM\",\"fullName\":\"Linh Ngoc Dam\"}"));
+        assertThat(result.getResponse().getContentAsString(), is(
+                "{\"id\":0,\"username\":null,\"staffCode\":\"test\",\"firstName\":\"Linh\",\"lastName\":\"Ngoc Dam\"," +
+                        "\"gender\":\"FEMALE\",\"joinedDate\":\"2022-11-17T00:00:00.000+00:00\"," +
+                        "\"dateOfBirth\":\"2001-12-21T00:00:00.000+00:00\",\"type\":\"STAFF\",\"location\":\"HCM\"," +
+                        "\"fullName\":\"Linh Ngoc Dam\"}"
+        ));
 
     }
 
@@ -265,7 +280,7 @@ public class UserControllerTest {
         MvcResult result = mockMvc.perform(request).andReturn();
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
-        assertThat(result.getResponse().getContentAsString(),is("true"));
+        assertThat(result.getResponse().getContentAsString(), is("true"));
     }
 
     @Test
@@ -336,7 +351,10 @@ public class UserControllerTest {
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
         assertThat(actual.getContentAsString(), is(
-                "{\"username\":null,\"staffCode\":null,\"firstName\":null,\"lastName\":null,\"gender\":null,\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":null,\"fullName\":\"Test\"}"));
+                "{\"id\":0,\"username\":null,\"staffCode\":null,\"firstName\":null,\"lastName\":null," +
+                        "\"gender\":null,\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":null," +
+                        "\"fullName\":\"Test\"}"
+        ));
     }
 
     @Test
@@ -378,6 +396,39 @@ public class UserControllerTest {
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
         assertThat(actual.getContentAsString(), is(
-                "{\"username\":null,\"staffCode\":null,\"firstName\":null,\"lastName\":null,\"gender\":null,\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":null,\"fullName\":\"Test\"}"));
+                "{\"id\":0,\"username\":null,\"staffCode\":null,\"firstName\":null,\"lastName\":null,\"gender\":null," +
+                        "\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":null,\"fullName\":\"Test\"}"
+        ));
+    }
+
+    @Test
+    void testGetAllUsers_ShouldReturnData() throws Exception {
+        UserResponse userResponse = UserResponse.builder()
+                .username("username")
+                .staffCode("staffCode")
+                .firstName("firstName")
+                .lastName("lastName")
+                .gender(EGender.MALE)
+                .joinedDate(date)
+                .dateOfBirth(date)
+                .type(EUserType.ADMIN)
+                .location("location")
+                .fullName("fullName").build();
+        List<UserResponse> response = new ArrayList<>();
+        response.add(userResponse);
+
+        when(getUserService.getAllUsers()).thenReturn(response);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/user");
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
+        assertThat(actual.getContentAsString(), is(
+                "[{\"id\":0,\"username\":\"username\",\"staffCode\":\"staffCode\",\"firstName\":\"firstName\"," +
+                        "\"lastName\":\"lastName\",\"gender\":\"MALE\",\"joinedDate\":\"2001-01-01T00:00:00.000+00:00\"," +
+                        "\"dateOfBirth\":\"2001-01-01T00:00:00.000+00:00\",\"type\":\"ADMIN\",\"location\":\"location\"," +
+                        "\"fullName\":\"fullName\"}]"
+        ));
     }
 }

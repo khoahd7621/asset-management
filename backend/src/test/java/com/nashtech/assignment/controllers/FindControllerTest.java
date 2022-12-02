@@ -72,7 +72,12 @@ public class FindControllerTest {
                 .param("location", "HCM");
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-        assertThat(result.getResponse().getContentAsString(), is("{\"data\":[{\"username\":\"Username\",\"staffCode\":\"staffCode\",\"firstName\":\"First Name\",\"lastName\":\"Last Name\",\"gender\":\"OTHERS\",\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":\"test\",\"fullName\":null}],\"totalPage\":1,\"totalRow\":1}"));
+        assertThat(result.getResponse().getContentAsString(), is(
+                "{\"data\":[{\"id\":0,\"username\":\"Username\",\"staffCode\":\"staffCode\"," +
+                        "\"firstName\":\"First Name\",\"lastName\":\"Last Name\",\"gender\":\"OTHERS\"," +
+                        "\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":\"test\"," +
+                        "\"fullName\":null}],\"totalPage\":1,\"totalRow\":1}"
+        ));
     }
 
     @Test
@@ -105,8 +110,11 @@ public class FindControllerTest {
                 .param("location", "Location");
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-        assertThat(result.getResponse().getContentAsString(),
-                is("{\"data\":[{\"username\":\"Username\",\"staffCode\":\"staffCode\",\"firstName\":\"First Name\",\"lastName\":\"Last Name\",\"gender\":\"OTHERS\",\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":\"test\",\"fullName\":null}],\"totalPage\":1,\"totalRow\":1}"));
+        assertThat(result.getResponse().getContentAsString(), is(
+                "{\"data\":[{\"id\":0,\"username\":\"Username\",\"staffCode\":\"staffCode\"," +
+                        "\"firstName\":\"First Name\",\"lastName\":\"Last Name\",\"gender\":\"OTHERS\"," +
+                        "\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":\"test\"," +
+                        "\"fullName\":null}],\"totalPage\":1,\"totalRow\":1}"));
     }
 
     @Test
@@ -126,8 +134,12 @@ public class FindControllerTest {
                 .param("staffCode", "staff code");
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-        assertThat(result.getResponse().getContentAsString(),
-                is("{\"data\":[{\"username\":\"Username\",\"staffCode\":\"staffCode\",\"firstName\":\"First Name\",\"lastName\":\"Last Name\",\"gender\":\"OTHERS\",\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":\"test\",\"fullName\":null}],\"totalPage\":1,\"totalRow\":1}"));
+        assertThat(result.getResponse().getContentAsString(), is(
+                "{\"data\":[{\"id\":0,\"username\":\"Username\",\"staffCode\":\"staffCode\"," +
+                        "\"firstName\":\"First Name\",\"lastName\":\"Last Name\",\"gender\":\"OTHERS\"," +
+                        "\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":\"test\"," +
+                        "\"fullName\":null}],\"totalPage\":1,\"totalRow\":1}"
+        ));
     }
 
     @Test
@@ -138,8 +150,11 @@ public class FindControllerTest {
                 .get("/api/find/get/{staffCode}", "test");
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-        assertThat(result.getResponse().getContentAsString(),
-                is("{\"username\":\"Username\",\"staffCode\":\"staffCode\",\"firstName\":\"First Name\",\"lastName\":\"Last Name\",\"gender\":\"OTHERS\",\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":\"test\",\"fullName\":null}"));
+        assertThat(result.getResponse().getContentAsString(), is(
+                "{\"id\":0,\"username\":\"Username\",\"staffCode\":\"staffCode\",\"firstName\":\"First Name\"," +
+                        "\"lastName\":\"Last Name\",\"gender\":\"OTHERS\",\"joinedDate\":null,\"dateOfBirth\":null," +
+                        "\"type\":null,\"location\":\"test\",\"fullName\":null}"
+        ));
     }
 
     @Test

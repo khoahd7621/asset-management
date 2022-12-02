@@ -68,7 +68,6 @@ const ListUser = () => {
   };
 
   const onChange = async (list) => {
-    console.log(list.map(toUpper));
     let url = `/api/find/filter/0?location=${user.location}`;
     setType(list.map(toUpper));
     setIsFilter(true);
@@ -254,7 +253,8 @@ const ListUser = () => {
       render: (text) => toTitle(text),
     },
     {
-      align: 'left',
+      width: '4em',
+      align: 'center',
       key: 'options',
       dataIndex: 'status',
       title: '',

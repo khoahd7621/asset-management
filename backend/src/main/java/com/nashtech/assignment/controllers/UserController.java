@@ -6,6 +6,7 @@ import com.nashtech.assignment.services.CreateService;
 import com.nashtech.assignment.services.EditService;
 import com.nashtech.assignment.services.DeleteService;
 
+import com.nashtech.assignment.services.get.GetUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,17 +35,20 @@ import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 
 import java.text.ParseException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
 
     @Autowired
-    CreateService createService;
+    private CreateService createService;
     @Autowired
-    EditService editService;
+    private EditService editService;
     @Autowired
-    DeleteService deleteService;
+    private DeleteService deleteService;
+    @Autowired
+    private GetUserService getUserService;
 
     @Operation(summary = "Create new user")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Create user successfully", content = {
@@ -118,5 +122,14 @@ public class UserController {
     public ResponseEntity<UserResponse> changePassword(
             @Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(editService.changePassword(changePasswordRequest));
+    }
+
+    @Operation(summary = "Get all users")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get all users successfully.")
+    })
+    @GetMapping()
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        return ResponseEntity.status(HttpStatus.OK).body(getUserService.getAllUsers());
     }
 }

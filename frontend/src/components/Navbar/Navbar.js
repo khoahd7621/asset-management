@@ -216,6 +216,14 @@ const Navbar = () => {
       ]);
     } else if (currentPath === adminRoute.manageAssignment) {
       setListTitles([...manageAssignment]);
+    } else if (currentPath === adminRoute.createAssignment) {
+      setListTitles([
+        ...manageAssignment,
+        {
+          title: 'Create Assignment',
+          link: `#`,
+        },
+      ]);
     } else if (currentPath === adminRoute.requestForReturning) {
       setListTitles([...manageRequestForReturning]);
     } else if (currentPath === adminRoute.report) {

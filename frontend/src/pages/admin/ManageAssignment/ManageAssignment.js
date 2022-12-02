@@ -1,13 +1,16 @@
-import { Row, Col, Table, Modal, Button, Popover, Checkbox, DatePicker, Input } from 'antd';
-import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Row, Col, Table, Modal, Button, Popover, Checkbox, DatePicker, Input } from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { CloseCircleOutlined } from '@ant-design/icons';
+
 import './ManageAssignment.scss';
+
 import { filterAssignmentList } from '../../../services/findApiService';
 import { CloseIcon, EditIcon, SortIcon, FilterIcon, RefreshIcon, CalendarIcon } from '../../../assets/CustomIcon';
-import { CloseCircleOutlined } from '@ant-design/icons';
 import CustomPagination from '../../../components/Pagination/Pagination';
 import { getAssignmentDetails } from '../../../services/getApiService';
+import { adminRoute } from '../../../routes/routes';
 
 const ManageAssignment = () => {
   const { Search } = Input;
@@ -44,13 +47,33 @@ const ManageAssignment = () => {
       current - 1,
     );
     if (response.status === 200) {
-      setAssignmentList(
-        response?.data?.data.map((item, index) => {
-          return { ...item, no: index + 1, key: item.id };
-        }),
-      );
-      console.log(assignmentList);
+      const assignmentResponse = location.state?.assignmentResponse;
+      if (assignmentResponse) {
+        let count = 1;
+        setAssignmentList(
+          response?.data?.data.reduce(
+            (prev, current) => {
+              count++;
+              return [...prev, { ...current, no: count, key: current.id }];
+            },
+            [
+              {
+                ...assignmentResponse,
+                no: count,
+                key: assignmentResponse.id,
+              },
+            ],
+          ),
+        );
+      } else {
+        setAssignmentList(
+          response?.data?.data.map((item, index) => {
+            return { ...item, no: index + 1, key: item.id };
+          }),
+        );
+      }
       setTotalRow(response.data.totalRow);
+      window.history.replaceState({}, document.title);
     }
   };
 
@@ -83,15 +106,13 @@ const ManageAssignment = () => {
       date.getFullYear()
     );
   };
-  
 
   const onClickToEdit = (assetCode) => {
     // handle pass state to edit page
   };
 
   const onClickToUnableDelete = () => {};
-  const onClickToAbleDelete = () => {
-  };
+  const onClickToAbleDelete = () => {};
 
   const CheckboxGroup = Checkbox.Group;
 
@@ -144,7 +165,8 @@ const ManageAssignment = () => {
 
   // handle letter case
   const toTitle = function (txt) {
-    return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
+    const text = txt.replaceAll('_', ' ');
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
   const handleValueEnumResquest = function (str) {
@@ -221,7 +243,7 @@ const ManageAssignment = () => {
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => formatDate(a.assignedDate) - formatDate(b.assignedDate),
-      render: (text) => convertStrDate(text)
+      render: (text) => convertStrDate(text),
     },
     {
       width: '12em',
@@ -238,38 +260,39 @@ const ManageAssignment = () => {
       key: 'options',
       dataIndex: 'status',
       title: '',
-      render: (text, record) => (
-        <div id="frame">
-          <div className="edit-icon">
-            <Button
-              data-id={record.assetCode}
-              type="link"
-              icon={<EditIcon />}
-              disabled={record.status === 'WAITING FOR ACCEPTANCE' ? false : true}
-              onClick={onClickToEdit}
-            ></Button>
+      render: (text, record) => {
+        return (
+          <div id="frame">
+            <div className="edit-icon">
+              <Button
+                data-id={record.assetCode}
+                type="link"
+                icon={<EditIcon />}
+                disabled={record.status === 'WAITING_FOR_ACCEPTANCE' ? false : true}
+                onClick={onClickToEdit}
+              ></Button>
+            </div>
+            <div className="delete-icon">
+              <Button
+                onClick={record.assignedTo === user?.username ? onClickToUnableDelete : onClickToAbleDelete}
+                data-id={record.assetCode}
+                type="link"
+                icon={<CloseCircleOutlined style={{ color: 'red' }} />}
+                disabled={record.status === 'DECLINED' || record.status === 'WAITING_FOR_ACCEPTANCE' ? false : true}
+              ></Button>
+            </div>
+            <div className="manage-assignment__return-icon">
+              <Button
+                // onClick={record.username === user?.username ? onClickToCurrentUser : onClickToCheck}
+                data-id={record.assetCode}
+                type="link"
+                icon={<RefreshIcon />}
+                disabled={record.status === 'ACCEPTED' ? false : true}
+              ></Button>
+            </div>
           </div>
-          <div className="delete-icon">
-            <Button
-              onClick={record.assignedTo === user?.username ? onClickToUnableDelete : onClickToAbleDelete}
-              data-id={record.assetCode}
-              type="link"
-              icon={<CloseCircleOutlined style={{ color: 'red' }} />}
-              disabled={
-                (record.status === ('DECLINED' || 'WAITING FOR ACCEPTANCE') ? false : true)
-              }
-            ></Button>
-          </div>
-          <div className="manage-assignment__return-icon">
-            <Button
-              // onClick={record.username === user?.username ? onClickToCurrentUser : onClickToCheck}
-              data-id={record.assetCode}
-              type="link"
-              icon={<RefreshIcon />}
-            ></Button>
-          </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       title: title(''),
@@ -326,7 +349,9 @@ const ManageAssignment = () => {
           <Col className="gutter-row" span={6}>
             <Button
               className="manage-assignment-button"
-              // onClick={() => navigate(`/${adminRoute.home}/${adminRoute.manageAssignment}/${adminRoute.createAssignment}`)}
+              onClick={() =>
+                navigate(`/${adminRoute.home}/${adminRoute.manageAssignment}/${adminRoute.createAssignment}`)
+              }
             >
               Create new assignment
             </Button>
@@ -422,7 +447,7 @@ const ManageAssignment = () => {
               <div className="title">Note</div>
             </Col>
             <Col span={16} sm={19} md={18}>
-              <div className="content">{assignmentDetails?.note ?? 'Loading...'}</div>
+              <div className="content">{assignmentDetails?.note ?? ''}</div>
             </Col>
           </Row>
         </Modal>

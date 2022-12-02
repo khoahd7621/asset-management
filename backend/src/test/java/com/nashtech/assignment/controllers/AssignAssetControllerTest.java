@@ -4,17 +4,23 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
+import com.nashtech.assignment.dto.request.assignment.CreateNewAssignmentRequest;
+import com.nashtech.assignment.exceptions.BadRequestException;
+import com.nashtech.assignment.services.create.CreateAssignmentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -40,28 +46,39 @@ import com.nashtech.assignment.utils.JwtTokenUtil;
                 CORSConfig.class })
 @AutoConfigureMockMvc(addFilters = false)
 public class AssignAssetControllerTest {
-        @Autowired
-        private ObjectMapper objectMapper;
+
         @Autowired
         private MockMvc mockMvc;
+        @Autowired
+        private ObjectMapper objectMapper;
         @MockBean
         private SearchAssignAssetService searchAssignAssetService;
         @MockBean
         private GetService getService;
+        @MockBean
+        private CreateAssignmentService createAssignmentService;
         @MockBean
         private JwtTokenUtil jwtTokenUtil;
         @MockBean
         private SecurityContextService securityContextService;
 
         private AssignAssetResponse assetResponse;
+        private Date date;
+        private BadRequestException badRequestException;
+        private NotFoundException notFoundException;
 
         @BeforeEach()
-        void setUp() {
+        void setUp() throws ParseException {
 
                 assetResponse = AssignAssetResponse.builder().assetCode("LP0101")
                                 .assetName("Laptop Lenovo 1009").category("Laptop")
                                 .note("note").build();
 
+            SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
+            formatterDate.setTimeZone(TimeZone.getTimeZone("GMT"));
+            date = formatterDate.parse("01/01/2001");
+            badRequestException = new BadRequestException("Error message");
+            notFoundException = new NotFoundException("Error message");
         }
 
         @Test
@@ -149,5 +166,83 @@ public class AssignAssetControllerTest {
                 assertThat(result.getResponse().getContentAsString(), is("{\"message\":\"Mess\"}"));
 
         }
+
+    @Test
+    void createNewAssignment_WhenDataRequestValid_ShouldReturnData() throws Exception {
+        CreateNewAssignmentRequest requestData =  CreateNewAssignmentRequest.builder()
+                .assetId(1L)
+                .userId(1L)
+                .assignedDate(date)
+                .note("note").build();
+        ArgumentCaptor<CreateNewAssignmentRequest> requestDataCaptor =
+                ArgumentCaptor.forClass(CreateNewAssignmentRequest.class);
+        AssignAssetResponse assetResponse = AssignAssetResponse.builder()
+                .id(1)
+                .assetCode("assetCode")
+                .assetName("assetName")
+                .userAssignedTo("userAssignedTo")
+                .userAssignedBy("userAssignedBy")
+                .assignedDate(date)
+                .category("category")
+                .note("note")
+                .specification("specification")
+                .status(EAssignStatus.WAITING_FOR_ACCEPTANCE).build();
+
+        when(createAssignmentService.createNewAssignment(requestDataCaptor.capture())).thenReturn(assetResponse);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/assignment")
+                .content(objectMapper.writeValueAsString(requestData))
+                .contentType(MediaType.APPLICATION_JSON);
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
+        assertThat(actual.getContentAsString(), is(
+                "{\"id\":1,\"assetId\":0,\"assetCode\":\"assetCode\",\"assetName\":\"assetName\"," +
+                        "\"userAssignedToId\":0,\"userAssignedTo\":\"userAssignedTo\",\"userAssignedBy\":\"userAssignedBy\"," +
+                        "\"assignedDate\":\"2001-01-01T00:00:00.000+00:00\",\"category\":\"category\",\"note\":\"note\"," +
+                        "\"specification\":\"specification\",\"status\":\"WAITING_FOR_ACCEPTANCE\"}"));
+    }
+
+    @Test
+    void createNewAssignment_WhenStatusOfAssetIsNotTypeOfAvailableOrAssignDateIsBeforeToDay_ThrowBadRequestException() throws Exception {
+        CreateNewAssignmentRequest requestData =  CreateNewAssignmentRequest.builder()
+                .assetId(1L)
+                .userId(1L)
+                .assignedDate(date)
+                .note("note").build();
+        ArgumentCaptor<CreateNewAssignmentRequest> requestDataCaptor =
+                ArgumentCaptor.forClass(CreateNewAssignmentRequest.class);
+
+        when(createAssignmentService.createNewAssignment(requestDataCaptor.capture())).thenThrow(badRequestException);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/assignment")
+                .content(objectMapper.writeValueAsString(requestData))
+                .contentType(MediaType.APPLICATION_JSON);
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"Error message\"}"));
+    }
+
+    @Test
+    void createNewAssignment_WhenAssetOrUserNotExist_ThrowBadRequestException() throws Exception {
+        CreateNewAssignmentRequest requestData =  CreateNewAssignmentRequest.builder()
+                .assetId(1L)
+                .userId(1L)
+                .assignedDate(date)
+                .note("note").build();
+        ArgumentCaptor<CreateNewAssignmentRequest> requestDataCaptor =
+                ArgumentCaptor.forClass(CreateNewAssignmentRequest.class);
+
+        when(createAssignmentService.createNewAssignment(requestDataCaptor.capture())).thenThrow(notFoundException);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/assignment")
+                .content(objectMapper.writeValueAsString(requestData))
+                .contentType(MediaType.APPLICATION_JSON);
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.NOT_FOUND.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"Error message\"}"));
+    }
 
 }

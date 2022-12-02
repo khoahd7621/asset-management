@@ -10,6 +10,7 @@ import com.nashtech.assignment.dto.response.asset.AssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.services.*;
+import com.nashtech.assignment.services.get.GetAssetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,6 +40,8 @@ public class AssetController {
     private EditService editService;
     @Autowired
     private DeleteService deleteService;
+    @Autowired
+    private GetAssetService getAssetService;
 
     @Operation(summary = "Get asset detail and its histories by assetId")
     @ApiResponses(value = {
@@ -136,5 +139,29 @@ public class AssetController {
     public ResponseEntity<Void> deleteAssetByAssetId(@PathVariable Long assetId) {
         deleteService.deleteAssetByAssetId(assetId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @Operation(summary = "Get all assets by assetStatus")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get all assets successfully.")
+    })
+    @GetMapping("/status/{assetStatus}")
+    public ResponseEntity<List<AssetResponse>> getAllAssetByAssetStatus(@PathVariable EAssetStatus assetStatus) {
+        return ResponseEntity.status(HttpStatus.OK).body(getAssetService.getAllAssetByAssetStatus(assetStatus));
+    }
+
+    @Operation(summary = "Get all assets by assetStatus with pagination")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get all assets successfully.")
+    })
+    @GetMapping("/status/{assetStatus}/pagination")
+    public ResponseEntity<PaginationResponse<List<AssetResponse>>> getAllAssetByAssetStatusWithPagination(
+            @PathVariable EAssetStatus assetStatus,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "limit", defaultValue = "20") Integer limit,
+            @RequestParam(name = "sort-field", defaultValue = "name") String sortField,
+            @RequestParam(name = "sort-type", defaultValue = "ASC") String sortType) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(getAssetService.getAllAssetByAssetStatusWithPagination(assetStatus, page, limit, sortField, sortType));
     }
 }

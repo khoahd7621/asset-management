@@ -21,6 +21,7 @@ import com.nashtech.assignment.dto.response.category.CategoryResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.services.*;
+import com.nashtech.assignment.services.get.GetAssetService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,6 +65,8 @@ class AssetControllerTest {
     private CreateService createService;
     @MockBean
     private DeleteService deleteService;
+    @MockBean
+    private GetAssetService getAssetService;
 
     private Date date;
     private AssetResponse assetResponse;
@@ -375,6 +378,57 @@ class AssetControllerTest {
 
         assertThat(actual.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
         assertThat(actual.getContentAsString(), is("{\"message\":\"error message\"}"));
+    }
+
+    @Test
+    void getAllAssetByAssetStatus_ShouldReturnData() throws Exception {
+        EAssetStatus assetStatus = EAssetStatus.AVAILABLE;
+        List<AssetResponse> response = new ArrayList<>();
+        response.add(assetResponse);
+
+        when(getAssetService.getAllAssetByAssetStatus(assetStatus)).thenReturn(response);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset/status/{assetStatus}", assetStatus);
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
+        assertThat(actual.getContentAsString(), is(
+                "[{\"id\":1,\"assetName\":\"name\",\"assetCode\":\"code\",\"installedDate\":\"2001-01-01T00:00:00.000+00:00\"," +
+                        "\"specification\":\"specification\",\"status\":\"AVAILABLE\",\"location\":\"location\"," +
+                        "\"category\":{\"id\":1,\"name\":\"name\",\"prefixAssetCode\":\"code\"},\"deleted\":false}]"));
+    }
+
+    @Test
+    void getAllAssetByAssetStatusWithPagination_ShouldReturnData() throws Exception {
+        EAssetStatus status = EAssetStatus.AVAILABLE;
+        int page = 0;
+        int limit = 20;
+        String sortField = "name";
+        String sortType = "ASC";
+        List<AssetResponse> assetResponseList = new ArrayList<>();
+        assetResponseList.add(assetResponse);
+        PaginationResponse<List<AssetResponse>> response = PaginationResponse.<List<AssetResponse>>builder()
+                .data(assetResponseList)
+                .totalPage(1)
+                .totalRow(1).build();
+
+        when(getAssetService.getAllAssetByAssetStatusWithPagination(status, page, limit, sortField, sortType)).thenReturn(response);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset/status/{assetStatus}/pagination", status)
+                .param("page", String.valueOf(page))
+                .param("limit", String.valueOf(limit))
+                .param("sort-field", sortField)
+                .param("sort-type", sortType);
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
+        assertThat(actual.getContentAsString(), is(
+                "{\"data\":[{\"id\":1,\"assetName\":\"name\",\"assetCode\":\"code\"," +
+                        "\"installedDate\":\"2001-01-01T00:00:00.000+00:00\"," +
+                        "\"specification\":\"specification\",\"status\":\"AVAILABLE\",\"location\":\"location\"," +
+                        "\"category\":{\"id\":1,\"name\":\"name\",\"prefixAssetCode\":\"code\"},\"deleted\":false}]," +
+                        "\"totalPage\":1,\"totalRow\":1}"
+        ));
     }
 
 }

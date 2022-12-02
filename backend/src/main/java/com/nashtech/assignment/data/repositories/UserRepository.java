@@ -25,18 +25,22 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u"
     +" FROM User u "
-    +" where " 
+    +" WHERE "
     +" u.location = :location" 
-    +" and (u.type = :type or :type is null)"
-    +" and u.isDeleted = 'false'"
-    +" and ((lower(concat(u.firstName,' ', u.lastName))  like lower(:name) or :name is null)"
-        +" or (lower(concat(u.lastName,' ', u.firstName))  like lower(:name) or :name is null)"
-        +" or (lower(u.staffCode) like lower(:code) or :code is null))"
-    +" order by u.firstName asc")
+    +" AND (u.type = :type OR :type IS NULL)"
+    +" AND u.isDeleted = FALSE"
+    +" AND ((lower(concat(u.firstName,' ', u.lastName))  LIKE lower(:name) OR :name IS NULL)"
+        +" OR (lower(concat(u.lastName,' ', u.firstName))  LIKE lower(:name) OR :name IS NULL)"
+        +" OR (lower(u.staffCode) LIKE lower(:code) OR :code IS NULL))"
+    +" ORDER BY u.firstName ASC")
     Page<User> search(@Param("name") String name, @Param("code") String staffCode, @Param("location") String location, @Param("type")EUserType type, Pageable pageable);
     
     @Query(value = "select * from user_tbl as u where u.user_name ~ :username", nativeQuery = true)
-    public List<User> findAllByUsernameMatchRegex(String username);
+    List<User> findAllByUsernameMatchRegex(String username);
 
-    public Optional<User> findByUsernameAndIsDeletedFalse(String username);
+    Optional<User> findByUsernameAndIsDeletedFalse(String username);
+
+    List<User> findAllByLocationAndIsDeletedFalse(String location);
+
+    Optional<User> findByIdAndIsDeletedFalse(Long id);
 }

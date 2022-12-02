@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Admin from './layouts/Admin';
 import Login from './layouts/Login';
 import User from './layouts/User';
-import { CreateUser, Home as AdminHome, ManageAsset, ManageUser } from './pages/admin';
+import { CreateAssignment, CreateUser, Home as AdminHome, ManageAsset, ManageUser } from './pages/admin';
 import CreateAsset from './pages/admin/CreateAsset/CreateAsset';
 import EditAsset from './pages/admin/EditAsset/EditAsset';
 import { Home as UserHome } from './pages/user';
@@ -86,14 +86,22 @@ const App = () => {
               </CheckFirstLoginRoute>
             }
           />
-          <Route
-            path={adminRoute.manageAssignment}
-            element={
-              <CheckFirstLoginRoute>
-                <ManageAssignment />
-              </CheckFirstLoginRoute>
-            }
-          />
+            <Route
+                path={adminRoute.manageAssignment}
+                element={
+                    <CheckFirstLoginRoute>
+                        <ManageAssignment />
+                    </CheckFirstLoginRoute>
+                }
+            />
+            <Route
+                path={`${adminRoute.manageAssignment}/${adminRoute.createAssignment}`}
+                element={
+                    <CheckFirstLoginRoute>
+                        <CreateAssignment />
+                    </CheckFirstLoginRoute>
+                }
+            />
         </Route>
         <Route
           path={userRoute.home}

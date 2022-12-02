@@ -29,4 +29,13 @@ const postCreateNewAsset = ({ assetName, categoryName, specification, installedD
   });
 };
 
-export { postCreateNewUser, postCreateNewCategory, postCreateNewAsset };
+const createNewAssignment = ({ assetId, userId, assignedDate, note }) => {
+  return axios.post('/api/assignment', {
+    assetId,
+    userId,
+    assignedDate,
+    note,
+  });
+};
+
+export { postCreateNewUser, postCreateNewCategory, postCreateNewAsset, createNewAssignment };

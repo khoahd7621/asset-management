@@ -1,7 +1,6 @@
 .manage-user {
   flex: 1;
   padding: 80px 50px 0 96px;
-  
 
   .title-manage-user {
     font-size: 20px;
@@ -13,10 +12,12 @@
 .user-list {
   table {
     display: table;
-    width: 100%;
-    border-spacing: 2.3em 0;
     background-color: white;
     font-size: 13px;
+    border-collapse: inherit;
+    border-spacing: 30px 0px;
+    width: calc(100% + 60px);
+    margin-left: -30px;
   }
 
   .ant-table-thead > tr > th {

@@ -22,14 +22,18 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
             "AND (coalesce(:categoryIds, NULL) IS NULL OR a.category.id IN :categoryIds) " +
             "AND a.location = :location AND a.isDeleted = FALSE")
     Page<Asset> findAllAssetsByQueryAndStatusesAndCategoryIds(
-            @Param("query") String query,
-            @Param("statuses") List<EAssetStatus> statuses,
-            @Param("categoryIds") List<Integer> categoryIds,
-            @Param("location") String location,
-            Pageable pageable);
+                @Param("query") String query,
+                @Param("statuses") List<EAssetStatus> statuses,
+                @Param("categoryIds") List<Integer> categoryIds,
+                @Param("location") String location,
+                Pageable pageable);
 
     Optional<Asset> findByIdAndIsDeletedFalse(long id);
 
     @Query(value = "select * from asset_tbl as a where a.category_id = :categoryId", nativeQuery = true)
     List<Asset> findAssetsByCategoryId(@Param("categoryId") int categoryId);
+
+    List<Asset> findAllByStatusAndLocationAndIsDeletedFalse(EAssetStatus status, String location);
+
+    Page<Asset> findAllByStatusAndLocationAndIsDeletedFalse(EAssetStatus status, String location, Pageable pageable);
 }
