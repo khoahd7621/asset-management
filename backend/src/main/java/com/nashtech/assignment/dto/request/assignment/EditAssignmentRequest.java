@@ -11,7 +11,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class CreateNewAssignmentRequest {
+public class EditAssignmentRequest {
     @Min(1)
     private Long assetId;
     @Min(1)

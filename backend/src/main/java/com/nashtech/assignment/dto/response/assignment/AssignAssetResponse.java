@@ -18,6 +18,7 @@ public class AssignAssetResponse {
     private String assetName;
     private long userAssignedToId;
     private String userAssignedTo;
+    private String userAssignedToFullName;
     private String userAssignedBy;
     private Date assignedDate;
     private String category;

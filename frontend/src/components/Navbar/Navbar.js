@@ -220,7 +220,15 @@ const Navbar = () => {
       setListTitles([
         ...manageAssignment,
         {
-          title: 'Create Assignment',
+          title: 'Create New Assignment',
+          link: `#`,
+        },
+      ]);
+    } else if (currentPath === adminRoute.editAssignment) {
+      setListTitles([
+        ...manageAssignment,
+        {
+          title: 'Edit Assignment',
           link: `#`,
         },
       ]);

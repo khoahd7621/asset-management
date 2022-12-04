@@ -1,0 +1,82 @@
+.edit-assignment-block {
+  flex: 1;
+  padding: 80px 160px 0;
+
+  .edit-assignment__title {
+    font-size: 20px;
+    color: #cf2338;
+    font-weight: bold;
+    margin: 4px 0 24px;
+  }
+
+  .edit-assignment__form {
+    min-width: 350px;
+    width: 400px;
+
+    .ant-picker {
+      width: 100%;
+    }
+
+    .ant-form-item {
+      .ant-input-affix-wrapper {
+        border: 1px solid #a8a3a3;
+        border-radius: 6px;
+        color: #000;
+        background-color: #fff;
+        cursor: pointer;
+
+        input {
+          cursor: pointer;
+        }
+
+        &:hover {
+          border-color: #cf2338;
+        }
+      }
+
+      .ant-picker {
+        border: 1px solid #a8a3a3;
+        border-radius: 6px;
+      }
+
+      textarea {
+        border: 1px solid #a8a3a3;
+        border-radius: 6px;
+      }
+
+      .ant-form-item-explain {
+        padding: 8px 0;
+        color: #cf2338 !important;
+      }
+
+      .ant-picker-status-error {
+        border-color: #cf2338;
+      }
+    }
+
+    .edit-assignment__form-action {
+      display: flex;
+      justify-content: end;
+
+      button {
+        &.save-button {
+          background-color: #cf2338;
+          border-color: #cf2338;
+
+          &:disabled {
+            background-color: #a8a3a3;
+            border-color: #a8a3a3;
+            color: #fff;
+          }
+        }
+
+        & + button {
+          margin-left: 40px;
+        }
+      }
+      .ant-form-item-row {
+        justify-content: end;
+      }
+    }
+  }
+}

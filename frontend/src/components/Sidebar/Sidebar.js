@@ -72,7 +72,11 @@ const Sizebar = () => {
       currentPath === adminRoute.editAsset
     ) {
       setCurrentIndex(adminItems.findIndex((item) => item.key === 'Manage Asset'));
-    } else if (currentPath === adminRoute.manageAssignment || currentPath === adminRoute.createAssignment) {
+    } else if (
+      currentPath === adminRoute.manageAssignment ||
+      currentPath === adminRoute.createAssignment ||
+      currentPath === adminRoute.editAssignment
+    ) {
       setCurrentIndex(adminItems.findIndex((item) => item.key === 'Manage Assignment'));
     } else if (currentPath === adminRoute.requestForReturning) {
       setCurrentIndex(adminItems.findIndex((item) => item.key === 'Request for Returning'));

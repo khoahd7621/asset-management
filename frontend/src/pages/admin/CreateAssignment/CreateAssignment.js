@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, DatePicker, Form, Input } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import moment from 'moment';
@@ -40,6 +40,10 @@ const CreateAssignment = () => {
   const [isSending, setIsSending] = useState(false);
   const [joinedDateValidate, setJoinedDateValidate] = useState({ ...initialError });
 
+  useEffect(() => {
+    document.title = 'Manage Assignment - Create New Assignment';
+  }, []);
+
   const handleSaveChoose = (type, data) => {
     if (type === 'USER') {
       setCurrentUser({ ...data });
@@ -69,7 +73,10 @@ const CreateAssignment = () => {
         },
       });
     } else {
-      if (response?.response?.data?.message === 'Assigned date cannot before joined date of user.') {
+      if (
+        response?.response?.data?.message === 'Assigned date cannot before joined date of user.' ||
+        response?.response?.data?.message === 'Assigned date cannot before installed date of asset.'
+      ) {
         setJoinedDateValidate({
           help: response?.response?.data?.message,
           status: 'error',
@@ -144,7 +151,7 @@ const CreateAssignment = () => {
           >
             Save
           </Button>
-          <Button htmlType="button" onClick={() => {}}>
+          <Button htmlType="button" onClick={() => navigate(`/${adminRoute.home}/${adminRoute.manageAssignment}`)}>
             Cancel
           </Button>
         </div>

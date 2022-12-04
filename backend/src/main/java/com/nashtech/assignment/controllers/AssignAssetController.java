@@ -2,11 +2,13 @@ package com.nashtech.assignment.controllers;
 
 import com.nashtech.assignment.data.constants.EAssignStatus;
 import com.nashtech.assignment.dto.request.assignment.CreateNewAssignmentRequest;
+import com.nashtech.assignment.dto.request.assignment.EditAssignmentRequest;
 import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.assignment.AssignAssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.services.create.CreateAssignmentService;
+import com.nashtech.assignment.services.edit.EditAssignAssetService;
 import com.nashtech.assignment.services.get.GetAssignAssetService;
 import com.nashtech.assignment.services.search.SearchAssignAssetService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.List;
 
@@ -32,6 +35,8 @@ public class AssignAssetController {
     SearchAssignAssetService searchAssignAssetService;
     @Autowired
     private CreateAssignmentService createAssignmentService;
+    @Autowired
+    private EditAssignAssetService editAssignAssetService;
 
     @Operation(summary = "Search assign by receive name, status, date, page")
     @ApiResponses(value = {
@@ -63,13 +68,30 @@ public class AssignAssetController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Create assignment successfully", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class))}),
-            @ApiResponse(responseCode = "400", description = "Status of this asset is not available | Assign date is before today", content = {
+            @ApiResponse(responseCode = "400", description = "Status of this asset is not available | Assign date is before today | Assigned date cannot before installed date of asset", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class))}),
-            @ApiResponse(responseCode = "404", description = "Not exist asset with this assetId | Not exist user with this userId | Assigned date cannot before joined date of user.", content = {
+            @ApiResponse(responseCode = "404", description = "Not exist asset with this assetId | Not exist user with this userId | Assigned date cannot before joined date of user", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))})
     })
     @PostMapping
-    public ResponseEntity<AssignAssetResponse> createNewAssignment(@RequestBody CreateNewAssignmentRequest createNewAssignmentRequest) {
+    public ResponseEntity<AssignAssetResponse> createNewAssignment(
+            @RequestBody @Valid CreateNewAssignmentRequest createNewAssignmentRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(createAssignmentService.createNewAssignment(createNewAssignmentRequest));
+    }
+
+    @Operation(summary = "Edit assignment by assignmentId")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Edit assignment successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "Can only edit assignment with status waiting for acceptance | Can only assign asset with status available | Assign date is before today | Assigned date cannot before joined date of user | Assigned date cannot before installed date of asset",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class))}),
+            @ApiResponse(responseCode = "404", description = "Not exist assignment with assignment id | Not exist asset with asset id | Not exist user with user id",
+                    content = {@Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))})
+    })
+    @PutMapping("/{assignmentId}")
+    public ResponseEntity<AssignAssetResponse> editAssignment(
+            @PathVariable Long assignmentId,
+            @RequestBody @Valid EditAssignmentRequest editAssignmentRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(editAssignAssetService.editAssignment(assignmentId, editAssignmentRequest));
     }
 }

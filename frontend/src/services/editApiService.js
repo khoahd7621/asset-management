@@ -32,4 +32,13 @@ const putChangePasswordFirst = ({ newPassword }) => {
   });
 };
 
-export { postEditUser, putEditAsset, putChangePassword, putChangePasswordFirst };
+const putEditAssignment = (assignmentId, { assetId, userId, assignedDate, note }) => {
+  return axios.put(`/api/assignment/${assignmentId}`, {
+    assetId,
+    userId,
+    assignedDate,
+    note,
+  });
+};
+
+export { postEditUser, putEditAsset, putChangePassword, putChangePasswordFirst, putEditAssignment };

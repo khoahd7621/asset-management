@@ -23,6 +23,7 @@ public class AssignAssetMapper {
                 .assetName(asset.getName())
                 .userAssignedToId(userAssignedTo.getId())
                 .userAssignedTo(userAssignedTo.getUsername())
+                .userAssignedToFullName(userAssignedTo.getFirstName() + " " + userAssignedTo.getLastName())
                 .userAssignedBy(assignAsset.getUserAssignedBy().getUsername())
                 .assignedDate(assignAsset.getAssignedDate())
                 .category(asset.getCategory().getName())

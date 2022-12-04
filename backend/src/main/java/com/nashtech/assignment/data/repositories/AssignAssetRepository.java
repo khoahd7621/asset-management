@@ -1,6 +1,7 @@
 package com.nashtech.assignment.data.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,4 +32,6 @@ public interface AssignAssetRepository extends JpaRepository<AssignAsset, Long> 
             + " and AS1.isDeleted = false"
             + " order by AS1.userAssignedTo.username asc")
     Page<AssignAsset> searchByNameOrStatusOrDateAndLocation(@Param("name") String name, @Param("statuses") List<EAssignStatus> status, @Param("date") String date, @Param("location") String location, Pageable pageable);
+
+    Optional<AssignAsset> findByIdAndIsDeletedFalse(long id);
 }

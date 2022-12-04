@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Row, Col, Table, Modal, Button, Popover, Checkbox, DatePicker, Input } from 'antd';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
 import './ManageAssignment.scss';
@@ -34,6 +34,10 @@ const ManageAssignment = () => {
   const [getSearchData, setGetSearchData] = useState('');
   const [assigndate, setAssigndate] = useState('');
   const [state, setState] = useState(plainOptions);
+
+  useEffect(() => {
+    document.title = 'Manage Assignment - Assignment List';
+  }, []);
 
   useEffect(() => {
     getData();
@@ -107,8 +111,8 @@ const ManageAssignment = () => {
     );
   };
 
-  const onClickToEdit = (assetCode) => {
-    // handle pass state to edit page
+  const onClickToEdit = (assignmentId) => {
+    navigate(`/${adminRoute.home}/${adminRoute.manageAssignment}/${adminRoute.editAssignment}/${assignmentId}`);
   };
 
   const onClickToUnableDelete = () => {};
@@ -269,7 +273,7 @@ const ManageAssignment = () => {
                 type="link"
                 icon={<EditIcon />}
                 disabled={record.status === 'WAITING_FOR_ACCEPTANCE' ? false : true}
-                onClick={onClickToEdit}
+                onClick={() => onClickToEdit(record.id)}
               ></Button>
             </div>
             <div className="delete-icon">
