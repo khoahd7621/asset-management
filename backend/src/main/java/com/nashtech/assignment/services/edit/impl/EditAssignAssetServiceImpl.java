@@ -10,8 +10,10 @@ import com.nashtech.assignment.data.repositories.AssignAssetRepository;
 import com.nashtech.assignment.dto.request.assignment.EditAssignmentRequest;
 import com.nashtech.assignment.dto.response.assignment.AssignAssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
+import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.mappers.AssignAssetMapper;
+import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.services.edit.EditAssignAssetService;
 import com.nashtech.assignment.services.validation.ValidationAssetService;
 import com.nashtech.assignment.services.validation.ValidationUserService;
@@ -39,8 +41,59 @@ public class EditAssignAssetServiceImpl implements EditAssignAssetService {
     private ValidationUserService validationUserService;
     @Autowired
     private CompareDateUtil compareDateUtil;
+    @Autowired
+    private SecurityContextService securityContextService;
 
     @Override
+    public AssignAssetResponse acceptAssignAsset(Long idAssignAsset) {
+        Optional<AssignAsset> assignAssetOpt = assignAssetRepository.findById(idAssignAsset);
+        if (assignAssetOpt.isEmpty()) {
+            throw new NotFoundException("Assignment not found");
+        }
+        if (!assignAssetOpt.get().getStatus().equals(EAssignStatus.WAITING_FOR_ACCEPTANCE)) {
+            throw new BadRequestException("Assignment is not waiting for acceptance");
+        }
+
+        Date today = new Date();
+        Date assignedDate = assignAssetOpt.get().getAssignedDate();
+        if (compareDateUtil.isBefore(today, assignedDate)) {
+            throw new BadRequestException("Assign date is after today.");
+        }
+
+        User currentUser = securityContextService.getCurrentUser();
+        if (currentUser.getId() != assignAssetOpt.get().getUserAssignedTo().getId())
+            throw new ForbiddenException("Current user is not match to this assignment.");
+
+        assignAssetOpt.get().setStatus(EAssignStatus.ACCEPTED);
+        assignAssetRepository.save(assignAssetOpt.get());
+        return assignAssetMapper.toAssignAssetResponse(assignAssetOpt.get());
+    }
+
+    @Override
+    public AssignAssetResponse declineAssignAsset(Long idAssignAsset) {
+        Optional<AssignAsset> assignAssetOpt = assignAssetRepository.findById(idAssignAsset);
+        if (assignAssetOpt.isEmpty()) {
+            throw new NotFoundException("Assignment not found");
+        }
+        if (!assignAssetOpt.get().getStatus().equals(EAssignStatus.WAITING_FOR_ACCEPTANCE)) {
+            throw new BadRequestException("Assignment is not waiting for acceptance");
+        }
+
+        Date today = new Date();
+        Date assignedDate = assignAssetOpt.get().getAssignedDate();
+        if (compareDateUtil.isBefore(today, assignedDate)) {
+            throw new BadRequestException("Assign date is after today.");
+        }
+
+        User currentUser = securityContextService.getCurrentUser();
+        if (currentUser.getId() != assignAssetOpt.get().getUserAssignedTo().getId())
+            throw new ForbiddenException("Current user is not match to this assignment.");
+
+        assignAssetOpt.get().setStatus(EAssignStatus.DECLINED);
+        assignAssetRepository.save(assignAssetOpt.get());
+        return assignAssetMapper.toAssignAssetResponse(assignAssetOpt.get());
+    }
+
     public AssignAssetResponse editAssignment(Long assignmentId, EditAssignmentRequest editAssignmentRequest) {
         Optional<AssignAsset> assignAssetOpt = assignAssetRepository.findByIdAndIsDeletedFalse(assignmentId);
         if (assignAssetOpt.isEmpty()) {
@@ -64,7 +117,8 @@ public class EditAssignAssetServiceImpl implements EditAssignAssetService {
         }
         Asset currentAssetAssignedTo = assignAsset.getAsset();
         if (currentAssetAssignedTo.getId() != editAssignmentRequest.getAssetId()) {
-            Asset newAsset = validationAssetService.validationAssetAssignedToAssignment(editAssignmentRequest.getAssetId());
+            Asset newAsset = validationAssetService
+                    .validationAssetAssignedToAssignment(editAssignmentRequest.getAssetId());
             newAsset.setStatus(EAssetStatus.ASSIGNED);
             currentAssetAssignedTo.setStatus(EAssetStatus.AVAILABLE);
             assetRepository.save(currentAssetAssignedTo);

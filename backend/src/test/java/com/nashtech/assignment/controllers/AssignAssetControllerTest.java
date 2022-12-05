@@ -402,4 +402,79 @@ public class AssignAssetControllerTest {
         ));
     }
 
+    @Test
+    void testAcceptAssignAsset_WhenReturnData() throws Exception {
+        AssignAssetResponse assignAssetReponse = AssignAssetResponse.builder().status(EAssignStatus.ACCEPTED).build();
+        when(editAssignAssetService.acceptAssignAsset(1L)).thenReturn(assignAssetReponse);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/accept/{idAssignAsset}", 1L);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getContentAsString(), is(
+            "{\"id\":0,\"assetId\":0,\"assetCode\":null,\"assetName\":null,\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null,\"userAssignedBy\":null,\"assignedDate\":null,\"category\":null,\"note\":null,\"specification\":null,\"status\":\"ACCEPTED\"}"));
+    }
+
+    @Test
+    void testAcceptAssignAsset_WhenReturnNotFoundException() throws Exception {
+        when(editAssignAssetService.acceptAssignAsset(1L)).thenThrow(notFoundException);
+        
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/accept/{idAssignAsset}", 1L);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.NOT_FOUND.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"Error message\"}"));
+    }
+
+    @Test
+    void testAcceptAssignAsset_WhenReturnBadRequestException() throws Exception {
+        when(editAssignAssetService.acceptAssignAsset(1L)).thenThrow(badRequestException);
+        
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/accept/{idAssignAsset}", 1L);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"Error message\"}"));
+    }
+
+    @Test
+    void testDeclineAssignAsset_WhenReturnNotFoundException() throws Exception {
+        when(editAssignAssetService.declineAssignAsset(1L)).thenThrow(notFoundException);
+        
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/decline/{idAssignAsset}", 1L);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.NOT_FOUND.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"Error message\"}"));
+    }
+
+    @Test
+    void testDeclineAssignAsset_WhenReturnBadRequestException() throws Exception {
+        when(editAssignAssetService.declineAssignAsset(1L)).thenThrow(badRequestException);
+        
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/decline/{idAssignAsset}", 1L);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"Error message\"}"));
+    }
+
+    @Test
+    void testDeclineAssignAsset_WhenReturnData() throws Exception {
+        AssignAssetResponse assignAssetReponse = AssignAssetResponse.builder().status(EAssignStatus.DECLINED).build();
+
+        when(editAssignAssetService.declineAssignAsset(1L)).thenReturn(assignAssetReponse);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/decline/{idAssignAsset}", 1L);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getContentAsString(), is(
+            "{\"id\":0,\"assetId\":0,\"assetCode\":null,\"assetName\":null,\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null,\"userAssignedBy\":null,\"assignedDate\":null,\"category\":null,\"note\":null,\"specification\":null,\"status\":\"DECLINED\"}"));
+    }
+
 }

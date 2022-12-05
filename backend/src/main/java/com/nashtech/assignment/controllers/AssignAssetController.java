@@ -40,11 +40,39 @@ public class AssignAssetController {
     private EditAssignAssetService editAssignAssetService;
     @Autowired
     private FindAssignAssetService findAssignAsset;
+    @Autowired
+    private EditAssignAssetService editStatusAssignAssetService;
+
+    @Operation(summary = "Accept an assignment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accept assignment successfully.", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class)) }),
+            @ApiResponse(responseCode = "400", description = "Assignment is not waiting for acceptance", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) }),
+            @ApiResponse(responseCode = "404", description = "Assignment not found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) }) })
+    @PutMapping("/user/accept/{id}")
+    public ResponseEntity<AssignAssetResponse> acceptAssignAsset(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(editStatusAssignAssetService.acceptAssignAsset(id));
+    }
+
+    @Operation(summary = "Decline an assignment")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Decline assignment successfully.", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class)) }),
+            @ApiResponse(responseCode = "400", description = "Assignment is not waiting for acceptance", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) }),
+            @ApiResponse(responseCode = "404", description = "Assignment not found", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) }) })
+    @PutMapping("/user/decline/{id}")
+    public ResponseEntity<AssignAssetResponse> declineAssignAsset(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(editStatusAssignAssetService.declineAssignAsset(id));
+    }
 
     @Operation(summary = "Search assign by receive name, status, date, page")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Return list of assignAsset, total page and total row that suitable with the information that user provided", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = PaginationResponse.class))})})
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = PaginationResponse.class)) }) })
     @GetMapping
     public ResponseEntity<PaginationResponse<List<AssignAssetResponse>>> searchAssignAsset(
             @RequestParam(required = false) String name,
@@ -58,9 +86,9 @@ public class AssignAssetController {
     @Operation(summary = "Get assignment details")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Return details of assignment", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class)) }),
             @ApiResponse(responseCode = "404", description = "Assignment not found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))})})
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) }) })
     @GetMapping("/details")
     public ResponseEntity<AssignAssetResponse> getAssignmentDetails(
             @RequestParam Long id) {
@@ -70,11 +98,11 @@ public class AssignAssetController {
     @Operation(summary = "Create new assignment")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Create assignment successfully", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class)) }),
             @ApiResponse(responseCode = "400", description = "Status of this asset is not available | Assign date is before today", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) }),
             @ApiResponse(responseCode = "404", description = "Not exist asset with this assetId | Not exist user with this userId", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))})
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) })
     })
     @PostMapping
     public ResponseEntity<AssignAssetResponse> createNewAssignment(
@@ -86,11 +114,11 @@ public class AssignAssetController {
     @Operation(summary = "Edit assignment by assignmentId")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Edit assignment successfully", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class)) }),
             @ApiResponse(responseCode = "400", description = "Can only edit assignment with status waiting for acceptance | Can only assign asset with status available | Assign date is before today", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) }),
             @ApiResponse(responseCode = "404", description = "Not exist assignment with assignment id | Not exist asset with asset id | Not exist user with user id", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))})
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) })
     })
     @PutMapping("/{assignmentId}")
     public ResponseEntity<AssignAssetResponse> editAssignment(
@@ -103,9 +131,9 @@ public class AssignAssetController {
     @Operation(summary = "Get all assign asset by user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Get all assign asset successfully.", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class)) }),
             @ApiResponse(responseCode = "404", description = "User doesn't assign asset", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))})})
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) }) })
     @GetMapping("/user")
     public ResponseEntity<List<AssignAssetResponse>> findAllAssignAssetByUser() {
         return ResponseEntity.status(HttpStatus.OK).body(findAssignAsset.findAssignAssetByUser());
@@ -114,9 +142,9 @@ public class AssignAssetController {
     @Operation(summary = "View detail assign asset")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "View detail assign asset successfully.", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class)) }),
             @ApiResponse(responseCode = "404", description = "Assign asset not found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))})})
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) }) })
     @GetMapping("/user/{assignAssetId}")
     public ResponseEntity<AssignAssetResponse> viewDetailAssignAsset(@PathVariable Long assignAssetId) {
         return ResponseEntity.status(HttpStatus.OK).body(findAssignAsset.detailAssignAsset(assignAssetId));

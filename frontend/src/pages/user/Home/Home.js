@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import TableMyAssignment from '../../../components/TableMyAssignment/TableMyAssignment';
 
 import './Home.scss';
-import TableMyAssignment from '../../../components/TableMyAssignment/TableMyAssignment';
 
 const Home = () => {
   useEffect(() => {

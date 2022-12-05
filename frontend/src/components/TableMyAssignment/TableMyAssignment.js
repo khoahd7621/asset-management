@@ -3,13 +3,18 @@ import { Modal, Table } from 'antd';
 import { CaretDownOutlined, CheckOutlined, UndoOutlined, CloseOutlined } from '@ant-design/icons';
 import ModalAssignAssetDetail from './ModalAssignAssetDetail';
 import './TableMyAssignment.scss';
-import { getAllMyAssignAsset, getAsignAssetDetail } from '../../services/getApiService';
+import { getAllMyAssignAsset, getAssignAssetDetails } from '../../services/getApiService';
+import { putAcceptAssignAsset, putDeclineAssignAsset } from '../../services/editApiService';
 import FirstPasswordModal from '../FirstPasswordModal/FirstPasswordModal';
 
 const TableMyAssignment = () => {
   const [isShowModalAssignAssetDetail, setIsShowModalAssignAssetDetail] = useState(false);
   const [data, setData] = useState([]);
   const [modalData, setModalData] = useState({});
+  const [declinePopUp, setDeclinePopUp] = useState(false);
+  const [acceptPopUp, setAcceptPopUp] = useState(false);
+  const [idAccept, setIdAccept] = useState();
+  const [idDecline, setIdDecline] = useState();
 
   useEffect(() => {
     fetchGetMyAssignAsset();
@@ -47,12 +52,38 @@ const TableMyAssignment = () => {
     }
   };
 
+  const onClickToAccept = async () => {
+    const response = await putAcceptAssignAsset({ idAccept });
+    if (response && response.status === 200) {
+      fetchGetMyAssignAsset();
+    }
+    setAcceptPopUp(false);
+  };
+
+  const onclickShowAccept = (id) => {
+    setIdAccept(id);
+    setAcceptPopUp(true);
+  };
+
+  const onClickToDecline = async () => {
+    const response = await putDeclineAssignAsset({ idDecline });
+    if (response && response.status === 200) {
+      fetchGetMyAssignAsset();
+    }
+    setDeclinePopUp(false);
+  };
+
+  const onclickShowDecline = (id) => {
+    setIdDecline(id);
+    setDeclinePopUp(true);
+  };
+
   const onclickShowDetail = () => {
     setIsShowModalAssignAssetDetail(true);
   };
 
   const handleClickRecord = async (assignAssetId) => {
-    const response = await getAsignAssetDetail(assignAssetId);
+    const response = await getAssignAssetDetails(assignAssetId);
     if (response && response.status === 200) {
       setModalData(response.data);
     }
@@ -161,10 +192,18 @@ const TableMyAssignment = () => {
       render: (text, record) => {
         return (
           <div className="col-action in-active">
-            <button className="check-btn" disabled={record.state === 'Accepted'}>
+            <button
+              className="check-btn"
+              disabled={record.state === 'Accepted'}
+              onClick={() => onclickShowAccept(record.assignAssetId)}
+            >
               <CheckOutlined />
             </button>
-            <button className="delete-btn" disabled={record.state === 'Accepted'}>
+            <button
+              className="delete-btn"
+              disabled={record.state === 'Accepted'}
+              onClick={() => onclickShowDecline(record.assignAssetId)}
+            >
               <CloseOutlined />
             </button>
             <button className="return-btn" disabled={record.state === 'Waiting for acceptance'}>
@@ -190,6 +229,32 @@ const TableMyAssignment = () => {
         />
       </div>
       <FirstPasswordModal />
+      <Modal
+        open={acceptPopUp}
+        className="user-list__disable-modal"
+        title={'Are you sure?'}
+        centered
+        onOk={onClickToAccept}
+        onCancel={() => setAcceptPopUp(false)}
+        okText="Accept"
+        cancelText="Cancel"
+        closable={false}
+      >
+        <p>Do you want to accept this assignment?</p>
+      </Modal>
+      <Modal
+        open={declinePopUp}
+        className="user-list__disable-modal"
+        title={'Are you sure?'}
+        centered
+        onOk={onClickToDecline}
+        onCancel={() => setDeclinePopUp(false)}
+        okText="Decline"
+        cancelText="Cancel"
+        closable={false}
+      >
+        <p>Do you want to decline this assignment?</p>
+      </Modal>
       <ModalAssignAssetDetail
         open={isShowModalAssignAssetDetail}
         onCancel={() => {

@@ -10,8 +10,10 @@ import com.nashtech.assignment.data.repositories.AssignAssetRepository;
 import com.nashtech.assignment.dto.request.assignment.EditAssignmentRequest;
 import com.nashtech.assignment.dto.response.assignment.AssignAssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
+import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.mappers.AssignAssetMapper;
+import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.services.validation.ValidationAssetService;
 import com.nashtech.assignment.services.validation.ValidationUserService;
 import com.nashtech.assignment.utils.CompareDateUtil;
@@ -36,13 +38,14 @@ class EditAssignAssetServiceImplTest {
     private ValidationAssetService validationAssetService;
     private ValidationUserService validationUserService;
     private CompareDateUtil compareDateUtil;
-
+    private SecurityContextService securityContextService;
     private AssignAsset assignAsset;
     private AssignAssetResponse assignAssetResponse;
     private Date today;
 
     @BeforeEach
     void setup() {
+        securityContextService = mock(SecurityContextService.class);
         assignAssetRepository = mock(AssignAssetRepository.class);
         assetRepository = mock(AssetRepository.class);
         assignAssetMapper = mock(AssignAssetMapper.class);
@@ -55,7 +58,8 @@ class EditAssignAssetServiceImplTest {
                 .assignAssetMapper(assignAssetMapper)
                 .validationAssetService(validationAssetService)
                 .validationUserService(validationUserService)
-                .compareDateUtil(compareDateUtil).build();
+                .compareDateUtil(compareDateUtil)
+                .securityContextService(securityContextService).build();
         assignAsset = mock(AssignAsset.class);
         assignAssetResponse = mock(AssignAssetResponse.class);
         today = new Date();
@@ -154,6 +158,166 @@ class EditAssignAssetServiceImplTest {
         verify(assignAsset).setAssignedDate(today);
         verify(assignAsset).setNote("note");
         verify(assignAssetRepository).save(assignAsset);
+        assertThat(actual, is(assignAssetResponse));
+    }
+
+    @Test
+    void testAcceptAssignAsset_WhenNotFindEntity_WhenReturnException() throws Exception{
+        when(assignAssetRepository.findById(1L)).thenReturn(Optional.empty());
+
+        NotFoundException actual = assertThrows(NotFoundException.class, () -> {
+            editAssignAssetServiceImpl.acceptAssignAsset(1L);
+        });
+
+        assertThat(actual.getMessage(), is("Assignment not found"));
+    }
+
+    @Test
+    void testAcceptAssignAsset_WhenStatusWaiting_WhenReturnException() throws Exception{
+        when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
+        when(assignAsset.getStatus()).thenReturn(EAssignStatus.ACCEPTED);
+
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            editAssignAssetServiceImpl.acceptAssignAsset(1L);
+        });
+
+        assertThat(actual.getMessage(), is("Assignment is not waiting for acceptance"));
+    }
+
+    @Test
+    void testAcceptAssignAsset_WhenAssignedDateIsAfterToday_WhenReturnException() throws Exception {
+        ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
+        ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
+        when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
+        when(assignAsset.getStatus()).thenReturn(EAssignStatus.WAITING_FOR_ACCEPTANCE);
+        when(compareDateUtil.isBefore(todayCaptor.capture(), assignedDateCaptor.capture())).thenReturn(true);
+
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            editAssignAssetServiceImpl.acceptAssignAsset(1L);
+        });
+
+        assertThat(actual.getMessage(), is("Assign date is after today."));
+    }
+
+    @Test
+    void testAcceptAssignAsset_WhenCurrentUserIsNotMatchAssignToUser_WhenReturnException() throws Exception {
+        ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
+        ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
+        User userAssignedTo = User.builder().id(1L).build();
+        User userCurrent = User.builder().id(2L).build();
+
+        when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
+        when(assignAsset.getStatus()).thenReturn(EAssignStatus.WAITING_FOR_ACCEPTANCE);
+        when(compareDateUtil.isBefore(todayCaptor.capture(), assignedDateCaptor.capture())).thenReturn(false);
+        when(assignAsset.getUserAssignedTo()).thenReturn(userAssignedTo);
+        when(securityContextService.getCurrentUser()).thenReturn(userCurrent);
+
+        ForbiddenException actual = assertThrows(ForbiddenException.class, () -> {
+            editAssignAssetServiceImpl.acceptAssignAsset(1L);
+        });
+
+        assertThat(actual.getMessage(), is("Current user is not match to this assignment."));
+    }
+
+    @Test
+    void testAcceptAssignAsset_WhenFindEntity_WhenReturnData() throws Exception {
+        ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
+        ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
+        AssignAssetResponse assignAssetResponse = AssignAssetResponse.builder().status(EAssignStatus.ACCEPTED).build();
+        User userAssignedTo = User.builder().id(1L).build();
+        User userCurrent = User.builder().id(1L).build();
+
+        when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
+        when(assignAsset.getStatus()).thenReturn(EAssignStatus.WAITING_FOR_ACCEPTANCE);
+        when(compareDateUtil.isBefore(todayCaptor.capture(), assignedDateCaptor.capture())).thenReturn(false);
+        when(assignAsset.getUserAssignedTo()).thenReturn(userAssignedTo);
+        when(securityContextService.getCurrentUser()).thenReturn(userCurrent);
+
+        ArgumentCaptor<AssignAsset> assignAssetArgumentCaptor = ArgumentCaptor.forClass(AssignAsset.class);
+        when(assignAssetMapper.toAssignAssetResponse(assignAssetArgumentCaptor.capture()))
+                .thenReturn(assignAssetResponse);
+
+        AssignAssetResponse actual = editAssignAssetServiceImpl.acceptAssignAsset(1L);
+        assertThat(actual, is(assignAssetResponse));
+    }
+
+    @Test
+    void testDeclineAssignAsset_WhenNotFindEntity_WhenReturnException() throws Exception{
+        when(assignAssetRepository.findById(1L)).thenReturn(Optional.empty());
+
+        NotFoundException actual = assertThrows(NotFoundException.class, () -> {
+            editAssignAssetServiceImpl.declineAssignAsset(1L);
+        });
+
+        assertThat(actual.getMessage(), is("Assignment not found"));
+    }
+
+    @Test
+    void testDeclineAssignAsset_WhenStatusWaiting_WhenReturnException() throws Exception{
+        when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
+        when(assignAsset.getStatus()).thenReturn(EAssignStatus.ACCEPTED);
+
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            editAssignAssetServiceImpl.declineAssignAsset(1L);
+        });
+
+        assertThat(actual.getMessage(), is("Assignment is not waiting for acceptance"));
+    }
+
+    @Test
+    void testDeclineAssignAsset_WhenAssignedDateIsAfterToday_WhenReturnException() throws Exception {
+        ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
+        ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
+        when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
+        when(assignAsset.getStatus()).thenReturn(EAssignStatus.WAITING_FOR_ACCEPTANCE);
+        when(compareDateUtil.isBefore(todayCaptor.capture(), assignedDateCaptor.capture())).thenReturn(true);
+
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            editAssignAssetServiceImpl.declineAssignAsset(1L);
+        });
+
+        assertThat(actual.getMessage(), is("Assign date is after today."));
+    }
+
+    @Test
+    void testDeclineAssignAsset_WhenCurrentUserIsNotMatchAssignToUser_WhenReturnException() throws Exception {
+        ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
+        ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
+        User userAssignedTo = User.builder().id(1L).build();
+        User userCurrent = User.builder().id(2L).build();
+
+        when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
+        when(assignAsset.getStatus()).thenReturn(EAssignStatus.WAITING_FOR_ACCEPTANCE);
+        when(compareDateUtil.isBefore(todayCaptor.capture(), assignedDateCaptor.capture())).thenReturn(false);
+        when(assignAsset.getUserAssignedTo()).thenReturn(userAssignedTo);
+        when(securityContextService.getCurrentUser()).thenReturn(userCurrent);
+
+        ForbiddenException actual = assertThrows(ForbiddenException.class, () -> {
+            editAssignAssetServiceImpl.declineAssignAsset(1L);
+        });
+
+        assertThat(actual.getMessage(), is("Current user is not match to this assignment."));
+    }
+
+    @Test
+    void testDeclineAssignAsset_WhenFindEntity_WhenReturnData() throws Exception {
+        ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
+        ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
+        AssignAssetResponse assignAssetResponse = AssignAssetResponse.builder().status(EAssignStatus.DECLINED).build();
+        User userAssignedTo = User.builder().id(1L).build();
+        User userCurrent = User.builder().id(1L).build();
+
+        when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
+        when(assignAsset.getStatus()).thenReturn(EAssignStatus.WAITING_FOR_ACCEPTANCE);
+        when(compareDateUtil.isBefore(todayCaptor.capture(), assignedDateCaptor.capture())).thenReturn(false);
+        when(assignAsset.getUserAssignedTo()).thenReturn(userAssignedTo);
+        when(securityContextService.getCurrentUser()).thenReturn(userCurrent);
+
+        ArgumentCaptor<AssignAsset> assignAssetArgumentCaptor = ArgumentCaptor.forClass(AssignAsset.class);
+        when(assignAssetMapper.toAssignAssetResponse(assignAssetArgumentCaptor.capture()))
+                .thenReturn(assignAssetResponse);
+
+        AssignAssetResponse actual = editAssignAssetServiceImpl.acceptAssignAsset(1L);
         assertThat(actual, is(assignAssetResponse));
     }
 }
