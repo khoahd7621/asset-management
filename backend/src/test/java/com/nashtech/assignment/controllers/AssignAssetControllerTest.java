@@ -13,6 +13,7 @@ import com.nashtech.assignment.dto.request.assignment.EditAssignmentRequest;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.services.create.CreateAssignmentService;
 import com.nashtech.assignment.services.edit.EditAssignAssetService;
+import com.nashtech.assignment.services.get.FindAssignAssetService;
 import com.nashtech.assignment.services.get.GetAssignAssetService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,8 +44,8 @@ import com.nashtech.assignment.services.search.SearchAssignAssetService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 
 @WebMvcTest(value = AssignAssetController.class)
-@ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class,
-        CORSConfig.class})
+@ContextConfiguration(classes = { AssignmentApplication.class, SecurityConfig.class,
+        CORSConfig.class })
 @AutoConfigureMockMvc(addFilters = false)
 public class AssignAssetControllerTest {
 
@@ -54,6 +55,8 @@ public class AssignAssetControllerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private SearchAssignAssetService searchAssignAssetService;
+    @MockBean
+    private FindAssignAssetService findAssignAssetService;
     @MockBean
     private GetAssignAssetService getAssignAssetService;
     @MockBean
@@ -159,8 +162,7 @@ public class AssignAssetControllerTest {
         assertThat(result.getResponse().getContentAsString(), is(
                 "{\"id\":0,\"assetId\":1,\"assetCode\":\"test\",\"assetName\":null,\"userAssignedToId\":0," +
                         "\"userAssignedTo\":null,\"userAssignedToFullName\":null,\"userAssignedBy\":null," +
-                        "\"assignedDate\":null,\"category\":null,\"note\":null,\"specification\":null,\"status\":null}"
-        ));
+                        "\"assignedDate\":null,\"category\":null,\"note\":null,\"specification\":null,\"status\":null}"));
 
     }
 
@@ -185,8 +187,8 @@ public class AssignAssetControllerTest {
                 .userId(1L)
                 .assignedDate(date)
                 .note("note").build();
-        ArgumentCaptor<CreateNewAssignmentRequest> requestDataCaptor =
-                ArgumentCaptor.forClass(CreateNewAssignmentRequest.class);
+        ArgumentCaptor<CreateNewAssignmentRequest> requestDataCaptor = ArgumentCaptor
+                .forClass(CreateNewAssignmentRequest.class);
         AssignAssetResponse assetResponse = AssignAssetResponse.builder()
                 .id(1)
                 .assetCode("assetCode")
@@ -208,21 +210,25 @@ public class AssignAssetControllerTest {
 
         assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
         assertThat(actual.getContentAsString(), is(
-                "{\"id\":1,\"assetId\":0,\"assetCode\":\"assetCode\",\"assetName\":\"assetName\",\"userAssignedToId\":0," +
-                        "\"userAssignedTo\":\"userAssignedTo\",\"userAssignedToFullName\":null,\"userAssignedBy\":\"userAssignedBy\"," +
-                        "\"assignedDate\":\"2001-01-01T00:00:00.000+00:00\",\"category\":\"category\",\"note\":\"note\"," +
+                "{\"id\":1,\"assetId\":0,\"assetCode\":\"assetCode\",\"assetName\":\"assetName\",\"userAssignedToId\":0,"
+                        +
+                        "\"userAssignedTo\":\"userAssignedTo\",\"userAssignedToFullName\":null,\"userAssignedBy\":\"userAssignedBy\","
+                        +
+                        "\"assignedDate\":\"2001-01-01T00:00:00.000+00:00\",\"category\":\"category\",\"note\":\"note\","
+                        +
                         "\"specification\":\"specification\",\"status\":\"WAITING_FOR_ACCEPTANCE\"}"));
     }
 
     @Test
-    void createNewAssignment_WhenStatusOfAssetIsNotTypeOfAvailableOrAssignDateIsBeforeToDay_ThrowBadRequestException() throws Exception {
+    void createNewAssignment_WhenStatusOfAssetIsNotTypeOfAvailableOrAssignDateIsBeforeToDay_ThrowBadRequestException()
+            throws Exception {
         CreateNewAssignmentRequest requestData = CreateNewAssignmentRequest.builder()
                 .assetId(1L)
                 .userId(1L)
                 .assignedDate(date)
                 .note("note").build();
-        ArgumentCaptor<CreateNewAssignmentRequest> requestDataCaptor =
-                ArgumentCaptor.forClass(CreateNewAssignmentRequest.class);
+        ArgumentCaptor<CreateNewAssignmentRequest> requestDataCaptor = ArgumentCaptor
+                .forClass(CreateNewAssignmentRequest.class);
 
         when(createAssignmentService.createNewAssignment(requestDataCaptor.capture())).thenThrow(badRequestException);
 
@@ -242,8 +248,8 @@ public class AssignAssetControllerTest {
                 .userId(1L)
                 .assignedDate(date)
                 .note("note").build();
-        ArgumentCaptor<CreateNewAssignmentRequest> requestDataCaptor =
-                ArgumentCaptor.forClass(CreateNewAssignmentRequest.class);
+        ArgumentCaptor<CreateNewAssignmentRequest> requestDataCaptor = ArgumentCaptor
+                .forClass(CreateNewAssignmentRequest.class);
 
         when(createAssignmentService.createNewAssignment(requestDataCaptor.capture())).thenThrow(notFoundException);
 
@@ -292,7 +298,8 @@ public class AssignAssetControllerTest {
         assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
         assertThat(actual.getContentAsString(), is(
                 "{\"id\":1,\"assetId\":1,\"assetCode\":\"assetCode\",\"assetName\":\"assetName\"," +
-                        "\"userAssignedToId\":1,\"userAssignedTo\":\"userAssignedTo\",\"userAssignedToFullName\":\"fullName\"," +
+                        "\"userAssignedToId\":1,\"userAssignedTo\":\"userAssignedTo\",\"userAssignedToFullName\":\"fullName\","
+                        +
                         "\"userAssignedBy\":\"userAssignedBy\",\"assignedDate\":\"2001-01-01T00:00:00.000+00:00\"," +
                         "\"category\":\"categoryName\",\"note\":\"note\",\"specification\":\"specification\"," +
                         "\"status\":\"WAITING_FOR_ACCEPTANCE\"}"));
@@ -342,6 +349,57 @@ public class AssignAssetControllerTest {
 
         assertThat(actual.getStatus(), is(HttpStatus.NOT_FOUND.value()));
         assertThat(actual.getContentAsString(), is("{\"message\":\"Error message\"}"));
+    }
+
+    @Test
+    void testFindAllAssignAssetByUser_ReturnException() throws Exception {
+        when(findAssignAssetService.findAssignAssetByUser()).thenThrow(notFoundException);
+        
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user");
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.NOT_FOUND.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"Error message\"}"));
+    }
+
+    @Test
+    void testFindAllAssignAssetByUser_ReturnData() throws Exception {
+        List<AssignAssetResponse> assignAssets = new ArrayList<>();
+        assignAssets.add(assetResponse);
+
+        when(findAssignAssetService.findAssignAssetByUser()).thenReturn(assignAssets);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user");
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getContentAsString(), is(
+                "[{\"id\":0,\"assetId\":0,\"assetCode\":\"LP0101\",\"assetName\":\"Laptop Lenovo 1009\",\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null,\"userAssignedBy\":null,\"assignedDate\":null,\"category\":\"Laptop\",\"note\":\"note\",\"specification\":null,\"status\":null}]"));
+    }
+
+    @Test
+    void testViewDetailAssignAsset_ReturnException() throws Exception {
+        when(findAssignAssetService.detailAssignAsset(1L)).thenThrow(notFoundException);
+        
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user/{assignAssetId}", 1L);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.NOT_FOUND.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"Error message\"}"));
+    }
+
+    @Test
+    void testViewDetailAssignAsset_ReturnData() throws Exception {
+        when(findAssignAssetService.detailAssignAsset(1L)).thenReturn(assetResponse);
+        
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user/{assignAssetId}", 1L);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getContentAsString(), is("{\"id\":0,\"assetId\":0,\"assetCode\":\"LP0101\",\"assetName\":\"Laptop Lenovo 1009\",\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null,\"userAssignedBy\":null,\"assignedDate\":null,\"category\":\"Laptop\",\"note\":\"note\",\"specification\":null,\"status\":null}"
+        ));
     }
 
 }

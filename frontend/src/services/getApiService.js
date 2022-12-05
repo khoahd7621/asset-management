@@ -23,3 +23,10 @@ export const getAllUsers = () => {
 export const getAllAssetsByStatus = (status) => {
   return axios.get(`/api/asset/status/${status}`);
 };
+
+export const getAllMyAssignAsset = () => {
+  return axios.get(`/api/assignment/user`);
+};
+export const getAssignAssetDetails = (asignAssetId) => {
+  return axios.get(`/api/assignment/user/${asignAssetId}`);
+};

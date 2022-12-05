@@ -61,7 +61,6 @@ class CreateAssignmentServiceImplTest {
 
     @Test
     void createNewAssignment_WhenAssignDateIsBeforeToDay_ThrowBadRequestException() throws ParseException {
-        Date today = new Date();
         Date assignedDate = new Date(today.getTime() - (1000 * 60 * 60 * 24));
         CreateNewAssignmentRequest requestData = CreateNewAssignmentRequest.builder()
                 .assignedDate(assignedDate).build();
@@ -76,7 +75,7 @@ class CreateAssignmentServiceImplTest {
             createAssignmentServiceImpl.createNewAssignment(requestData);
         });
 
-        assertThat(assignedDateCaptor.getValue(), is(assignedDate));
+        assertThat(assignedDateCaptor.getValue().equals(assignedDate), is(true));
         assertThat(actual.getMessage(), is("Assign date is before today."));
     }
 
@@ -97,16 +96,16 @@ class CreateAssignmentServiceImplTest {
         when(compareDateUtil.isAfter(todayCaptor.capture(), assignedDateCaptor.capture()))
                 .thenReturn(false);
         when(validationAssetService.validationAssetAssignedToAssignment(
-                assetIdCaptor.capture(), assignedDateCaptor.capture())).thenReturn(asset);
+                assetIdCaptor.capture())).thenReturn(asset);
         when(validationUserService.validationUserAssignedToAssignment(
-                userIdCaptor.capture(), assignedDateCaptor.capture())).thenReturn(user);
+                userIdCaptor.capture())).thenReturn(user);
         when(securityContextService.getCurrentUser()).thenReturn(user);
         when(assignAssetRepository.save(assignAssetCaptor.capture())).thenReturn(assignAsset);
         when(assignAssetMapper.toAssignAssetResponse(assignAsset)).thenReturn(expected);
 
         AssignAssetResponse actual = createAssignmentServiceImpl.createNewAssignment(requestData);
 
-        assertThat(assignedDateCaptor.getValue(), is(today));
+        assertThat(assignedDateCaptor.getValue().equals(today), is(true));
         assertThat(assetIdCaptor.getValue(), is(1L));
         assertThat(userIdCaptor.getValue(), is(1L));
         verify(asset).setStatus(EAssetStatus.ASSIGNED);

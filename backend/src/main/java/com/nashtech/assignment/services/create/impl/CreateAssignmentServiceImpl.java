@@ -40,14 +40,15 @@ public class CreateAssignmentServiceImpl implements CreateAssignmentService {
 
     @Override
     public AssignAssetResponse createNewAssignment(CreateNewAssignmentRequest createNewAssignmentRequest) {
+        Date today = new Date();
         Date assignedDate = createNewAssignmentRequest.getAssignedDate();
-        if (compareDateUtil.isAfter(new Date(), assignedDate)) {
+        if (compareDateUtil.isAfter(today, assignedDate)) {
             throw new BadRequestException("Assign date is before today.");
         }
         Asset asset = validationAssetService.validationAssetAssignedToAssignment(
-                createNewAssignmentRequest.getAssetId(), assignedDate);
+                createNewAssignmentRequest.getAssetId());
         User userAssignedTo = validationUserService.validationUserAssignedToAssignment(
-                createNewAssignmentRequest.getUserId(), assignedDate);
+                createNewAssignmentRequest.getUserId());
         User currentUser = securityContextService.getCurrentUser();
         asset.setStatus(EAssetStatus.ASSIGNED);
         AssignAsset assignAsset = AssignAsset.builder()

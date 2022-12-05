@@ -112,83 +112,9 @@ class EditAssignAssetServiceImplTest {
             editAssignAssetServiceImpl.editAssignment(assignmentId, editAssignmentRequest);
         });
 
-        assertThat(todayCaptor.getValue(), is(new Date()));
-        assertThat(oldAssignedDateCaptor.getValue(), is(oldAssignedDate));
-        assertThat(newAssignedDateCaptor.getValue(), is(newAssignedDate));
+        assertThat(oldAssignedDateCaptor.getValue().equals(oldAssignedDate), is(true));
+        assertThat(newAssignedDateCaptor.getValue().equals(newAssignedDate), is(true));
         assertThat(actual.getMessage(), is("Assign date is before today."));
-    }
-
-    @Test
-    void editAssignment_WhenNotChangeAssetButAssignedDateBeforeInstalledDateOfOldAsset_ThrowBadRequestException() {
-        long assignmentId = 1L;
-        EditAssignmentRequest editAssignmentRequest = EditAssignmentRequest.builder()
-                .assignedDate(today)
-                .assetId(1L).build();
-        Date installedDate = new Date(today.getTime() + (1000 * 60 * 60 * 48));
-        ArgumentCaptor<Date> oldAssignedDateCaptor = ArgumentCaptor.forClass(Date.class);
-        ArgumentCaptor<Date> newAssignedDateCaptor = ArgumentCaptor.forClass(Date.class);
-        ArgumentCaptor<Date> installedDateCaptor = ArgumentCaptor.forClass(Date.class);
-        Asset asset = mock(Asset.class);
-
-        when(assignAssetRepository.findByIdAndIsDeletedFalse(assignmentId)).thenReturn(Optional.of(assignAsset));
-        when(assignAsset.getStatus()).thenReturn(EAssignStatus.WAITING_FOR_ACCEPTANCE);
-        when(assignAsset.getAssignedDate()).thenReturn(today);
-        when(compareDateUtil.isEquals(oldAssignedDateCaptor.capture(), newAssignedDateCaptor.capture()))
-                .thenReturn(true);
-        when(assignAsset.getAsset()).thenReturn(asset);
-        when(asset.getId()).thenReturn(1L);
-        when(asset.getInstalledDate()).thenReturn(installedDate);
-        when(compareDateUtil.isBefore(newAssignedDateCaptor.capture(), installedDateCaptor.capture()))
-                .thenReturn(true);
-
-        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
-            editAssignAssetServiceImpl.editAssignment(assignmentId, editAssignmentRequest);
-        });
-
-        assertThat(oldAssignedDateCaptor.getValue(), is(today));
-        assertThat(newAssignedDateCaptor.getValue(), is(today));
-        assertThat(installedDateCaptor.getValue(), is(installedDate));
-        assertThat(actual.getMessage(), is("Assigned date cannot before installed date of asset."));
-    }
-
-    @Test
-    void editAssignment_WhenNotChangeUserButAssignedDateIsBeforeJoinedDate_ThrowBadRequestException() {
-        long assignmentId = 1L;
-        EditAssignmentRequest editAssignmentRequest = EditAssignmentRequest.builder()
-                .assignedDate(today)
-                .assetId(1L)
-                .userId(1L).build();
-        Date joinedDate = new Date(today.getTime() + (1000 * 60 * 60 * 24));
-        ArgumentCaptor<Date> oldAssignedDateCaptor = ArgumentCaptor.forClass(Date.class);
-        ArgumentCaptor<Date> newAssignedDateCaptor = ArgumentCaptor.forClass(Date.class);
-        ArgumentCaptor<Long> newAssetId = ArgumentCaptor.forClass(Long.class);
-        ArgumentCaptor<Date> joinedDateCaptor = ArgumentCaptor.forClass(Date.class);
-        Asset asset = mock(Asset.class);
-        User user = mock(User.class);
-
-        when(assignAssetRepository.findByIdAndIsDeletedFalse(assignmentId)).thenReturn(Optional.of(assignAsset));
-        when(assignAsset.getStatus()).thenReturn(EAssignStatus.WAITING_FOR_ACCEPTANCE);
-        when(assignAsset.getAssignedDate()).thenReturn(today);
-        when(compareDateUtil.isEquals(oldAssignedDateCaptor.capture(), newAssignedDateCaptor.capture()))
-                .thenReturn(true);
-        when(assignAsset.getAsset()).thenReturn(asset);
-        when(asset.getId()).thenReturn(2L);
-        when(validationAssetService.validationAssetAssignedToAssignment(
-                newAssetId.capture(), newAssignedDateCaptor.capture())).thenReturn(asset);
-        when(assignAsset.getUserAssignedTo()).thenReturn(user);
-        when(user.getId()).thenReturn(1L);
-        when(user.getJoinedDate()).thenReturn(joinedDate);
-        when(compareDateUtil.isBefore(newAssignedDateCaptor.capture(), joinedDateCaptor.capture()))
-                .thenReturn(true);
-
-        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
-            editAssignAssetServiceImpl.editAssignment(assignmentId, editAssignmentRequest);
-        });
-
-        assertThat(oldAssignedDateCaptor.getValue(), is(today));
-        assertThat(newAssignedDateCaptor.getValue(), is(today));
-        assertThat(joinedDateCaptor.getValue(), is(joinedDate));
-        assertThat(actual.getMessage(), is("Assigned date cannot before joined date of user."));
     }
 
     @Test
@@ -199,7 +125,6 @@ class EditAssignAssetServiceImplTest {
                 .assetId(1L)
                 .userId(1L)
                 .note("note").build();
-        ArgumentCaptor<Date> newAssignedDateCaptor = ArgumentCaptor.forClass(Date.class);
         ArgumentCaptor<Long> newAssetIdCaptor = ArgumentCaptor.forClass(Long.class);
         ArgumentCaptor<Long> newUserIdCaptor = ArgumentCaptor.forClass(Long.class);
         Asset asset = mock(Asset.class);
@@ -208,20 +133,17 @@ class EditAssignAssetServiceImplTest {
         when(assignAssetRepository.findByIdAndIsDeletedFalse(assignmentId)).thenReturn(Optional.of(assignAsset));
         when(assignAsset.getStatus()).thenReturn(EAssignStatus.WAITING_FOR_ACCEPTANCE);
         when(assignAsset.getAssignedDate()).thenReturn(today);
-        when(assignAsset.getAsset()).thenReturn(asset);
-        when(asset.getId()).thenReturn(2L);
-        when(validationAssetService.validationAssetAssignedToAssignment(
-                newAssetIdCaptor.capture(), newAssignedDateCaptor.capture())).thenReturn(asset);
         when(assignAsset.getUserAssignedTo()).thenReturn(user);
         when(user.getId()).thenReturn(2L);
-        when(validationUserService.validationUserAssignedToAssignment(
-                newUserIdCaptor.capture(), newAssignedDateCaptor.capture())).thenReturn(user);
+        when(validationUserService.validationUserAssignedToAssignment(newUserIdCaptor.capture())).thenReturn(user);
+        when(assignAsset.getAsset()).thenReturn(asset);
+        when(asset.getId()).thenReturn(2L);
+        when(validationAssetService.validationAssetAssignedToAssignment(newAssetIdCaptor.capture())).thenReturn(asset);
         when(assignAssetRepository.save(assignAsset)).thenReturn(assignAsset);
         when(assignAssetMapper.toAssignAssetResponse(assignAsset)).thenReturn(assignAssetResponse);
 
         AssignAssetResponse actual = editAssignAssetServiceImpl.editAssignment(assignmentId, editAssignmentRequest);
 
-        assertThat(newAssignedDateCaptor.getValue(), is(today));
         assertThat(newAssetIdCaptor.getValue(), is(1L));
         assertThat(newUserIdCaptor.getValue(), is(1L));
         verify(asset).setStatus(EAssetStatus.ASSIGNED);

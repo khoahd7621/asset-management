@@ -52,33 +52,22 @@ public class EditAssignAssetServiceImpl implements EditAssignAssetService {
         }
         Date oldAssignedDate = assignAsset.getAssignedDate();
         Date newAssignedDate = editAssignmentRequest.getAssignedDate();
+        Date today = new Date();
         if (!compareDateUtil.isEquals(oldAssignedDate, newAssignedDate)
-                && compareDateUtil.isAfter(new Date(), newAssignedDate)) {
+                && compareDateUtil.isAfter(today, newAssignedDate)) {
             throw new BadRequestException("Assign date is before today.");
-        }
-        Asset oldAsset = assignAsset.getAsset();
-        Asset newAsset = null;
-        if (oldAsset.getId() != editAssignmentRequest.getAssetId()) {
-            newAsset = validationAssetService.validationAssetAssignedToAssignment(
-                    editAssignmentRequest.getAssetId(), newAssignedDate);
-        } else {
-            if (compareDateUtil.isBefore(editAssignmentRequest.getAssignedDate(), oldAsset.getInstalledDate())) {
-                throw new BadRequestException("Assigned date cannot before installed date of asset.");
-            }
         }
         User currentUserAssignTo = assignAsset.getUserAssignedTo();
         if (currentUserAssignTo.getId() != editAssignmentRequest.getUserId()) {
             currentUserAssignTo = validationUserService.validationUserAssignedToAssignment(
-                    editAssignmentRequest.getUserId(), newAssignedDate);
-        } else {
-            if (compareDateUtil.isBefore(newAssignedDate, currentUserAssignTo.getJoinedDate())) {
-                throw new BadRequestException("Assigned date cannot before joined date of user.");
-            }
+                    editAssignmentRequest.getUserId());
         }
-        if (newAsset != null) {
+        Asset currentAssetAssignedTo = assignAsset.getAsset();
+        if (currentAssetAssignedTo.getId() != editAssignmentRequest.getAssetId()) {
+            Asset newAsset = validationAssetService.validationAssetAssignedToAssignment(editAssignmentRequest.getAssetId());
             newAsset.setStatus(EAssetStatus.ASSIGNED);
-            oldAsset.setStatus(EAssetStatus.AVAILABLE);
-            assetRepository.save(oldAsset);
+            currentAssetAssignedTo.setStatus(EAssetStatus.AVAILABLE);
+            assetRepository.save(currentAssetAssignedTo);
             assignAsset.setAsset(newAsset);
         }
         assignAsset.setUserAssignedTo(currentUserAssignTo);
