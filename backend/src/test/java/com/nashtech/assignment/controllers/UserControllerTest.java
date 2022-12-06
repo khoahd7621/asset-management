@@ -238,7 +238,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void deleteUser_WhenSuccessfully_ShouldReturnStatusCode201() throws Exception {
+    void deleteUser_WhenSuccessfully_ShouldReturnStatusCode204() throws Exception {
 
         doNothing().when(deleteUserService).deleteUser("test");
         RequestBuilder request = MockMvcRequestBuilders

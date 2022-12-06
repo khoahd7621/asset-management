@@ -1,12 +1,12 @@
 import { Table } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 
 import './TableRequest.scss';
 
 import Pagination from '../Pagination/Pagination';
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
 import { adminRoute } from '../../routes/routes';
+import { CheckIcon, DeclineIcon } from '../../assets/CustomIcon';
 
 const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize = 20, handleChangeCurrentPage }) => {
   const TableAssetColumns = [
@@ -144,20 +144,12 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
       render: (_text, record) => {
         return (
           <div className="col-action in-active">
-            <Link
-              to={
-                _record.state === 'Assigned'
-                  ? '#'
-                  : `/${adminRoute.home}/${adminRoute.manageAsset}/${adminRoute.editAsset}/${record.assetId}`
-              }
-            >
-              <button className="edit-btn" disabled={record.state === 'Completed'}>
-                <CheckOutlined />
-              </button>
-            </Link>
+            <button className="check-icon" disabled={record.state === 'Completed'}>
+              <CheckIcon />
+            </button>
 
-            <button className="delete-btn" disabled={record.state === 'Completed'}>
-              <CloseOutlined />
+            <button className="decline-icon" disabled={record.state === 'Completed'}>
+              <DeclineIcon />
             </button>
           </div>
         );

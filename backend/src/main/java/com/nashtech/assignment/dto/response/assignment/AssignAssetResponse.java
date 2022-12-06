@@ -3,6 +3,7 @@ package com.nashtech.assignment.dto.response.assignment;
 import java.util.Date;
 
 import com.nashtech.assignment.data.constants.EAssignStatus;
+import com.nashtech.assignment.data.entities.ReturnAsset;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -25,4 +26,5 @@ public class AssignAssetResponse {
     private String note;
     private String specification;
     private EAssignStatus status;
+    private ReturnAsset returnAsset;
 }

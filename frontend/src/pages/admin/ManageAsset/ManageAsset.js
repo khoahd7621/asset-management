@@ -28,7 +28,6 @@ const ManageAsset = () => {
   useEffect(() => {
     document.title = 'Manage Asset - Asset List';
   }, []);
-
   useEffect(() => {
     setIsLoading(true);
     fetchListCategories();

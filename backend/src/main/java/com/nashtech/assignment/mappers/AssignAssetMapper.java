@@ -29,6 +29,7 @@ public class AssignAssetMapper {
                 .category(asset.getCategory().getName())
                 .note(assignAsset.getNote())
                 .specification(asset.getSpecification())
+                .returnAsset(assignAsset.getReturnAsset())
                 .status(assignAsset.getStatus()).build();
     }
 

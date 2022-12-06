@@ -40,7 +40,7 @@ const EditAssignment = () => {
   const [isShowModalUser, setIsShowModalUser] = useState(false);
   const [isShowModalAsset, setIsShowModalAsset] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [joinedDateValidate, setJoinedDateValidate] = useState({ ...initialError });
+  const [assetValidate, setAssetValidate] = useState({ ...initialError });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -52,7 +52,6 @@ const EditAssignment = () => {
     const response = await getAssignmentDetails(params.id);
     if (response && response.status === 200) {
       if (response?.data?.status === 'WAITING_FOR_ACCEPTANCE') {
-        console.log(response.data);
         setCurrentUser({
           userId: response?.data?.userAssignedToId,
           fullName: response?.data?.userAssignedToFullName,
@@ -102,16 +101,14 @@ const EditAssignment = () => {
       });
     } else {
       if (
-        response?.response?.data?.message === 'Assign date is before today.' ||
-        response?.response?.data?.message === 'Assigned date cannot before joined date of user.' ||
-        response?.response?.data?.message === 'Assigned date cannot before installed date of asset.'
+        response?.response?.data?.message === 'Can only assign asset with status available.' ||
+        response?.response?.data?.message === 'Not exist asset with this asset id.'
       ) {
-        setJoinedDateValidate({
-          help: response?.response?.data?.message,
+        setAssetValidate({
+          help: 'Maybe asset has been deleted or status has changed. Please reload page to update list assets.',
           status: 'error',
         });
       }
-      console.log(response);
     }
     setIsSending(false);
   };
@@ -149,7 +146,7 @@ const EditAssignment = () => {
                 }
               />
             </Form.Item>
-            <Form.Item name="assetName" label="Asset" labelAlign="left">
+            <Form.Item name="assetName" label="Asset" labelAlign="left" help={assetValidate.help}>
               <Input
                 id="edit-assignment-input__asset-name"
                 readOnly
@@ -158,15 +155,15 @@ const EditAssignment = () => {
                     <CaretDownOutlined />
                   </span>
                 }
+                status={assetValidate.status}
               />
             </Form.Item>
-            <Form.Item name="assignedDate" label="Assigned Date" labelAlign="left" help={joinedDateValidate.help}>
+            <Form.Item name="assignedDate" label="Assigned Date" labelAlign="left">
               <DatePicker
                 id="edit-assignment-date-picker__assigned-date"
                 placeholder="dd/mm/yyyy"
                 format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
-                onChange={(date, dateStr) => {
-                  setJoinedDateValidate({ ...initialError });
+                onChange={(date, _dateStr) => {
                   setAssignedDate(date);
                 }}
                 disabledDate={(current) => {
@@ -176,7 +173,6 @@ const EditAssignment = () => {
                     current > moment('01/01/9999', 'DD/MM/YYYY')
                   );
                 }}
-                status={joinedDateValidate.status}
               />
             </Form.Item>
             <Form.Item name="note" label="Note" labelAlign="left">

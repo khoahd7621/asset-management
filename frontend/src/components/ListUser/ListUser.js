@@ -22,7 +22,6 @@ const ListUser = () => {
   const [current, setCurrent] = useState(1);
   const [type, setType] = useState(['ALL']);
   const [userDetail, setUserDetail] = useState({});
-  const [disabled, setDisable] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // Handle Filter
@@ -116,7 +115,7 @@ const ListUser = () => {
   };
 
   const content = (
-    <div style={{ display: 'list-item' }}>
+    <div style={{ display: 'table-caption' }}>
       <Checkbox
         defaultChecked={defaultCheckedList}
         onChange={onCheckAllChange}
@@ -156,7 +155,7 @@ const ListUser = () => {
     const response = await getItems(url);
     if (response.status === 200) {
       const userResponse = location.state?.userResponse;
-      if (userResponse && userResponse.location && userResponse.location === user.location) {
+      if (userResponse && userResponse.location && userResponse.location === user.location && isDisabled === false) {
         const listDatas = response?.data.data.filter((item) => item.username !== userResponse.username);
         listDatas.unshift(userResponse);
         setUserList({
@@ -178,15 +177,17 @@ const ListUser = () => {
     }
   };
 
+  const crypt = (salt, text) => {
+    const textToChars = (text) => text.split('').map((c) => c.charCodeAt(0));
+    const byteHex = (n) => ('0' + Number(n).toString(16)).substr(-2);
+    const applySaltToChar = (code) => textToChars(salt).reduce((a, b) => a ^ b, code);
+
+    return text.split('').map(textToChars).map(applySaltToChar).map(byteHex).join('');
+  };
+
   const onClickToEdit = (data) => {
-    let lists = userList.data;
-    let index = lists.findIndex((item) => item.staffCode === data.currentTarget.dataset.id);
-    let editUser = lists[index];
-    navigate(`/${adminRoute.home}/${adminRoute.manageUser}/${adminRoute.editUser}`, {
-      state: {
-        userDetails: editUser,
-      },
-    });
+    const encrypted_text = crypt('salt', data.currentTarget.dataset.id);
+    navigate(`/${adminRoute.home}/${adminRoute.manageUser}/${adminRoute.editUser}/${encrypted_text}`);
   };
 
   const title = (title) => {
@@ -239,7 +240,7 @@ const ListUser = () => {
       key: 'joineddate',
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
-      sorter: (a, b) => formatDate(a.joinedDate) - formatDate(b.joinedDate),
+      sorter: (a, b) => formatDate(convertStrDate(a.joinedDate)) - formatDate(convertStrDate(b.joinedDate)),
       render: (text) => convertStrDate(text),
     },
     {
@@ -258,14 +259,13 @@ const ListUser = () => {
       key: 'options',
       dataIndex: 'status',
       title: '',
-      render: (text, record) => (
+      render: (_text, record) => (
         <div id="frame">
           <div className="edit-icon">
             <Button
               data-id={record.staffCode}
               type="link"
               icon={<EditIcon />}
-              disabled={disabled}
               onClick={onClickToEdit}
             ></Button>
           </div>
@@ -392,7 +392,6 @@ const ListUser = () => {
               className="handle-search"
               allowClear
               onSearch={onSearch}
-              style={{ width: 220 }}
               id="search-user"
             ></Search>
           </Col>
@@ -430,7 +429,7 @@ const ListUser = () => {
       )}
       <Modal
         centered
-        className="user-list"
+        className="assignment-details__modal"
         mask={false}
         title={'Detailed User Information'}
         open={isModalVisible}
@@ -440,26 +439,68 @@ const ListUser = () => {
         closeIcon={<CloseIcon />}
       >
         <Row>
-          <Col span={8}>
-            <p>Staff Code</p>
-            <p>Full Name</p>
-            <p>Username</p>
-            <p>Date of Birth</p>
-            <p>Gender</p>
-            <p>Joined Date</p>
-            <p>Type</p>
-            <p>Location</p>
+          <Col span={8} sm={5} md={6}>
+            <div className="title">Staff Code</div>
           </Col>
 
-          <Col span={16}>
-            <p>{userDetail?.staffCode}</p>
-            <p>{userDetail?.fullName}</p>
-            <p>{userDetail?.username}</p>
-            <p>{userDetail?.dateOfBirth ? convertStrDate(userDetail?.dateOfBirth) : '...loading'}</p>
-            <p>{!userDetail?.gender ? userDetail?.gender : toTitle(userDetail?.gender)}</p>
-            <p>{userDetail?.joinedDate ? convertStrDate(userDetail?.joinedDate) : '...loading'}</p>
-            <p>{!userDetail?.type ? userDetail?.type : toTitle(userDetail?.type)}</p>
-            <p>{userDetail?.location}</p>
+          <Col span={16} sm={19} md={18}>
+            <div className="content">{userDetail?.staffCode ?? ''}</div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={8} sm={5} md={6}>
+            <div className="title">Full Name</div>
+          </Col>
+          <Col span={16} sm={19} md={18}>
+            <div className="content">{userDetail?.fullName ?? ''}</div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={8} sm={5} md={6}>
+            <div className="title">Username</div>
+          </Col>
+          <Col span={16} sm={19} md={18}>
+            <div className="content">{userDetail?.username ?? ''}</div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={8} sm={5} md={6}>
+            <div className="title">Date of Birth</div>
+          </Col>
+          <Col span={16} sm={19} md={18}>
+            <div className="content">{userDetail?.dateOfBirth ? convertStrDate(userDetail?.dateOfBirth) : ''}</div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={8} sm={5} md={6}>
+            <div className="title">Gender</div>
+          </Col>
+          <Col span={16} sm={19} md={18}>
+            <div className="content">{userDetail?.gender ? toTitle(userDetail?.gender) : ''}</div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={8} sm={5} md={6}>
+            <div className="title">Joined Date</div>
+          </Col>
+          <Col span={16} sm={19} md={18}>
+            <div className="content">{userDetail?.joinedDate ? convertStrDate(userDetail?.joinedDate) : ''}</div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={8} sm={5} md={6}>
+            <div className="title">Type</div>
+          </Col>
+          <Col span={16} sm={19} md={18}>
+            <div className="content">{userDetail?.type ? toTitle(userDetail?.type) : ''}</div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={8} sm={5} md={6}>
+            <div className="Location">Note</div>
+          </Col>
+          <Col span={16} sm={19} md={18}>
+            <div className="content">{userDetail?.location ?? ''}</div>
           </Col>
         </Row>
       </Modal>

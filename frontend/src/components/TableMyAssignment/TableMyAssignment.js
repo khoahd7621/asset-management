@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Modal, Table } from 'antd';
-import { CaretDownOutlined, CheckOutlined, UndoOutlined, CloseOutlined } from '@ant-design/icons';
+import { CaretDownOutlined } from '@ant-design/icons';
 
 import './TableMyAssignment.scss';
 
@@ -9,6 +9,7 @@ import { getAllMyAssignAsset, getAssignAssetDetails } from '../../services/getAp
 import { putAcceptAssignAsset, putDeclineAssignAsset } from '../../services/editApiService';
 import FirstPasswordModal from '../FirstPasswordModal/FirstPasswordModal';
 import { postCreateNewRequestReturn } from '../../services/createApiService';
+import { CheckIcon, DeclineIcon, RefreshIcon } from '../../assets/CustomIcon';
 
 const TableMyAssignment = () => {
   const [isShowModalAssignAssetDetail, setIsShowModalAssignAssetDetail] = useState(false);
@@ -51,9 +52,12 @@ const TableMyAssignment = () => {
             category: item.category,
             assignedDate: convertStrDate(item.assignedDate),
             state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
+            request: item.returnAsset,
           };
         }),
       );
+    } else {
+      setData([]);
     }
   };
 
@@ -207,29 +211,29 @@ const TableMyAssignment = () => {
     {
       key: 'action',
       width: '100px',
-      render: (text, record) => {
+      render: (_text, record) => {
         return (
           <div className="col-action in-active">
             <button
-              className="check-btn"
+              className="check-icon"
               disabled={record.state === 'Accepted'}
               onClick={() => onclickShowAccept(record.assignAssetId)}
             >
-              <CheckOutlined />
+              <CheckIcon />
             </button>
             <button
-              className="delete-btn"
+              className="decline-icon"
               disabled={record.state === 'Accepted'}
               onClick={() => onclickShowDecline(record.assignAssetId)}
             >
-              <CloseOutlined />
+              <DeclineIcon />
             </button>
             <button
-              className="return-btn"
-              disabled={record.state === 'Waiting for acceptance'}
+              className="return-icon"
+              disabled={record.state === 'Accepted' && record.request === null ? false : true}
               onClick={() => onclickShowReturn(record.assignAssetId)}
             >
-              <UndoOutlined />
+              <RefreshIcon />
             </button>
           </div>
         );

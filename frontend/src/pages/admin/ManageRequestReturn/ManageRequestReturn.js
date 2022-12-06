@@ -107,6 +107,7 @@ const ManageRequestReturn = () => {
       <div className="manage-request-block__action">
         <div style={{ display: 'flex' }}>
           <FilterMenu
+            id="manage-request-block__filter"
             options={LIST_STATUS}
             value={currentChoosedStatus}
             onChange={handleChangeFilterMenu}
@@ -114,7 +115,7 @@ const ManageRequestReturn = () => {
             checkboxType="ASSET_STATE"
           />
           <DatePicker
-            id="filter-return-request-date-picker__assigned-date"
+            id="manage-request-block__date-picker"
             placeholder="Returned date"
             format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
             onChange={handleValidateDateOfBirth}
@@ -126,7 +127,7 @@ const ManageRequestReturn = () => {
           className="search-input"
           onSearch={handleSubmitSearch}
           enterButton
-          id="manager-request__search-request"
+          id="manager-request-block__search"
         />
       </div>
       <div className="manage-request-block__table">
@@ -136,7 +137,7 @@ const ManageRequestReturn = () => {
           </Space>
         ) : (
           <TableRequest
-            id="table-request"
+            id="manage-request-block__table"
             currentPage={currentPage}
             listAssets={listAssets}
             totalRow={totalRow}

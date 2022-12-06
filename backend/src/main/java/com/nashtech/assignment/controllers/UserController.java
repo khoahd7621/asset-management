@@ -76,7 +76,7 @@ public class UserController {
 
     @Operation(summary = "Delete user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Delete user successfully", content = {
+            @ApiResponse(responseCode = "204", description = "Delete user successfully", content = {
                     @Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "User not valid for delete", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class))}),

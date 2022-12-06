@@ -2,7 +2,7 @@ const CloseIcon = () => {
   return (
     <svg
       clipRule="evenodd"
-      fillRule="evenodd"
+      fillRule="evenodd"  
       strokeLinejoin="round"
       strokeMiterlimit="2"
       viewBox="0 0 24 24"
@@ -50,7 +50,7 @@ const SortIcon = () => {
 
 const editIcon = () => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
       <path d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z" />
     </svg>
   );
@@ -66,9 +66,36 @@ const CalendarIcon = () => {
 
 const RefreshIcon = () => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24">
       <path d="M13.5 2c-5.621 0-10.211 4.443-10.475 10h-3.025l5 6.625 5-6.625h-2.975c.257-3.351 3.06-6 6.475-6 3.584 0 6.5 2.916 6.5 6.5s-2.916 6.5-6.5 6.5c-1.863 0-3.542-.793-4.728-2.053l-2.427 3.216c1.877 1.754 4.389 2.837 7.155 2.837 5.79 0 10.5-4.71 10.5-10.5s-4.71-10.5-10.5-10.5z" />
     </svg>
   );
 };
-export { CloseIcon, FilterIcon, EditIcon, DeleteIcon, SortIcon, editIcon, CalendarIcon, RefreshIcon };
+
+const CheckIcon = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+      <path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z" />
+    </svg>
+  );
+};
+
+const DeclineIcon = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+      <path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z" />
+    </svg>
+  );
+};
+export {
+  CloseIcon,
+  FilterIcon,
+  EditIcon,
+  DeleteIcon,
+  SortIcon,
+  editIcon,
+  CalendarIcon,
+  RefreshIcon,
+  CheckIcon,
+  DeclineIcon,
+};

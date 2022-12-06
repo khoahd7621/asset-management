@@ -5,9 +5,10 @@
   } 
 
   .border-right {
-    border-right: 1.6px solid rgb(168, 163, 163);
-      top: -4px;
-      right: 3px;
+    border-right: 0.1rem solid rgb(168, 163, 163);
+    top: -5px;
+    height: 2.15rem;
+    right: -1px;
   }
 }
 
@@ -19,6 +20,7 @@
 
 //button
 .handle-button {
+  height: 36px;
   color: aliceblue;
   border-radius: 5px;
   background-color: #e5273d;
@@ -32,13 +34,16 @@
 
 //search
 .handle-search {
+  width: 15rem;
   .ant-input-group .ant-input-affix-wrapper:not(:last-child) {
+    height: 36px;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
     border: 1px solid rgb(134, 123, 123);
   }
 
   .ant-input-group > .ant-input-group-addon:last-child .ant-input-search-button:not(.ant-btn-primary) {
+    height: 36px;
     border: 1px solid rgb(134, 123, 123);
     color: rgba(5, 3, 3, 0.45);
     border-top-right-radius: 5px;
@@ -48,14 +53,22 @@
 
 //filter
 .handle-filter {
+  height: 36px;
+  color: #292b2c;
   text-align: left;
-  width: 8rem;
-  border-radius: 5px;
-  border-color: rgb(134, 123, 123);
+  width: 15rem;
+  border-radius: 0.3rem;
+  border: 0.1rem solid rgb(168, 163, 163);
+  
+  &:hover {
+    color:rgb(168, 163, 163);
+    border-color: #292b2c;
+  }
 
   svg {
+    padding-left: 0.5rem;
     height: 25px;
-    width: 18px;
+    width: 22px;
   }
 }
 
@@ -64,7 +77,7 @@
     top: -19px;
     position: relative;
     border: 1px solid rgb(134, 123, 123);
-    width: 128px;
+    width: 15rem;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
   }
@@ -187,20 +200,26 @@
       border: 1px solid rgb(121, 110, 110);
       background-color: #fff;
       color: rgb(121, 110, 110);
+      &:hover {
+        background-color: #e9e9e9;
+      }
     }
 
     .ant-btn.ant-btn-primary {
-      border: 1px solid #e5273d;
-      background-color: #e5273d;
+      border: 1px solid #cf2338;
+      background-color: #cf2338;
       color: #fff;
+      &:hover {
+        background-color: #a51021;
+        border-color: #a51021;
+      }
     }
   }
 
   .edit-icon svg {
-    padding-top: 3px;
     fill: #585c5f;
-    width: 18px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -276,8 +295,8 @@
   .edit-icon svg {
     padding-top: 3px;
     fill: #585c5f;
-    width: 18px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -334,7 +353,7 @@
       color: rgb(121, 110, 110);
     }
     .ant-btn.ant-btn-primary {
-      background-color: #e5273d;
+      background-color: #cf2338;
       color: #fff;
     }
   }
@@ -354,7 +373,7 @@
   .edit-icon svg {
     padding-top: 3px;
     fill: #585c5f;
-    width: 18px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
   }
 }

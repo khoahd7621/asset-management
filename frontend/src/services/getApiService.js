@@ -23,3 +23,7 @@ export const getAllMyAssignAsset = () => {
 export const getAssignAssetDetails = (asignAssetId) => {
   return axios.get(`/api/assignment/user/${asignAssetId}`);
 };
+
+export const getReportDetails = () => {
+  return axios.get('/api/report')
+}

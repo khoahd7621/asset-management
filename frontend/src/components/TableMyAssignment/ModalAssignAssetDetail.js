@@ -1,4 +1,4 @@
-import { Col, Row, Table } from 'antd';
+import { Col, Row } from 'antd';
 
 import CustomModal from '../Modal/Modal';
 
@@ -24,14 +24,14 @@ const ModalAssignAssetDetail = ({ open, onCancel, data }) => {
       title="Detail Asset Information"
       open={open}
       onCancel={onCancel}
-      width="450px"
+      width="35rem"
     >
       <Row>
         <Col span={8} sm={5} md={8}>
           <div className="title">Asset Code</div>
         </Col>
         <Col span={16} sm={19} md={16}>
-          <div className="content">{data.assetCode ?? 'Loading...'}</div>
+          <div className="content">{data.assetCode ?? ''}</div>
         </Col>
       </Row>
       <Row>
@@ -39,7 +39,7 @@ const ModalAssignAssetDetail = ({ open, onCancel, data }) => {
           <div className="title">Asset Name</div>
         </Col>
         <Col span={16} sm={19} md={16}>
-          <div className="content">{data?.assetName?.replaceAll(' ', '\u00a0') ?? 'Loading...'}</div>
+          <div className="content">{data?.assetName?.replaceAll(' ', '\u00a0') ?? ''}</div>
         </Col>
       </Row>
       <Row>
@@ -47,7 +47,7 @@ const ModalAssignAssetDetail = ({ open, onCancel, data }) => {
           <div className="title">Specification</div>
         </Col>
         <Col span={16} sm={19} md={16}>
-          <div className="content">{data?.specification ?? 'Loading...'}</div>
+          <div className="content">{data?.specification ?? ''}</div>
         </Col>
       </Row>
       <Row>
@@ -55,7 +55,7 @@ const ModalAssignAssetDetail = ({ open, onCancel, data }) => {
           <div className="title">Assign To</div>
         </Col>
         <Col span={16} sm={19} md={16}>
-          <div className="content">{data?.userAssignedTo ?? 'Loading...'}</div>
+          <div className="content">{data?.userAssignedTo ?? ''}</div>
         </Col>
       </Row>
       <Row>
@@ -63,7 +63,7 @@ const ModalAssignAssetDetail = ({ open, onCancel, data }) => {
           <div className="title">Assign By</div>
         </Col>
         <Col span={16} sm={19} md={16}>
-          <div className="content">{data?.userAssignedBy ?? 'Loading...'}</div>
+          <div className="content">{data?.userAssignedBy ?? ''}</div>
         </Col>
       </Row>
       <Row>
@@ -71,7 +71,7 @@ const ModalAssignAssetDetail = ({ open, onCancel, data }) => {
           <div className="title">Assign Date</div>
         </Col>
         <Col span={16} sm={19} md={16}>
-          <div className="content">{data.assignedDate ? convertStrDate(data.assignedDate) : 'Loading...'}</div>
+          <div className="content">{data.assignedDate ? convertStrDate(data.assignedDate) : ''}</div>
         </Col>
       </Row>
       <Row>
@@ -80,7 +80,7 @@ const ModalAssignAssetDetail = ({ open, onCancel, data }) => {
         </Col>
         <Col span={16} sm={19} md={16}>
           <div className="content">
-            {data.status ? capitalizeFirstLetter(data.status.toLowerCase().replaceAll('_', ' ')) : 'Loading...'}
+            {data.status ? capitalizeFirstLetter(data.status.toLowerCase().replaceAll('_', ' ')) : ''}
           </div>
         </Col>
       </Row>
@@ -89,7 +89,7 @@ const ModalAssignAssetDetail = ({ open, onCancel, data }) => {
           <div className="title">Note</div>
         </Col>
         <Col span={16} sm={19} md={16}>
-          <div className="content">{data.note ?? 'Loading...'}</div>
+          <div className="content">{data.note ?? ''}</div>
         </Col>
       </Row>
     </CustomModal>

@@ -37,7 +37,7 @@ const CreateAssignment = () => {
   const [isShowModalUser, setIsShowModalUser] = useState(false);
   const [isShowModalAsset, setIsShowModalAsset] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [joinedDateValidate, setJoinedDateValidate] = useState({ ...initialError });
+  const [assetValidate, setAssetValidate] = useState({ ...initialError });
 
   useEffect(() => {
     document.title = 'Manage Assignment - Create New Assignment';
@@ -73,15 +73,14 @@ const CreateAssignment = () => {
       });
     } else {
       if (
-        response?.response?.data?.message === 'Assigned date cannot before joined date of user.' ||
-        response?.response?.data?.message === 'Assigned date cannot before installed date of asset.'
+        response?.response?.data?.message === 'Can only assign asset with status available.' ||
+        response?.response?.data?.message === 'Not exist asset with this asset id.'
       ) {
-        setJoinedDateValidate({
-          help: response?.response?.data?.message,
+        setAssetValidate({
+          help: 'Maybe asset has been deleted or status has changed. Please reload page to update list assets.',
           status: 'error',
         });
       }
-      console.log(response);
     }
     setIsSending(false);
   };
@@ -113,7 +112,7 @@ const CreateAssignment = () => {
             }
           />
         </Form.Item>
-        <Form.Item name="assetName" label="Asset" labelAlign="left">
+        <Form.Item name="assetName" label="Asset" labelAlign="left" help={assetValidate.help}>
           <Input
             id="create-assignment-input__asset-name"
             readOnly
@@ -122,15 +121,15 @@ const CreateAssignment = () => {
                 <SearchOutlined />
               </span>
             }
+            status={assetValidate.status}
           />
         </Form.Item>
-        <Form.Item name="assignedDate" label="Assigned Date" labelAlign="left" help={joinedDateValidate.help}>
+        <Form.Item name="assignedDate" label="Assigned Date" labelAlign="left">
           <DatePicker
             id="create-assignment-date-picker__assigned-date"
             placeholder="dd/mm/yyyy"
             format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
-            onChange={(date, dateStr) => {
-              setJoinedDateValidate({ ...initialError });
+            onChange={(date, _dateStr) => {
               setAssignedDate(date);
             }}
             disabledDate={(current) => {
@@ -139,7 +138,6 @@ const CreateAssignment = () => {
                 (current && current < moment(customDate, 'DD/MM/YYYY')) || current > moment('01/01/9999', 'DD/MM/YYYY')
               );
             }}
-            status={joinedDateValidate.status}
           />
         </Form.Item>
         <Form.Item name="note" label="Note" labelAlign="left">

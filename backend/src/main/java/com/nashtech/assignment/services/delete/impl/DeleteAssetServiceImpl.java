@@ -18,7 +18,7 @@ import java.util.Optional;
 public class DeleteAssetServiceImpl implements DeleteAssetService {
 
     @Autowired
-    AssignAssetRepository assignAssetRepository;
+    private AssignAssetRepository assignAssetRepository;
     @Autowired
     private AssetRepository assetRepository;
 

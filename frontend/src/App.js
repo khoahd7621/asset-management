@@ -21,6 +21,7 @@ import StaffPrivateRoute from './routes/StaffPrivateRoute';
 import CheckFirstLoginRoute from './routes/CheckFirstLoginRoute';
 import ManageAssignment from './pages/admin/ManageAssignment/ManageAssignment';
 import LoginProtectRoute from './routes/LoginProtectRoute';
+import { Report } from './pages/admin/Report/Report';
 import ManageRequestReturn from './pages/admin/ManageRequestReturn/ManageRequestReturn';
 
 const App = () => {
@@ -79,7 +80,7 @@ const App = () => {
             }
           />
           <Route
-            path={`${adminRoute.manageUser}/${adminRoute.editUser}`}
+            path={`${adminRoute.manageUser}/${adminRoute.editUser}/:id`}
             element={
               <CheckFirstLoginRoute>
                 <EditUser />
@@ -126,6 +127,14 @@ const App = () => {
               </CheckFirstLoginRoute>
             }
           />
+             <Route
+                path={adminRoute.report}
+                element={
+                    <CheckFirstLoginRoute>
+                        <Report />
+                    </CheckFirstLoginRoute>
+                }
+            />
         </Route>
 
         <Route

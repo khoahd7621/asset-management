@@ -1,5 +1,6 @@
 package com.nashtech.assignment.data.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nashtech.assignment.data.constants.EReturnStatus;
 import lombok.*;
 
@@ -28,17 +29,21 @@ public class ReturnAsset {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "asset_id")
+    @JsonIgnore
     private Asset asset;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "assign_asset_id", referencedColumnName = "id")
+    @JsonIgnore
     private AssignAsset assignAsset;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "requested_user_id")
+    @JsonIgnore
     private User userRequestedReturn;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "accepted_user_id")
+    @JsonIgnore
     private User userAcceptedReturn;
 }

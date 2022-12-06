@@ -30,7 +30,7 @@ public interface AssignAssetRepository extends JpaRepository<AssignAsset, Long> 
             + " or lower(AS1.asset.name) like lower(concat('%', :name, '%')) "
             + " or lower(AS1.userAssignedTo.username) like lower(concat('%',:name,'%')) ) ) "
             + " and AS1.isDeleted = false"
-            + " order by AS1.userAssignedTo.username asc")
+            + " order by AS1.asset.name asc")
     Page<AssignAsset> searchByNameOrStatusOrDateAndLocation(@Param("name") String name,
             @Param("statuses") List<EAssignStatus> status, @Param("date") String date,
             @Param("location") String location, Pageable pageable);

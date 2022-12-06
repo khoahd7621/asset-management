@@ -1,6 +1,19 @@
 .table-request {
   background-color: #fff;
 
+  .check-icon {
+    fill: #cf2338;
+    height: 20px;
+    width: 20px;
+    
+  }
+
+  .decline-icon {
+    height: 16px;
+    width: 16px;
+  }
+
+
   table {
     border-collapse: inherit;
     border-spacing: 10px 0px;

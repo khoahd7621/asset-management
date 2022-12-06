@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { Row, Col, Table, Modal, Button, Popover, Checkbox, DatePicker, Input } from 'antd';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
 import './ManageAssignment.scss';
@@ -11,16 +10,18 @@ import { CloseIcon, EditIcon, SortIcon, FilterIcon, RefreshIcon, CalendarIcon } 
 import CustomPagination from '../../../components/Pagination/Pagination';
 import { getAssignmentDetails } from '../../../services/getApiService';
 import { adminRoute } from '../../../routes/routes';
+import { deleteAssignment } from '../../../services/disableApiService';
 
 const ManageAssignment = () => {
   const { Search } = Input;
-  const user = useSelector((state) => state.user.user);
   const location = useLocation();
   const navigate = useNavigate();
   const [assignmentList, setAssignmentList] = useState([]);
   const [assignmentDetails, setAssignmentDetails] = useState();
+  const [assignmentId, setAssignmentId] = useState();
   const [isModalAssignmentDetails, SetIsModalAssignmentDetails] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [confirmPopUp, setConfirmPopUp] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
 
   const plainOptions = ['Accepted', 'Waiting for acceptance', 'Declined'];
   const defaultCheckedList = ['ALL'];
@@ -41,7 +42,7 @@ const ManageAssignment = () => {
 
   useEffect(() => {
     getData();
-  }, [current, assigndate, getSearchData, state]);
+  }, [current, assigndate, getSearchData, state, isDelete]);
 
   const getData = async () => {
     const response = await filterAssignmentList(
@@ -52,7 +53,7 @@ const ManageAssignment = () => {
     );
     if (response.status === 200) {
       const assignmentResponse = location.state?.assignmentResponse;
-      if (assignmentResponse) {
+      if (assignmentResponse && isDelete === false) {
         let count = 1;
         setAssignmentList(
           response?.data?.data.reduce(
@@ -115,8 +116,19 @@ const ManageAssignment = () => {
     navigate(`/${adminRoute.home}/${adminRoute.manageAssignment}/${adminRoute.editAssignment}/${assignmentId}`);
   };
 
-  const onClickToUnableDelete = () => {};
-  const onClickToAbleDelete = () => {};
+  const onClickToDelete = async () => {
+    const response = await deleteAssignment(assignmentId);
+    if (response.status === 204) {
+      setIsDelete(true);
+      setConfirmPopUp(false);
+      getData();
+    }
+  };
+
+  const onClickToAbleDelete = (data) => {
+    setAssignmentId(data.currentTarget.dataset.id);
+    setConfirmPopUp(true);
+  };
 
   const CheckboxGroup = Checkbox.Group;
 
@@ -197,6 +209,12 @@ const ManageAssignment = () => {
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.no - b.no,
+      render: (text, record) => (
+        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+          {text}
+        </a>
+      ),
+      responsive: ['md'],
     },
     {
       width: '8em',
@@ -206,6 +224,12 @@ const ManageAssignment = () => {
       key: 'assetcode',
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.assetCode.localeCompare(b.assetCode),
+      render: (text, record) => (
+        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+          {text}
+        </a>
+      ),
+      responsive: ['lg'],
     },
     {
       width: '11em',
@@ -220,6 +244,7 @@ const ManageAssignment = () => {
           {text}
         </a>
       ),
+      responsive: ['lg'],
     },
     {
       width: '8em',
@@ -229,6 +254,12 @@ const ManageAssignment = () => {
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.userAssignedTo.localeCompare(b.userAssignedTo),
+      render: (text, record) => (
+        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+          {text}
+        </a>
+      ),
+      responsive: ['xl'],
     },
     {
       width: '8em',
@@ -238,6 +269,12 @@ const ManageAssignment = () => {
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.userAssignedBy.localeCompare(b.userAssignedBy),
+      render: (text, record) => (
+        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+          {text}
+        </a>
+      ),
+      responsive: ['xxl'],
     },
     {
       width: '8em',
@@ -246,8 +283,13 @@ const ManageAssignment = () => {
       key: 'assigneddate',
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
-      sorter: (a, b) => formatDate(a.assignedDate) - formatDate(b.assignedDate),
-      render: (text) => convertStrDate(text),
+      sorter: (a, b) => formatDate(convertStrDate(a.assignedDate)) - formatDate(convertStrDate(b.assignedDate)),
+      render: (text, record) => (
+        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+          {convertStrDate(text)}
+        </a>
+      ),
+      responsive: ['xxl'],
     },
     {
       width: '12em',
@@ -257,14 +299,20 @@ const ManageAssignment = () => {
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.status.localeCompare(b.status),
-      render: (text) => toTitle(text),
+      render: (text, record) => (
+        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+          {toTitle(text)}
+        </a>
+      ),
+      responsive: ['xxl'],
     },
     {
+      responsive: ['sm'],
       align: 'center',
       key: 'options',
       dataIndex: 'status',
       title: '',
-      render: (text, record) => {
+      render: (_text, record) => {
         return (
           <div id="frame">
             <div className="edit-icon">
@@ -278,8 +326,8 @@ const ManageAssignment = () => {
             </div>
             <div className="delete-icon">
               <Button
-                onClick={record.assignedTo === user?.username ? onClickToUnableDelete : onClickToAbleDelete}
-                data-id={record.assetCode}
+                onClick={onClickToAbleDelete}
+                data-id={record.id}
                 type="link"
                 icon={<CloseCircleOutlined style={{ color: 'red' }} />}
                 disabled={record.status === 'DECLINED' || record.status === 'WAITING_FOR_ACCEPTANCE' ? false : true}
@@ -287,7 +335,6 @@ const ManageAssignment = () => {
             </div>
             <div className="manage-assignment__return-icon">
               <Button
-                // onClick={record.username === user?.username ? onClickToCurrentUser : onClickToCheck}
                 data-id={record.assetCode}
                 type="link"
                 icon={<RefreshIcon />}
@@ -315,7 +362,9 @@ const ManageAssignment = () => {
             xs: 300,
             sm: 300,
             md: 250,
-            lg: 75,
+            lg: 300,
+            xl: 400,
+            xxl: 100,
           }}
         >
           <Col className="gutter-row" span={6}>
@@ -333,9 +382,9 @@ const ManageAssignment = () => {
           </Col>
           <Col className="gutter-row" span={6}>
             <DatePicker
-              id="manage-assignment-date"
+              id="manage-assignment__date-picker"
               className="manage-assignment-date"
-              placeholder="dd/mm/yyyy"
+              placeholder="Assigned Date"
               format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
               onChange={FilterByJoinedDate}
               suffixIcon={<CalendarIcon />}
@@ -343,7 +392,7 @@ const ManageAssignment = () => {
           </Col>
           <Col className="gutter-row" span={6}>
             <Search
-              id="manage-assignment-search"
+              id="manage-assignment__search"
               maxLength={100}
               className="manage-assignment-search"
               allowClear
@@ -365,7 +414,7 @@ const ManageAssignment = () => {
       <br></br>
       <div className="manage-assignment__body">
         <Table
-          id="assignment-table"
+          id="manage-assignment__table"
           showSorterTooltip={false}
           size="small"
           sortDirections={'ascend'}
@@ -409,7 +458,7 @@ const ManageAssignment = () => {
               <div className="title">Specification</div>
             </Col>
             <Col span={16} sm={19} md={18}>
-              <div className="content">{assignmentDetails?.specification ?? 'Loading...'}</div>
+              <div className="content">{assignmentDetails?.specification ?? ''}</div>
             </Col>
           </Row>
           <Row>
@@ -454,6 +503,20 @@ const ManageAssignment = () => {
               <div className="content">{assignmentDetails?.note ?? ''}</div>
             </Col>
           </Row>
+        </Modal>
+
+        <Modal
+          open={confirmPopUp}
+          className="user-list__disable-modal"
+          title={'Are you sure?'}
+          centered
+          onOk={onClickToDelete}
+          onCancel={() => setConfirmPopUp(false)}
+          okText="Disable"
+          cancelText="Cancel"
+          closable={false}
+        >
+          <p>Do you want to delete this assignment?</p>
         </Modal>
       </div>
     </div>
