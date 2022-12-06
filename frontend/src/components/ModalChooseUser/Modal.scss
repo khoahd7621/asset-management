@@ -51,12 +51,10 @@
   }
 
   .modal-choose__table {
-    margin: 18px 0 36px;
+    margin: 18px 0 24px;
     padding-right: 24px;
     background-color: #fff;
     overflow-x: hidden;
-    max-height: 448px;
-    overflow-y: auto;
 
     table {
       border-collapse: inherit;
@@ -155,6 +153,15 @@
           border-color: #cf2338;
         }
       }
+    }
+  }
+
+  .modal-choose__pagination {
+    margin-right: 24px;
+
+    .custom-pagination {
+      margin: 0 0 32px 0;
+      padding: 0;
     }
   }
 

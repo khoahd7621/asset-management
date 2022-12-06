@@ -4,7 +4,8 @@ import { CaretDownOutlined } from '@ant-design/icons';
 
 import './Modal.scss';
 
-import { getAllUsers } from '../../../services/getApiService';
+import { searchUsersWithKeywordAndTypesWithPagination } from '../../services/findApiService';
+import CustomPagination from '../Pagination/Pagination';
 
 const ModalChooseUser = ({ open, onCancel, currentUser, handleSaveChoose }) => {
   const { Search } = Input;
@@ -48,7 +49,11 @@ const ModalChooseUser = ({ open, onCancel, currentUser, handleSaveChoose }) => {
       width: '130px',
     },
   ];
+  const PAGE_SIZE = 10;
 
+  const [totalRow, setTotalRow] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchKeywords, setSearchKeywords] = useState('');
   const [datas, setDatas] = useState([]);
   const [selectedKey, setSelectedKey] = useState([currentUser.userId]);
   const [currentData, setCurrentData] = useState({
@@ -57,14 +62,21 @@ const ModalChooseUser = ({ open, onCancel, currentUser, handleSaveChoose }) => {
   const [dataSource, setDataSource] = useState([...datas]);
 
   useEffect(() => {
-    fetchListUsers();
+    fetchListUsers('', '', PAGE_SIZE, currentPage - 1, '', '');
   }, []);
 
-  const fetchListUsers = async () => {
-    const response = await getAllUsers();
+  const fetchListUsers = async (keyWord, types, limit, page, sortField, sortType) => {
+    const response = await searchUsersWithKeywordAndTypesWithPagination({
+      keyWord,
+      types,
+      limit,
+      page,
+      sortField,
+      sortType,
+    });
     if (response && response.status === 200) {
       setDatas(
-        response?.data.map((item, index) => {
+        response?.data?.data.map((item, _index) => {
           return {
             key: item.id,
             staffCode: item.staffCode,
@@ -74,7 +86,7 @@ const ModalChooseUser = ({ open, onCancel, currentUser, handleSaveChoose }) => {
         }),
       );
       setDataSource(
-        response?.data.map((item, index) => {
+        response?.data?.data.map((item, _index) => {
           return {
             key: item.id,
             staffCode: item.staffCode,
@@ -83,17 +95,19 @@ const ModalChooseUser = ({ open, onCancel, currentUser, handleSaveChoose }) => {
           };
         }),
       );
+      setTotalRow(response?.data?.totalRow);
     }
   };
 
+  const handleChangePage = (current) => {
+    setCurrentPage(current);
+    fetchListUsers(searchKeywords, '', PAGE_SIZE, current - 1, '', '');
+  };
+
   const handleOnSearch = (keyword) => {
-    setDataSource(
-      datas.filter(
-        (user) =>
-          user?.staffCode?.toLowerCase()?.includes(keyword?.toLowerCase()) ||
-          user?.fullName?.toLowerCase()?.includes(keyword?.toLowerCase()),
-      ),
-    );
+    fetchListUsers(keyword, '', PAGE_SIZE, 0, '', '');
+    setCurrentPage(1);
+    setSearchKeywords(keyword);
   };
 
   const handleSave = () => {
@@ -131,7 +145,7 @@ const ModalChooseUser = ({ open, onCancel, currentUser, handleSaveChoose }) => {
           columns={TableColumns}
           dataSource={dataSource}
           pagination={false}
-          onRow={(record, rowIndex) => ({
+          onRow={(record, _rowIndex) => ({
             onClick: () => {
               setCurrentData({
                 userId: record.key,
@@ -140,6 +154,14 @@ const ModalChooseUser = ({ open, onCancel, currentUser, handleSaveChoose }) => {
               setSelectedKey([record.key]);
             },
           })}
+        />
+      </div>
+      <div className="modal-choose__pagination">
+        <CustomPagination
+          onChange={handleChangePage}
+          current={currentPage}
+          defaultPageSize={PAGE_SIZE}
+          total={totalRow}
         />
       </div>
       <div className="modal-choose__action">

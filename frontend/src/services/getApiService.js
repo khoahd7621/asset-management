@@ -16,17 +16,10 @@ export const getCheckAssetIsValidForDeleteOrNot = (assetId) => {
   return axios.get(`/api/asset/check-asset/${assetId}`);
 };
 
-export const getAllUsers = () => {
-  return axios.get('/api/user');
-};
-
-export const getAllAssetsByStatus = (status) => {
-  return axios.get(`/api/asset/status/${status}`);
-};
-
 export const getAllMyAssignAsset = () => {
   return axios.get(`/api/assignment/user`);
 };
+
 export const getAssignAssetDetails = (asignAssetId) => {
   return axios.get(`/api/assignment/user/${asignAssetId}`);
 };

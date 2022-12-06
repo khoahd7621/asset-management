@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, DatePicker, Form, Input } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import moment from 'moment';
@@ -6,10 +7,8 @@ import { SearchOutlined } from '@ant-design/icons';
 
 import './CreateAssignment.scss';
 
-import ModalChooseUser from './ModalChooseUser';
-import ModalChooseAsset from './ModalChooseAsset';
+import { ModalChooseUser, ModalChooseAsset } from '../../../components';
 import { createNewAssignment } from '../../../services/createApiService';
-import { useNavigate } from 'react-router-dom';
 import { adminRoute } from '../../../routes/routes';
 
 const CreateAssignment = () => {
@@ -103,11 +102,27 @@ const CreateAssignment = () => {
         colon={false}
         onFinish={() => {}}
       >
-        <Form.Item name="fullName" label="User" labelAlign="left" onClick={() => setIsShowModalUser(true)}>
-          <Input id="create-assignment-input__full-name" readOnly suffix={<SearchOutlined />} />
+        <Form.Item name="fullName" label="User" labelAlign="left">
+          <Input
+            id="create-assignment-input__user-name"
+            readOnly
+            suffix={
+              <span className="suffix-icon" onClick={() => setIsShowModalUser(true)}>
+                <SearchOutlined />
+              </span>
+            }
+          />
         </Form.Item>
-        <Form.Item name="assetName" label="Asset" labelAlign="left" onClick={() => setIsShowModalAsset(true)}>
-          <Input id="create-assignment-input__asset-name" readOnly suffix={<SearchOutlined />} />
+        <Form.Item name="assetName" label="Asset" labelAlign="left">
+          <Input
+            id="create-assignment-input__asset-name"
+            readOnly
+            suffix={
+              <span className="suffix-icon" onClick={() => setIsShowModalAsset(true)}>
+                <SearchOutlined />
+              </span>
+            }
+          />
         </Form.Item>
         <Form.Item name="assignedDate" label="Assigned Date" labelAlign="left" help={joinedDateValidate.help}>
           <DatePicker

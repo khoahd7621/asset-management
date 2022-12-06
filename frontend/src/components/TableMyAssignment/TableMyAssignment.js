@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Modal, Table } from 'antd';
 import { CaretDownOutlined, CheckOutlined, UndoOutlined, CloseOutlined } from '@ant-design/icons';
-import ModalAssignAssetDetail from './ModalAssignAssetDetail';
+
 import './TableMyAssignment.scss';
+
+import ModalAssignAssetDetail from './ModalAssignAssetDetail';
 import { getAllMyAssignAsset, getAssignAssetDetails } from '../../services/getApiService';
 import { putAcceptAssignAsset, putDeclineAssignAsset } from '../../services/editApiService';
 import FirstPasswordModal from '../FirstPasswordModal/FirstPasswordModal';

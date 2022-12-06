@@ -6,10 +6,8 @@ import com.nashtech.assignment.config.CORSConfig;
 import com.nashtech.assignment.config.SecurityConfig;
 import com.nashtech.assignment.data.constants.EGender;
 import com.nashtech.assignment.data.constants.EUserType;
-import com.nashtech.assignment.dto.request.user.ChangePasswordFirstRequest;
-import com.nashtech.assignment.dto.request.user.ChangePasswordRequest;
-import com.nashtech.assignment.dto.request.user.CreateNewUserRequest;
-import com.nashtech.assignment.dto.request.user.EditUserRequest;
+import com.nashtech.assignment.dto.request.user.*;
+import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.user.UserResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
@@ -17,7 +15,7 @@ import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.services.create.CreateUserService;
 import com.nashtech.assignment.services.delete.DeleteUserService;
 import com.nashtech.assignment.services.edit.EditUserService;
-import com.nashtech.assignment.services.get.GetUserService;
+import com.nashtech.assignment.services.search.SearchUserService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,9 +58,9 @@ public class UserControllerTest {
     @MockBean
     private DeleteUserService deleteUserService;
     @MockBean
-    private GetUserService getUserService;
-    @MockBean
     private CreateUserService createUserService;
+    @MockBean
+    private SearchUserService searchUserService;
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @MockBean
@@ -72,6 +70,7 @@ public class UserControllerTest {
     private Date dateOfBirth;
     private Date joinedDate;
     private Date date;
+    private UserResponse userResponse;
 
     @BeforeEach
     void setup() throws Exception {
@@ -79,9 +78,19 @@ public class UserControllerTest {
         SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
         formatterDate.setTimeZone(TimeZone.getTimeZone("GMT"));
         dateOfBirth = formatterDate.parse("21/12/2001");
-        ;
         joinedDate = formatterDate.parse("17/11/2022");
         date = formatterDate.parse("01/01/2001");
+        userResponse = UserResponse.builder()
+                .username("username")
+                .staffCode("staffCode")
+                .firstName("firstName")
+                .lastName("lastName")
+                .gender(EGender.MALE)
+                .joinedDate(date)
+                .dateOfBirth(date)
+                .type(EUserType.ADMIN)
+                .location("location")
+                .fullName("fullName").build();
     }
 
     @Test
@@ -399,33 +408,43 @@ public class UserControllerTest {
     }
 
     @Test
-    void getAllUsers_ShouldReturnData() throws Exception {
-        UserResponse userResponse = UserResponse.builder()
-                .username("username")
-                .staffCode("staffCode")
-                .firstName("firstName")
-                .lastName("lastName")
-                .gender(EGender.MALE)
-                .joinedDate(date)
-                .dateOfBirth(date)
-                .type(EUserType.ADMIN)
-                .location("location")
-                .fullName("fullName").build();
-        List<UserResponse> response = new ArrayList<>();
-        response.add(userResponse);
+    void searchAllUsersByKeyWordInTypesWithPagination_WhenValidDataRequest_ShouldReturnData() throws Exception {
+        List<EUserType> types = new ArrayList<>();
+        types.add(EUserType.ADMIN);
+        List<UserResponse> userResponseList = new ArrayList<>();
+        userResponseList.add(userResponse);
+        PaginationResponse<List<UserResponse>> response = PaginationResponse.<List<UserResponse>>builder()
+                .data(userResponseList)
+                .totalPage(1)
+                .totalRow(1).build();
+        ArgumentCaptor<SearchUserRequest> searchUserRequestCaptor = ArgumentCaptor.forClass(SearchUserRequest.class);
 
-        when(getUserService.getAllUsers()).thenReturn(response);
+        when(searchUserService.searchAllUsersByKeyWordInTypesWithPagination(searchUserRequestCaptor.capture()))
+                .thenReturn(response);
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/user");
-
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/user/search")
+                .param("key-word", "keyword")
+                .param("types", EUserType.ADMIN.toString())
+                .param("limit", "20")
+                .param("page", "0")
+                .param("sort-field", "firstName")
+                .param("sort-type", "ASC");
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
+        SearchUserRequest searchUserRequestActual = searchUserRequestCaptor.getValue();
+        assertThat(searchUserRequestActual.getKeyword(), is("keyword"));
+        assertThat(searchUserRequestActual.getTypes(), is(types));
+        assertThat(searchUserRequestActual.getLimit(), is(20));
+        assertThat(searchUserRequestActual.getPage(), is(0));
+        assertThat(searchUserRequestActual.getSortField(), is("firstName"));
+        assertThat(searchUserRequestActual.getSortType(), is("ASC"));
         assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
         assertThat(actual.getContentAsString(), is(
-                "[{\"id\":0,\"username\":\"username\",\"staffCode\":\"staffCode\",\"firstName\":\"firstName\"," +
-                        "\"lastName\":\"lastName\",\"gender\":\"MALE\",\"joinedDate\":\"2001-01-01T00:00:00.000+00:00\"," +
-                        "\"dateOfBirth\":\"2001-01-01T00:00:00.000+00:00\",\"type\":\"ADMIN\",\"location\":\"location\"," +
-                        "\"fullName\":\"fullName\"}]"
-        ));
+                "{\"data\":[{\"id\":0,\"username\":\"username\",\"staffCode\":\"staffCode\"," +
+                        "\"firstName\":\"firstName\",\"lastName\":\"lastName\",\"gender\":\"MALE\"," +
+                        "\"joinedDate\":\"2001-01-01T00:00:00.000+00:00\",\"dateOfBirth\":\"2001-01-01T00:00:00.000+00:00\"," +
+                        "\"type\":\"ADMIN\",\"location\":\"location\",\"fullName\":\"fullName\"}]," +
+                        "\"totalPage\":1,\"totalRow\":1}"));
     }
+
 }

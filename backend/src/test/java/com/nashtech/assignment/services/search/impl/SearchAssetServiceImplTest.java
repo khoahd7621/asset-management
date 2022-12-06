@@ -4,7 +4,7 @@ import com.nashtech.assignment.data.constants.EAssetStatus;
 import com.nashtech.assignment.data.entities.Asset;
 import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.data.repositories.AssetRepository;
-import com.nashtech.assignment.dto.request.asset.SearchFilterAssetRequest;
+import com.nashtech.assignment.dto.request.asset.SearchAssetRequest;
 import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.asset.AssetResponse;
 import com.nashtech.assignment.mappers.AssetMapper;
@@ -57,13 +57,19 @@ class SearchAssetServiceImplTest {
         statuses.add(EAssetStatus.AVAILABLE);
         List<Integer> categoryIds = new ArrayList<>();
         categoryIds.add(1);
-        SearchFilterAssetRequest searchFilterAssetRequest = SearchFilterAssetRequest.builder()
-                .keyword("keyword").statuses(statuses).categoryIds(categoryIds).limit(20).page(0)
-                .sortField("name").sortType("ASC").build();
+        SearchAssetRequest searchAssetRequest = SearchAssetRequest.builder()
+                .keyword("keyword")
+                .statuses(statuses)
+                .categoryIds(categoryIds)
+                .limit(20)
+                .page(0)
+                .sortField("name")
+                .sortType("ASC").build();
 
-        Pageable pageable = PageRequest.of(searchFilterAssetRequest.getPage(),
-                searchFilterAssetRequest.getLimit(),
-                Sort.by(searchFilterAssetRequest.getSortField()).ascending());
+        Pageable pageable = PageRequest.of(
+                searchAssetRequest.getPage(),
+                searchAssetRequest.getLimit(),
+                Sort.by(searchAssetRequest.getSortField()).ascending());
         ArgumentCaptor<String> keywordCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<List<EAssetStatus>> statusesCaptor = ArgumentCaptor.forClass(List.class);
         ArgumentCaptor<List<Integer>> categoryIdsCaptor = ArgumentCaptor.forClass(List.class);
@@ -79,17 +85,18 @@ class SearchAssetServiceImplTest {
                 .build();
 
         when(securityContextService.getCurrentUser()).thenReturn(user);
-        when(pageableUtil.getPageable(searchFilterAssetRequest.getPage(), searchFilterAssetRequest.getLimit(),
-                searchFilterAssetRequest.getSortField(), searchFilterAssetRequest.getSortType()))
-                .thenReturn(pageable);
+        when(pageableUtil.getPageable(
+                searchAssetRequest.getPage(),
+                searchAssetRequest.getLimit(),
+                searchAssetRequest.getSortField(),
+                searchAssetRequest.getSortType())).thenReturn(pageable);
         when(assetRepository.findAllAssetsByQueryAndStatusesAndCategoryIds(keywordCaptor.capture(),
                 statusesCaptor.capture(), categoryIdsCaptor.capture(), locationCaptor.capture(),
                 pageableCaptor.capture())).thenReturn(assetPage);
         when(assetMapper.toListAssetsResponse(assetPage.toList())).thenReturn(assetResponseList);
 
         PaginationResponse<List<AssetResponse>> actual = searchAssetServiceImpl
-                .filterAllAssetsByLocationAndKeyWordInStatusesAndCategoriesWithPagination(
-                        searchFilterAssetRequest);
+                .searchAllAssetsByKeyWordInStatusesAndCategoriesWithPagination(searchAssetRequest);
 
         Pageable actualPageable = pageableCaptor.getValue();
         assertThat(actualPageable, is(pageable));
@@ -104,13 +111,20 @@ class SearchAssetServiceImplTest {
 
     @Test
     void filterAllAssetsByLocationAndKeyWordInStatusesAndCategoriesWithPagination_WhenKeyWordOrStatusesOrCategoryIdsIsNull_ShouldReturnData() {
-        SearchFilterAssetRequest searchFilterAssetRequest = SearchFilterAssetRequest.builder().keyword(null)
-                .statuses(null).categoryIds(null).limit(20).page(0).sortField("name").sortType("ASC")
+        SearchAssetRequest searchAssetRequest = SearchAssetRequest.builder()
+                .keyword(null)
+                .statuses(null)
+                .categoryIds(null)
+                .limit(20)
+                .page(0)
+                .sortField("name")
+                .sortType("ASC")
                 .build();
 
-        Pageable pageable = PageRequest.of(searchFilterAssetRequest.getPage(),
-                searchFilterAssetRequest.getLimit(),
-                Sort.by(searchFilterAssetRequest.getSortField()).ascending());
+        Pageable pageable = PageRequest.of(
+                searchAssetRequest.getPage(),
+                searchAssetRequest.getLimit(),
+                Sort.by(searchAssetRequest.getSortField()).ascending());
         ArgumentCaptor<String> keywordCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<List<EAssetStatus>> statusesCaptor = ArgumentCaptor.forClass(List.class);
         ArgumentCaptor<List<Integer>> categoryIdsCaptor = ArgumentCaptor.forClass(List.class);
@@ -126,17 +140,21 @@ class SearchAssetServiceImplTest {
                 .build();
 
         when(securityContextService.getCurrentUser()).thenReturn(user);
-        when(pageableUtil.getPageable(searchFilterAssetRequest.getPage(), searchFilterAssetRequest.getLimit(),
-                searchFilterAssetRequest.getSortField(), searchFilterAssetRequest.getSortType()))
-                .thenReturn(pageable);
-        when(assetRepository.findAllAssetsByQueryAndStatusesAndCategoryIds(keywordCaptor.capture(),
-                statusesCaptor.capture(), categoryIdsCaptor.capture(), locationCaptor.capture(),
+        when(pageableUtil.getPageable(
+                searchAssetRequest.getPage(),
+                searchAssetRequest.getLimit(),
+                searchAssetRequest.getSortField(),
+                searchAssetRequest.getSortType())).thenReturn(pageable);
+        when(assetRepository.findAllAssetsByQueryAndStatusesAndCategoryIds(
+                keywordCaptor.capture(),
+                statusesCaptor.capture(),
+                categoryIdsCaptor.capture(),
+                locationCaptor.capture(),
                 pageableCaptor.capture())).thenReturn(assetPage);
         when(assetMapper.toListAssetsResponse(assetPage.toList())).thenReturn(assetResponseList);
 
         PaginationResponse<List<AssetResponse>> actual = searchAssetServiceImpl
-                .filterAllAssetsByLocationAndKeyWordInStatusesAndCategoriesWithPagination(
-                        searchFilterAssetRequest);
+                .searchAllAssetsByKeyWordInStatusesAndCategoriesWithPagination(searchAssetRequest);
 
         keywordCaptor.getValue();
 

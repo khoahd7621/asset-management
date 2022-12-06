@@ -7,8 +7,7 @@ import { CaretDownOutlined } from '@ant-design/icons';
 
 import './EditAssignment.scss';
 
-import ModalChooseUser from './ModalChooseUser';
-import ModalChooseAsset from './ModalChooseAsset';
+import { ModalChooseUser, ModalChooseAsset } from '../../../components';
 import { adminRoute } from '../../../routes/routes';
 import { getAssignmentDetails } from '../../../services/getApiService';
 import { putEditAssignment } from '../../../services/editApiService';
@@ -139,11 +138,27 @@ const EditAssignment = () => {
             colon={false}
             onFinish={() => {}}
           >
-            <Form.Item name="fullName" label="User" labelAlign="left" onClick={() => setIsShowModalUser(true)}>
-              <Input id="edit-assignment-input__full-name" readOnly suffix={<CaretDownOutlined />} />
+            <Form.Item name="fullName" label="User" labelAlign="left">
+              <Input
+                id="edit-assignment-input__full-name"
+                readOnly
+                suffix={
+                  <span className="suffix-icon" onClick={() => setIsShowModalUser(true)}>
+                    <CaretDownOutlined />
+                  </span>
+                }
+              />
             </Form.Item>
-            <Form.Item name="assetName" label="Asset" labelAlign="left" onClick={() => setIsShowModalAsset(true)}>
-              <Input id="edit-assignment-input__asset-name" readOnly suffix={<CaretDownOutlined />} />
+            <Form.Item name="assetName" label="Asset" labelAlign="left">
+              <Input
+                id="edit-assignment-input__asset-name"
+                readOnly
+                suffix={
+                  <span className="suffix-icon" onClick={() => setIsShowModalAsset(true)}>
+                    <CaretDownOutlined />
+                  </span>
+                }
+              />
             </Form.Item>
             <Form.Item name="assignedDate" label="Assigned Date" labelAlign="left" help={joinedDateValidate.help}>
               <DatePicker

@@ -7,7 +7,7 @@ import com.nashtech.assignment.config.SecurityConfig;
 import com.nashtech.assignment.data.constants.EAssetStatus;
 import com.nashtech.assignment.dto.request.asset.CreateNewAssetRequest;
 import com.nashtech.assignment.dto.request.asset.EditAssetInformationRequest;
-import com.nashtech.assignment.dto.request.asset.SearchFilterAssetRequest;
+import com.nashtech.assignment.dto.request.asset.SearchAssetRequest;
 import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.asset.AssetAndHistoriesResponse;
 import com.nashtech.assignment.dto.response.asset.AssetHistory;
@@ -120,12 +120,10 @@ class AssetControllerTest {
         assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
         assertThat(actual.getContentAsString(), is(
                 "{\"asset\":{" +
-                        "\"id\":1,\"assetName\":\"name\",\"assetCode\":\"code\",\"installedDate\":\"2001-01-01T00:00:00.000+00:00\","
-                        +
+                        "\"id\":1,\"assetName\":\"name\",\"assetCode\":\"code\",\"installedDate\":\"2001-01-01T00:00:00.000+00:00\"," +
                         "\"specification\":\"specification\",\"status\":\"AVAILABLE\",\"location\":\"location\"," +
                         "\"category\":{\"id\":1,\"name\":\"name\",\"prefixAssetCode\":\"code\"},\"deleted\":false}," +
-                        "\"histories\":[{\"assignedDate\":null,\"assignedTo\":\"username\",\"assignedBy\":\"username\","
-                        +
+                        "\"histories\":[{\"assignedDate\":null,\"assignedTo\":\"username\",\"assignedBy\":\"username\"," +
                         "\"returnedDate\":\"2001-01-01T00:00:00.000+00:00\"}]}"));
     }
 
@@ -141,7 +139,7 @@ class AssetControllerTest {
     }
 
     @Test
-    void filterAllAssetsByLocationAndKeyWordInStatusesAndCategoriesWithPagination_WhenValidDataRequest_ShouldReturnData()
+    void searchAllAssetsByKeyWordInStatusesAndCategoriesWithPagination_WhenValidDataRequest_ShouldReturnData()
             throws Exception {
         List<EAssetStatus> statuses = new ArrayList<>();
         statuses.add(EAssetStatus.AVAILABLE);
@@ -153,11 +151,11 @@ class AssetControllerTest {
                 .data(data)
                 .totalRow(1)
                 .totalPage(1).build();
-        ArgumentCaptor<SearchFilterAssetRequest> searchFilterAssetRequestCaptor = ArgumentCaptor
-                .forClass(SearchFilterAssetRequest.class);
+        ArgumentCaptor<SearchAssetRequest> searchAssetRequestCaptor = ArgumentCaptor
+                .forClass(SearchAssetRequest.class);
 
-        when(searchAssetService.filterAllAssetsByLocationAndKeyWordInStatusesAndCategoriesWithPagination(
-                searchFilterAssetRequestCaptor.capture())).thenReturn(response);
+        when(searchAssetService.searchAllAssetsByKeyWordInStatusesAndCategoriesWithPagination(
+                searchAssetRequestCaptor.capture())).thenReturn(response);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset")
                 .param("key-word", "keyword")
@@ -169,7 +167,7 @@ class AssetControllerTest {
                 .param("sort-type", "ASC");
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-        SearchFilterAssetRequest searchFilterAssetRequestActual = searchFilterAssetRequestCaptor.getValue();
+        SearchAssetRequest searchFilterAssetRequestActual = searchAssetRequestCaptor.getValue();
         assertThat(searchFilterAssetRequestActual.getKeyword(), is("keyword"));
         assertThat(searchFilterAssetRequestActual.getStatuses(), is(statuses));
         assertThat(searchFilterAssetRequestActual.getCategoryIds(), is(categoriesId));
@@ -180,8 +178,7 @@ class AssetControllerTest {
         assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
         assertThat(actual.getContentAsString(), is(
                 "{\"data\":[" +
-                        "{\"id\":1,\"assetName\":\"name\",\"assetCode\":\"code\",\"installedDate\":\"2001-01-01T00:00:00.000+00:00\","
-                        +
+                        "{\"id\":1,\"assetName\":\"name\",\"assetCode\":\"code\",\"installedDate\":\"2001-01-01T00:00:00.000+00:00\"," +
                         "\"specification\":\"specification\",\"status\":\"AVAILABLE\",\"location\":\"location\"," +
                         "\"category\":{\"id\":1,\"name\":\"name\",\"prefixAssetCode\":\"code\"},\"deleted\":false}" +
                         "],\"totalPage\":1,\"totalRow\":1}"));
@@ -216,8 +213,10 @@ class AssetControllerTest {
                 .contentType(MediaType.APPLICATION_JSON);
 
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
-        assertThat(actual.getContentAsString(),
-                is("{\"id\":0,\"assetName\":\"assetName\",\"assetCode\":null,\"installedDate\":\"2001-01-01T00:00:00.000+00:00\",\"specification\":\"assetSpecification\",\"status\":\"AVAILABLE\",\"location\":null,\"category\":null,\"deleted\":false}"));
+        assertThat(actual.getContentAsString(), is(
+                "{\"id\":0,\"assetName\":\"assetName\",\"assetCode\":null,\"installedDate\":\"2001-01-01T00:00:00.000+00:00\"," +
+                        "\"specification\":\"assetSpecification\",\"status\":\"AVAILABLE\",\"location\":null," +
+                        "\"category\":null,\"deleted\":false}"));
     }
 
     @Test
@@ -304,8 +303,10 @@ class AssetControllerTest {
                 .contentType(MediaType.APPLICATION_JSON);
 
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
-        assertThat(actual.getContentAsString(),
-                is("{\"id\":0,\"assetName\":\"assetName\",\"assetCode\":null,\"installedDate\":\"2001-01-01T00:00:00.000+00:00\",\"specification\":\"specification\",\"status\":\"AVAILABLE\",\"location\":\"location\",\"category\":null,\"deleted\":false}"));
+        assertThat(actual.getContentAsString(), is(
+                "{\"id\":0,\"assetName\":\"assetName\",\"assetCode\":null,\"installedDate\":\"2001-01-01T00:00:00.000+00:00\"," +
+                        "\"specification\":\"specification\",\"status\":\"AVAILABLE\",\"location\":\"location\"," +
+                        "\"category\":null,\"deleted\":false}"));
     }
 
     @Test
@@ -382,57 +383,6 @@ class AssetControllerTest {
 
         assertThat(actual.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
         assertThat(actual.getContentAsString(), is("{\"message\":\"error message\"}"));
-    }
-
-    @Test
-    void getAllAssetByAssetStatus_ShouldReturnData() throws Exception {
-        EAssetStatus assetStatus = EAssetStatus.AVAILABLE;
-        List<AssetResponse> response = new ArrayList<>();
-        response.add(assetResponse);
-
-        when(getAssetService.getAllAssetByAssetStatus(assetStatus)).thenReturn(response);
-
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset/status/{assetStatus}", assetStatus);
-        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
-
-        assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
-        assertThat(actual.getContentAsString(), is(
-                "[{\"id\":1,\"assetName\":\"name\",\"assetCode\":\"code\",\"installedDate\":\"2001-01-01T00:00:00.000+00:00\"," +
-                        "\"specification\":\"specification\",\"status\":\"AVAILABLE\",\"location\":\"location\"," +
-                        "\"category\":{\"id\":1,\"name\":\"name\",\"prefixAssetCode\":\"code\"},\"deleted\":false}]"));
-    }
-
-    @Test
-    void getAllAssetByAssetStatusWithPagination_ShouldReturnData() throws Exception {
-        EAssetStatus status = EAssetStatus.AVAILABLE;
-        int page = 0;
-        int limit = 20;
-        String sortField = "name";
-        String sortType = "ASC";
-        List<AssetResponse> assetResponseList = new ArrayList<>();
-        assetResponseList.add(assetResponse);
-        PaginationResponse<List<AssetResponse>> response = PaginationResponse.<List<AssetResponse>>builder()
-                .data(assetResponseList)
-                .totalPage(1)
-                .totalRow(1).build();
-
-        when(getAssetService.getAllAssetByAssetStatusWithPagination(status, page, limit, sortField, sortType)).thenReturn(response);
-
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset/status/{assetStatus}/pagination", status)
-                .param("page", String.valueOf(page))
-                .param("limit", String.valueOf(limit))
-                .param("sort-field", sortField)
-                .param("sort-type", sortType);
-        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
-
-        assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
-        assertThat(actual.getContentAsString(), is(
-                "{\"data\":[{\"id\":1,\"assetName\":\"name\",\"assetCode\":\"code\"," +
-                        "\"installedDate\":\"2001-01-01T00:00:00.000+00:00\"," +
-                        "\"specification\":\"specification\",\"status\":\"AVAILABLE\",\"location\":\"location\"," +
-                        "\"category\":{\"id\":1,\"name\":\"name\",\"prefixAssetCode\":\"code\"},\"deleted\":false}]," +
-                        "\"totalPage\":1,\"totalRow\":1}"
-        ));
     }
 
 }

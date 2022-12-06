@@ -1,16 +1,15 @@
 package com.nashtech.assignment.controllers;
 
-import com.nashtech.assignment.dto.request.user.ChangePasswordFirstRequest;
-import com.nashtech.assignment.dto.request.user.ChangePasswordRequest;
-import com.nashtech.assignment.dto.request.user.CreateNewUserRequest;
-import com.nashtech.assignment.dto.request.user.EditUserRequest;
+import com.nashtech.assignment.data.constants.EUserType;
+import com.nashtech.assignment.dto.request.user.*;
+import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.user.UserResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.services.create.CreateUserService;
 import com.nashtech.assignment.services.delete.DeleteUserService;
 import com.nashtech.assignment.services.edit.EditUserService;
-import com.nashtech.assignment.services.get.GetUserService;
+import com.nashtech.assignment.services.search.SearchUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,7 +36,7 @@ public class UserController {
     @Autowired
     private EditUserService editUserService;
     @Autowired
-    private GetUserService getUserService;
+    private SearchUserService searchUserService;
 
     @Operation(summary = "Create new user")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Create user successfully", content = {
@@ -113,12 +112,28 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(editUserService.changePassword(changePasswordRequest));
     }
 
-    @Operation(summary = "Get all users")
+    @Operation(summary = "Search all users by staffCode or fullName (optional) in list types (optional) same location with current user with pagination")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Get all users successfully.")
     })
-    @GetMapping()
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        return ResponseEntity.status(HttpStatus.OK).body(getUserService.getAllUsers());
+    @GetMapping("/search")
+    public ResponseEntity<PaginationResponse<List<UserResponse>>> searchAllUsersByKeyWordInTypesWithPagination(
+            @RequestParam(name = "key-word", required = false) String keyword,
+            @RequestParam(name = "types", required = false) List<EUserType> types,
+            @RequestParam(name = "limit", defaultValue = "20") Integer limit,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "sort-field", defaultValue = "firstName") String sortField,
+            @RequestParam(name = "sort-type", defaultValue = "ASC") String sortType
+    ) {
+        SearchUserRequest searchUserRequest = SearchUserRequest.builder()
+                .keyword(keyword.trim().length() == 0 ? null : keyword)
+                .types(types.isEmpty() ? null : types)
+                .limit(limit)
+                .page(page)
+                .sortField(sortField)
+                .sortType(sortType).build();
+        return ResponseEntity.status(HttpStatus.OK).body(searchUserService
+                .searchAllUsersByKeyWordInTypesWithPagination(searchUserRequest));
     }
+
 }

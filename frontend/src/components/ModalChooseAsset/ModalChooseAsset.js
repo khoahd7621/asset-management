@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { Button, Input, Modal, Table } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 
-import './Modal.scss';
-
-import { getAllAssetsByStatus } from '../../../services/getApiService';
+import { searchAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination } from '../../services/findApiService';
+import CustomPagination from '../Pagination/Pagination';
 
 const ModalChooseAsset = ({ open, onCancel, currentAsset, handleSaveChoose }) => {
   const { Search } = Input;
@@ -49,6 +48,12 @@ const ModalChooseAsset = ({ open, onCancel, currentAsset, handleSaveChoose }) =>
     },
   ];
 
+  const PAGE_SIZE = 10;
+  const ASSET_STATUS = 'AVAILABLE';
+
+  const [totalRow, setTotalRow] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchKeywords, setSearchKeywords] = useState('');
   const [datas, setDatas] = useState([]);
   const [selectedKey, setSelectedKey] = useState([currentAsset.assetCode]);
   const [currentData, setCurrentData] = useState({
@@ -57,14 +62,22 @@ const ModalChooseAsset = ({ open, onCancel, currentAsset, handleSaveChoose }) =>
   const [dataSource, setDataSource] = useState([...datas]);
 
   useEffect(() => {
-    fetchListAssets();
+    fetchListAssets(searchKeywords, ASSET_STATUS, '', PAGE_SIZE, currentPage - 1, '', '');
   }, []);
 
-  const fetchListAssets = async () => {
-    const response = await getAllAssetsByStatus('AVAILABLE');
+  const fetchListAssets = async (keyWord, statuses, categories, limit, page, sortField, sortType) => {
+    const response = await searchAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination({
+      keyWord,
+      statuses,
+      categories,
+      limit,
+      page,
+      sortField,
+      sortType,
+    });
     if (response && response.status === 200) {
       setDatas(
-        response?.data.map((item, index) => {
+        response?.data?.data.map((item, _index) => {
           return {
             key: item.id,
             assetCode: item.assetCode,
@@ -74,7 +87,7 @@ const ModalChooseAsset = ({ open, onCancel, currentAsset, handleSaveChoose }) =>
         }),
       );
       setDataSource(
-        response?.data.map((item, index) => {
+        response?.data?.data.map((item, _index) => {
           return {
             key: item.id,
             assetCode: item.assetCode,
@@ -83,17 +96,19 @@ const ModalChooseAsset = ({ open, onCancel, currentAsset, handleSaveChoose }) =>
           };
         }),
       );
+      setTotalRow(response?.data?.totalRow);
     }
   };
 
+  const handleChangePage = (current) => {
+    setCurrentPage(current);
+    fetchListAssets(searchKeywords, ASSET_STATUS, '', PAGE_SIZE, current - 1, '', '');
+  };
+
   const handleOnSearch = (keyword) => {
-    setDataSource(
-      datas.filter(
-        (asset) =>
-          asset?.assetCode?.toLowerCase()?.includes(keyword?.toLowerCase()) ||
-          asset?.assetName?.toLowerCase()?.includes(keyword?.toLowerCase()),
-      ),
-    );
+    fetchListAssets(keyword, ASSET_STATUS, '', PAGE_SIZE, 0, '', '');
+    setCurrentPage(1);
+    setSearchKeywords(keyword);
   };
 
   const handleSave = () => {
@@ -131,7 +146,7 @@ const ModalChooseAsset = ({ open, onCancel, currentAsset, handleSaveChoose }) =>
           columns={TableColumns}
           dataSource={dataSource}
           pagination={false}
-          onRow={(record, rowIndex) => ({
+          onRow={(record, _rowIndex) => ({
             onClick: () => {
               if (record.key !== selectedKey[0]) {
                 setCurrentData({
@@ -142,6 +157,14 @@ const ModalChooseAsset = ({ open, onCancel, currentAsset, handleSaveChoose }) =>
               }
             },
           })}
+        />
+      </div>
+      <div className="modal-choose__pagination">
+        <CustomPagination
+          onChange={handleChangePage}
+          current={currentPage}
+          defaultPageSize={PAGE_SIZE}
+          total={totalRow}
         />
       </div>
       <div className="modal-choose__action">

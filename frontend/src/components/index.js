@@ -4,3 +4,5 @@ export { default as FirstPasswordModal } from './FirstPasswordModal/FirstPasswor
 export { default as ListUser } from './ListUser/ListUser';
 export { default as FilterMenu } from './FilterMenu/FilterMenu';
 export { default as TableAsset } from './TableAsset/TableAsset';
+export { default as ModalChooseAsset } from './ModalChooseAsset/ModalChooseAsset';
+export { default as ModalChooseUser } from './ModalChooseUser/ModalChooseUser';

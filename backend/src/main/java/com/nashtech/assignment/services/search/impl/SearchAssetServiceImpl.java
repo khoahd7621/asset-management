@@ -3,7 +3,7 @@ package com.nashtech.assignment.services.search.impl;
 import com.nashtech.assignment.data.entities.Asset;
 import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.data.repositories.AssetRepository;
-import com.nashtech.assignment.dto.request.asset.SearchFilterAssetRequest;
+import com.nashtech.assignment.dto.request.asset.SearchAssetRequest;
 import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.asset.AssetResponse;
 import com.nashtech.assignment.mappers.AssetMapper;
@@ -32,15 +32,15 @@ public class SearchAssetServiceImpl implements SearchAssetService {
     private SecurityContextService securityContextService;
 
     @Override
-    public PaginationResponse<List<AssetResponse>> filterAllAssetsByLocationAndKeyWordInStatusesAndCategoriesWithPagination(
-            SearchFilterAssetRequest searchFilterAssetRequest) {
+    public PaginationResponse<List<AssetResponse>> searchAllAssetsByKeyWordInStatusesAndCategoriesWithPagination(
+            SearchAssetRequest searchAssetRequest) {
         User user = securityContextService.getCurrentUser();
-        Pageable pageable = pageableUtil.getPageable(searchFilterAssetRequest.getPage(),
-                searchFilterAssetRequest.getLimit(), searchFilterAssetRequest.getSortField(),
-                searchFilterAssetRequest.getSortType());
+        Pageable pageable = pageableUtil.getPageable(searchAssetRequest.getPage(),
+                searchAssetRequest.getLimit(), searchAssetRequest.getSortField(),
+                searchAssetRequest.getSortType());
         Page<Asset> assetList = assetRepository.findAllAssetsByQueryAndStatusesAndCategoryIds(
-                searchFilterAssetRequest.getKeyword(), searchFilterAssetRequest.getStatuses(),
-                searchFilterAssetRequest.getCategoryIds(), user.getLocation(), pageable);
+                searchAssetRequest.getKeyword(), searchAssetRequest.getStatuses(),
+                searchAssetRequest.getCategoryIds(), user.getLocation(), pageable);
         List<AssetResponse> assetResponseList = assetMapper.toListAssetsResponse(assetList.toList());
         return PaginationResponse.<List<AssetResponse>>builder().data(assetResponseList)
                 .totalPage(assetList.getTotalPages()).totalRow(assetList.getTotalElements()).build();

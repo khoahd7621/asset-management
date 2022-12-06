@@ -3,7 +3,7 @@ package com.nashtech.assignment.controllers;
 import com.nashtech.assignment.data.constants.EAssetStatus;
 import com.nashtech.assignment.dto.request.asset.CreateNewAssetRequest;
 import com.nashtech.assignment.dto.request.asset.EditAssetInformationRequest;
-import com.nashtech.assignment.dto.request.asset.SearchFilterAssetRequest;
+import com.nashtech.assignment.dto.request.asset.SearchAssetRequest;
 import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.asset.AssetAndHistoriesResponse;
 import com.nashtech.assignment.dto.response.asset.AssetResponse;
@@ -55,10 +55,10 @@ public class AssetController {
         return ResponseEntity.status(HttpStatus.OK).body(getAssetService.getAssetAndItsHistoriesByAssetId(assetId));
     }
 
-    @Operation(summary = "Filter all assets by assetCode or assetName (optional) in list status (optional) and in list categories (optional) same location with current user with pagination")
+    @Operation(summary = "Search all assets by assetCode or assetName (optional) in list status (optional) and in list categories (optional) same location with current user with pagination")
     @ApiResponse(responseCode = "200", description = "Get list assets successfully.")
     @GetMapping
-    public ResponseEntity<PaginationResponse<List<AssetResponse>>> filterAllAssetsByLocationAndKeyWordInStatusesAndCategoriesWithPagination(
+    public ResponseEntity<PaginationResponse<List<AssetResponse>>> searchAllAssetsByKeyWordInStatusesAndCategoriesWithPagination(
             @RequestParam(name = "key-word", required = false) String keyword,
             @RequestParam(name = "statuses", required = false) List<EAssetStatus> statuses,
             @RequestParam(name = "categories", required = false) List<Integer> categoryIds,
@@ -66,7 +66,7 @@ public class AssetController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "sort-field", defaultValue = "name") String sortField,
             @RequestParam(name = "sort-type", defaultValue = "ASC") String sortType) {
-        SearchFilterAssetRequest searchFilterAssetRequest = SearchFilterAssetRequest.builder()
+        SearchAssetRequest searchAssetRequest = SearchAssetRequest.builder()
                 .keyword(keyword.trim().length() == 0 ? null : keyword)
                 .statuses(statuses.isEmpty() ? null : statuses)
                 .categoryIds(categoryIds.isEmpty() ? null : categoryIds)
@@ -75,8 +75,8 @@ public class AssetController {
                 .sortField(sortField)
                 .sortType(sortType).build();
         return ResponseEntity.status(HttpStatus.OK)
-                .body(searchAssetService.filterAllAssetsByLocationAndKeyWordInStatusesAndCategoriesWithPagination(
-                        searchFilterAssetRequest));
+                .body(searchAssetService.searchAllAssetsByKeyWordInStatusesAndCategoriesWithPagination(
+                        searchAssetRequest));
     }
 
     @Operation(summary = "Edit asset information")
@@ -138,29 +138,5 @@ public class AssetController {
     public ResponseEntity<Void> deleteAssetByAssetId(@PathVariable Long assetId) {
         deleteAssetService.deleteAssetByAssetId(assetId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    @Operation(summary = "Get all assets by assetStatus")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Get all assets successfully.")
-    })
-    @GetMapping("/status/{assetStatus}")
-    public ResponseEntity<List<AssetResponse>> getAllAssetByAssetStatus(@PathVariable EAssetStatus assetStatus) {
-        return ResponseEntity.status(HttpStatus.OK).body(getAssetService.getAllAssetByAssetStatus(assetStatus));
-    }
-
-    @Operation(summary = "Get all assets by assetStatus with pagination")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Get all assets successfully.")
-    })
-    @GetMapping("/status/{assetStatus}/pagination")
-    public ResponseEntity<PaginationResponse<List<AssetResponse>>> getAllAssetByAssetStatusWithPagination(
-            @PathVariable EAssetStatus assetStatus,
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "limit", defaultValue = "20") Integer limit,
-            @RequestParam(name = "sort-field", defaultValue = "name") String sortField,
-            @RequestParam(name = "sort-type", defaultValue = "ASC") String sortType) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(getAssetService.getAllAssetByAssetStatusWithPagination(assetStatus, page, limit, sortField, sortType));
     }
 }

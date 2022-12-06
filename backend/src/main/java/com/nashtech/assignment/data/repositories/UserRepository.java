@@ -23,19 +23,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Page<User> findByLocationAndTypeAndIsDeletedFalseOrderByFirstNameAsc(String location, EUserType type, Pageable pageable);
 
-    @Query("SELECT u"
-    +" FROM User u "
-    +" WHERE "
-    +" u.location = :location" 
-    +" AND (u.type = :type OR :type IS NULL)"
-    +" AND u.isDeleted = FALSE"
-    +" AND ((lower(concat(u.firstName,' ', u.lastName))  LIKE lower(:name) OR :name IS NULL)"
-        +" OR (lower(concat(u.lastName,' ', u.firstName))  LIKE lower(:name) OR :name IS NULL)"
-        +" OR (lower(u.staffCode) LIKE lower(:code) OR :code IS NULL))"
-    +" ORDER BY u.firstName ASC")
+    @Query("SELECT u" +
+            " FROM User u" +
+            " WHERE" +
+            " u.location = :location" +
+            " AND (u.type = :type OR :type IS NULL)" +
+            " AND u.isDeleted = FALSE" +
+            " AND ((lower(concat(u.firstName, ' ', u.lastName)) LIKE lower(:name) OR :name IS NULL)" +
+            " OR (lower(concat(u.lastName, ' ', u.firstName)) LIKE lower(:name) OR :name IS NULL)" +
+            " OR (lower(u.staffCode) LIKE lower(:code) OR :code IS NULL))" +
+            " ORDER BY u.firstName ASC")
     Page<User> search(@Param("name") String name, @Param("code") String staffCode, @Param("location") String location, @Param("type")EUserType type, Pageable pageable);
     
-    @Query(value = "select * from user_tbl as u where u.user_name ~ :username", nativeQuery = true)
+    @Query(value = "SELECT * FROM user_tbl AS u WHERE u.user_name ~ :username", nativeQuery = true)
     List<User> findAllByUsernameMatchRegex(String username);
 
     Optional<User> findByUsernameAndIsDeletedFalse(String username);
@@ -43,4 +43,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByLocationAndIsDeletedFalse(String location);
 
     Optional<User> findByIdAndIsDeletedFalse(Long id);
+
+    @Query("SELECT u FROM User u WHERE u.location = :location AND u.isDeleted = FALSE" +
+            " AND (coalesce(:types, NULL) IS NULL OR u.type IN :types)" +
+            " AND (coalesce(:query, NULL) IS NULL" +
+            " OR lower(u.staffCode) LIKE lower(concat('%', :query, '%'))" +
+            " OR (lower(concat(u.firstName, ' ', u.lastName)) LIKE lower(concat('%', :query, '%')))" +
+            " OR (lower(concat(u.lastName, ' ', u.firstName)) LIKE lower(concat('%', :query, '%'))))")
+    Page<User> searchAllUsersByKeyWordInTypesWithPagination(
+            @Param("query") String query,
+            @Param("types") List<EUserType> types,
+            @Param("location") String location,
+            Pageable pageable);
 }
