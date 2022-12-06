@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -17,8 +17,9 @@ public class EditAssignmentRequest {
     private Long assetId;
     @Min(1)
     private Long userId;
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date assignedDate;
+    @NotBlank(message = "Assigned date is required")
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private String assignedDate;
     @Size(max = 500)
     private String note;
 }

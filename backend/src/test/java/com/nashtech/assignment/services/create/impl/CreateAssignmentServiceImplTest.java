@@ -17,7 +17,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,6 +40,7 @@ class CreateAssignmentServiceImplTest {
     private Date today;
     private User user;
     private Asset asset;
+    private DateFormat dateFormat;
 
     @BeforeEach
     void beforeEach() {
@@ -57,13 +60,14 @@ class CreateAssignmentServiceImplTest {
         today = new Date();
         user = mock(User.class);
         asset = mock(Asset.class);
+        dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     }
 
     @Test
     void createNewAssignment_WhenAssignDateIsBeforeToDay_ThrowBadRequestException() throws ParseException {
         Date assignedDate = new Date(today.getTime() - (1000 * 60 * 60 * 24));
         CreateNewAssignmentRequest requestData = CreateNewAssignmentRequest.builder()
-                .assignedDate(assignedDate).build();
+                .assignedDate(dateFormat.format(assignedDate)).build();
 
         ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
         ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
@@ -75,14 +79,14 @@ class CreateAssignmentServiceImplTest {
             createAssignmentServiceImpl.createNewAssignment(requestData);
         });
 
-        assertThat(assignedDateCaptor.getValue().equals(assignedDate), is(true));
+        assertThat(dateFormat.format(assignedDateCaptor.getValue()).equals(dateFormat.format(assignedDate)), is(true));
         assertThat(actual.getMessage(), is("Assign date is before today."));
     }
 
     @Test
-    void createNewAssignment_WhenDataValid_ShouldReturnData() {
+    void createNewAssignment_WhenDataValid_ShouldReturnData() throws ParseException {
         CreateNewAssignmentRequest requestData = CreateNewAssignmentRequest.builder()
-                .assignedDate(today)
+                .assignedDate(dateFormat.format(today))
                 .assetId(1L)
                 .userId(1L).build();
         AssignAsset assignAsset = mock(AssignAsset.class);
@@ -105,7 +109,7 @@ class CreateAssignmentServiceImplTest {
 
         AssignAssetResponse actual = createAssignmentServiceImpl.createNewAssignment(requestData);
 
-        assertThat(assignedDateCaptor.getValue().equals(today), is(true));
+        assertThat(dateFormat.format(assignedDateCaptor.getValue()).equals(dateFormat.format(today)), is(true));
         assertThat(assetIdCaptor.getValue(), is(1L));
         assertThat(userIdCaptor.getValue(), is(1L));
         verify(asset).setStatus(EAssetStatus.ASSIGNED);

@@ -54,21 +54,12 @@ const ManageAssignment = () => {
     if (response.status === 200) {
       const assignmentResponse = location.state?.assignmentResponse;
       if (assignmentResponse && isDelete === false) {
-        let count = 1;
+        const listDatas = response?.data?.data.filter((item) => item.id !== assignmentResponse.id);
+        listDatas.unshift(assignmentResponse);
         setAssignmentList(
-          response?.data?.data.reduce(
-            (prev, current) => {
-              count++;
-              return [...prev, { ...current, no: count, key: current.id }];
-            },
-            [
-              {
-                ...assignmentResponse,
-                no: count,
-                key: assignmentResponse.id,
-              },
-            ],
-          ),
+          listDatas.map((item, index) => {
+            return { ...item, no: index + 1, key: item.id };
+          }),
         );
       } else {
         setAssignmentList(

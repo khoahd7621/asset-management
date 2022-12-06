@@ -22,6 +22,9 @@ import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
@@ -94,7 +97,7 @@ public class EditAssignAssetServiceImpl implements EditAssignAssetService {
         return assignAssetMapper.toAssignAssetResponse(assignAssetOpt.get());
     }
 
-    public AssignAssetResponse editAssignment(Long assignmentId, EditAssignmentRequest editAssignmentRequest) {
+    public AssignAssetResponse editAssignment(Long assignmentId, EditAssignmentRequest editAssignmentRequest) throws ParseException {
         Optional<AssignAsset> assignAssetOpt = assignAssetRepository.findByIdAndIsDeletedFalse(assignmentId);
         if (assignAssetOpt.isEmpty()) {
             throw new NotFoundException("Not exist assignment with this assignment id.");
@@ -104,7 +107,8 @@ public class EditAssignAssetServiceImpl implements EditAssignAssetService {
             throw new BadRequestException("Can only edit assignment with status waiting for acceptance.");
         }
         Date oldAssignedDate = assignAsset.getAssignedDate();
-        Date newAssignedDate = editAssignmentRequest.getAssignedDate();
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date newAssignedDate = dateFormat.parse(editAssignmentRequest.getAssignedDate());
         Date today = new Date();
         if (!compareDateUtil.isEquals(oldAssignedDate, newAssignedDate)
                 && compareDateUtil.isAfter(today, newAssignedDate)) {
@@ -125,7 +129,7 @@ public class EditAssignAssetServiceImpl implements EditAssignAssetService {
             assignAsset.setAsset(newAsset);
         }
         assignAsset.setUserAssignedTo(currentUserAssignTo);
-        assignAsset.setAssignedDate(editAssignmentRequest.getAssignedDate());
+        assignAsset.setAssignedDate(newAssignedDate);
         assignAsset.setNote(editAssignmentRequest.getNote());
         assignAsset = assignAssetRepository.save(assignAsset);
         return assignAssetMapper.toAssignAssetResponse(assignAsset);

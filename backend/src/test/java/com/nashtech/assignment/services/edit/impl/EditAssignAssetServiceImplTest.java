@@ -21,6 +21,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
@@ -42,6 +45,7 @@ class EditAssignAssetServiceImplTest {
     private AssignAsset assignAsset;
     private AssignAssetResponse assignAssetResponse;
     private Date today;
+    private DateFormat dateFormat;
 
     @BeforeEach
     void setup() {
@@ -63,6 +67,7 @@ class EditAssignAssetServiceImplTest {
         assignAsset = mock(AssignAsset.class);
         assignAssetResponse = mock(AssignAssetResponse.class);
         today = new Date();
+        dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     }
 
     @Test
@@ -100,7 +105,7 @@ class EditAssignAssetServiceImplTest {
         Date oldAssignedDate = new Date(today.getTime() + (1000 * 60 * 60 * 48));
         Date newAssignedDate = new Date(today.getTime() + (1000 * 60 * 60 * 24));
         EditAssignmentRequest editAssignmentRequest = EditAssignmentRequest.builder()
-                .assignedDate(newAssignedDate).build();
+                .assignedDate(dateFormat.format(newAssignedDate)).build();
         ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
         ArgumentCaptor<Date> oldAssignedDateCaptor = ArgumentCaptor.forClass(Date.class);
         ArgumentCaptor<Date> newAssignedDateCaptor = ArgumentCaptor.forClass(Date.class);
@@ -116,16 +121,17 @@ class EditAssignAssetServiceImplTest {
             editAssignAssetServiceImpl.editAssignment(assignmentId, editAssignmentRequest);
         });
 
-        assertThat(oldAssignedDateCaptor.getValue().equals(oldAssignedDate), is(true));
-        assertThat(newAssignedDateCaptor.getValue().equals(newAssignedDate), is(true));
+        assertThat(dateFormat.format(oldAssignedDateCaptor.getValue()).equals(dateFormat.format(oldAssignedDate)), is(true));
+        assertThat(dateFormat.format(newAssignedDateCaptor.getValue()).equals(dateFormat.format(newAssignedDate)), is(true));
         assertThat(actual.getMessage(), is("Assign date is before today."));
     }
 
     @Test
-    void editAssignment_WhenAllDataValid_ShouldReturnData() {
+    void editAssignment_WhenAllDataValid_ShouldReturnData() throws ParseException {
         long assignmentId = 1L;
+        Date assignDate = dateFormat.parse("01/01/2022");
         EditAssignmentRequest editAssignmentRequest = EditAssignmentRequest.builder()
-                .assignedDate(today)
+                .assignedDate(dateFormat.format(assignDate))
                 .assetId(1L)
                 .userId(1L)
                 .note("note").build();
@@ -136,7 +142,7 @@ class EditAssignAssetServiceImplTest {
 
         when(assignAssetRepository.findByIdAndIsDeletedFalse(assignmentId)).thenReturn(Optional.of(assignAsset));
         when(assignAsset.getStatus()).thenReturn(EAssignStatus.WAITING_FOR_ACCEPTANCE);
-        when(assignAsset.getAssignedDate()).thenReturn(today);
+        when(assignAsset.getAssignedDate()).thenReturn(assignDate);
         when(assignAsset.getUserAssignedTo()).thenReturn(user);
         when(user.getId()).thenReturn(2L);
         when(validationUserService.validationUserAssignedToAssignment(newUserIdCaptor.capture())).thenReturn(user);
@@ -155,7 +161,7 @@ class EditAssignAssetServiceImplTest {
         verify(assetRepository).save(asset);
         verify(assignAsset).setAsset(asset);
         verify(assignAsset).setUserAssignedTo(user);
-        verify(assignAsset).setAssignedDate(today);
+        verify(assignAsset).setAssignedDate(dateFormat.parse("01/01/2022"));
         verify(assignAsset).setNote("note");
         verify(assignAssetRepository).save(assignAsset);
         assertThat(actual, is(assignAssetResponse));

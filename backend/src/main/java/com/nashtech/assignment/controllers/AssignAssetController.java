@@ -126,7 +126,7 @@ public class AssignAssetController {
     })
     @PostMapping
     public ResponseEntity<AssignAssetResponse> createNewAssignment(
-            @RequestBody @Valid CreateNewAssignmentRequest createNewAssignmentRequest) {
+            @RequestBody @Valid CreateNewAssignmentRequest createNewAssignmentRequest) throws ParseException {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(createAssignmentService.createNewAssignment(createNewAssignmentRequest));
     }
@@ -143,7 +143,7 @@ public class AssignAssetController {
     @PutMapping("/{assignmentId}")
     public ResponseEntity<AssignAssetResponse> editAssignment(
             @PathVariable Long assignmentId,
-            @RequestBody @Valid EditAssignmentRequest editAssignmentRequest) {
+            @RequestBody @Valid EditAssignmentRequest editAssignmentRequest) throws ParseException {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(editAssignAssetService.editAssignment(assignmentId, editAssignmentRequest));
     }
