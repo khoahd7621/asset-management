@@ -2,6 +2,9 @@ package com.nashtech.assignment.data.repositories;
 
 import com.nashtech.assignment.data.constants.EAssetStatus;
 import com.nashtech.assignment.data.entities.Asset;
+import com.nashtech.assignment.data.entities.Category;
+import com.nashtech.assignment.dto.response.report.AssetReportResponse;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,14 +25,31 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
             "AND (coalesce(:categoryIds, NULL) IS NULL OR a.category.id IN :categoryIds) " +
             "AND a.location = :location AND a.isDeleted = FALSE")
     Page<Asset> findAllAssetsByQueryAndStatusesAndCategoryIds(
-            @Param("query") String query,
-            @Param("statuses") List<EAssetStatus> statuses,
-            @Param("categoryIds") List<Integer> categoryIds,
-            @Param("location") String location,
-            Pageable pageable);
+                @Param("query") String query,
+                @Param("statuses") List<EAssetStatus> statuses,
+                @Param("categoryIds") List<Integer> categoryIds,
+                @Param("location") String location,
+                Pageable pageable);
 
     Optional<Asset> findByIdAndIsDeletedFalse(long id);
 
     @Query(value = "select * from asset_tbl as a where a.category_id = :categoryId", nativeQuery = true)
     List<Asset> findAssetsByCategoryId(@Param("categoryId") int categoryId);
+
+    List<Asset> findAllByStatusAndLocationAndIsDeletedFalse(EAssetStatus status, String location);
+
+    Page<Asset> findAllByStatusAndLocationAndIsDeletedFalse(EAssetStatus status, String location, Pageable pageable);
+
+    @Query("select sa.category.name as name,count(sa) as count," +
+            " sum(case when sa.status = com.nashtech.assignment.data.constants.EAssetStatus.ASSIGNED then 1 else 0 end) as assigned," +
+            " sum(case when sa.status = com.nashtech.assignment.data.constants.EAssetStatus.AVAILABLE then 1 else 0 end) as available," +
+            " sum(case when sa.status = com.nashtech.assignment.data.constants.EAssetStatus.NOT_AVAILABLE then 1 else 0 end) as notAvailable," +
+            " sum(case when sa.status = com.nashtech.assignment.data.constants.EAssetStatus.WAITING_FOR_RECYCLING then 1 else 0 end) as waitingForRecycling," +
+            " sum(case when sa.status = com.nashtech.assignment.data.constants.EAssetStatus.RECYCLED then 1 else 0 end) as recycling" +
+            " from Asset sa" +
+            " left join sa.category" +
+            " where sa.isDeleted = false" +
+            " group by sa.category.name")
+    List<AssetReportResponse> getAssetReport();
+
 }

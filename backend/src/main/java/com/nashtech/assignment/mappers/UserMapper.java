@@ -15,30 +15,25 @@ import com.nashtech.assignment.dto.response.user.UserResponse;
 @Component
 public class UserMapper {
     public UserResponse mapEntityToResponseDto(User user) {
-        DateTimeFormatter formated = DateTimeFormatter.ofPattern("dd/MM/YYYY");
-        ZoneId defaultZoneId = ZoneId.systemDefault();
-        Instant joinDateInstant = user.getJoinedDate().toInstant();
-        String joinDateFormat = joinDateInstant.atZone(defaultZoneId).toLocalDateTime().format(formated);
-        Instant dateOfBirthInstant = user.getDateOfBirth().toInstant();
-        String dateOfBirthFormat = dateOfBirthInstant.atZone(defaultZoneId).toLocalDateTime().format(formated);
         return UserResponse.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .fullName(user.getFirstName()+" " +user.getLastName())
+                .fullName(user.getFirstName() + " " + user.getLastName())
                 .gender(user.getGender())
-                .joinedDate(joinDateFormat)
-                .dateOfBirth(dateOfBirthFormat)
+                .joinedDate(user.getJoinedDate())
+                .dateOfBirth(user.getDateOfBirth())
                 .staffCode(user.getStaffCode())
                 .location(user.getLocation())
                 .type(user.getType())
                 .build();
     }
 
-    public List<UserResponse> mapListEntityUserResponses(List<User> users){
+    public List<UserResponse> mapListEntityUserResponses(List<User> users) {
         return users.stream()
-        .map(this::mapEntityToResponseDto)
-        .collect(Collectors.toList());
+                .map(this::mapEntityToResponseDto)
+                .collect(Collectors.toList());
     }
 
     public User toUser(CreateNewUserRequest createNewUserRequest) {

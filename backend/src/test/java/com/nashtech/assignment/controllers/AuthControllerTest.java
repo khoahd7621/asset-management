@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
-import com.nashtech.assignment.services.SecurityContextService;
+import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -27,7 +27,7 @@ import com.nashtech.assignment.config.SecurityConfig;
 import com.nashtech.assignment.dto.request.UserLoginRequest;
 import com.nashtech.assignment.dto.response.UserLoginResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
-import com.nashtech.assignment.services.LoginService;
+import com.nashtech.assignment.services.auth.LoginService;
 
 @WebMvcTest(value = AuthController.class)
 @ContextConfiguration(classes = { AssignmentApplication.class, SecurityConfig.class, CORSConfig.class })
@@ -46,7 +46,7 @@ public class AuthControllerTest {
         private SecurityContextService securityContextService;
 
         @Test
-        void testLogin_WhenDataValid_ShouldLoginSuccess() throws Exception {
+        void login_WhenDataValid_ShouldLoginSuccess() throws Exception {
                 UserLoginRequest userLoginRequest = UserLoginRequest.builder()
                         .username("username")
                         .password("123456").build();
@@ -66,7 +66,7 @@ public class AuthControllerTest {
         }
 
         @Test
-        void testLogin_WhenDataInvalid_ShouldReturnException() throws Exception {
+        void login_WhenDataInvalid_ShouldReturnException() throws Exception {
                 UserLoginRequest userLoginRequest = UserLoginRequest.builder()
                         .username("username")
                         .password("123456").build();

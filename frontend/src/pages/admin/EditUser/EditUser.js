@@ -1,21 +1,24 @@
-import { Form, Input, DatePicker, Radio, Select, Button } from 'antd';
+import { Form, Input, DatePicker, Radio, Select, Button, Space, Spin } from 'antd';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { adminRoute } from '../../../routes/routes';
+import { useNavigate, useParams} from 'react-router-dom';
 import { CaretDownOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
+import moment from 'moment';
+
 import './EditUser.scss';
+
+import { adminRoute } from '../../../routes/routes';
 import { CalendarIcon } from '../../../assets/CustomIcon';
 import { postEditUser } from '../../../services/editApiService';
-import moment from 'moment';
 import { removeDataUserLogout } from '../../../redux/slice/userSlice';
+import { getItems } from '../../../services/findApiService';
 
 const EditUser = () => {
-  const location = useLocation();
   const navigate = useNavigate();
+  const params = useParams();
   const [form] = Form.useForm();
   const { Option } = Select;
-  const userDetails = location.state?.userDetails;
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
 
   const joinedDateType = Form.useWatch('joinedDate', form);
@@ -27,12 +30,41 @@ const EditUser = () => {
   const [dateOfBirthValidate, setDateOfBirthValidate] = useState({ ...initialError });
   const [joinedDateValidate, setJoinedDateValidate] = useState({ ...initialError });
   const [isDisabled, setIsDisabled] = useState(true);
-  const dispatch = useDispatch();
+  const [userDetails, setUserDetails] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     document.title = 'Manage User - Edit User';
     window.history.replaceState({}, document.title);
   }, []);
+
+  const decrypt = (salt, encoded) => {
+    const textToChars = (text) => text.split('').map((c) => c.charCodeAt(0));
+    const applySaltToChar = (code) => textToChars(salt).reduce((a, b) => a ^ b, code);
+    return encoded
+      .match(/.{1,2}/g)
+      .map((hex) => parseInt(hex, 16))
+      .map(applySaltToChar)
+      .map((charCode) => String.fromCharCode(charCode))
+      .join('');
+  };
+
+  useEffect(() => {
+    ApiUserDetails();
+  }, []);
+
+  const ApiUserDetails = async () => {
+    setIsLoading(true);
+    const item = await decrypt('salt', params.id);
+    const response = await getItems(`/api/find/get/${item}`);
+    if (response && response.status === 200) {
+      setUserDetails(response.data);
+    }
+  };
+
+  useEffect(() => {
+    if (userDetails?.type) setIsLoading(false);
+  }, [userDetails]);
 
   useEffect(() => {
     if (
@@ -90,7 +122,30 @@ const EditUser = () => {
     setJoinedDateValidate({ ...initialError });
   };
 
-  const handleValidateDateOfBirth = (date, dateString) => {
+  const convertStrDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return (
+      (date.getDate() > 9 ? date.getDate() : '0' + date.getDate()) +
+      '/' +
+      (date.getMonth() > 8 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)) +
+      '/' +
+      date.getFullYear()
+    );
+  };
+
+  useEffect(() => {
+    form.setFieldsValue({
+      firstname: userDetails?.firstName,
+      lastname: userDetails?.lastName,
+      dateOfBirth: moment(userDetails?.dateOfBirth ? convertStrDate(userDetails.dateOfBirth) : '', 'DD/MM/YYYY'),
+      gender: userDetails?.gender,
+      joinedDate: moment(userDetails?.joinedDate ? convertStrDate(userDetails.joinedDate) : '', 'DD/MM/YYYY'),
+      type: userDetails?.type,
+      location: userDetails?.location,
+    });
+  }, [userDetails, form]);
+
+  const handleValidateDateOfBirth = (date, _dateString) => {
     if (date) {
       if (date.diff(new Date(), 'years') > -18) {
         setDateOfBirthValidate({
@@ -113,7 +168,7 @@ const EditUser = () => {
     }
   };
 
-  const handleValidateJoinedDate = (date, dateString) => {
+  const handleValidateJoinedDate = (date, _dateString) => {
     if (date) {
       const dayOfWeek = date.format('dddd');
 
@@ -138,85 +193,85 @@ const EditUser = () => {
   };
 
   return (
-    <div className="edit-user">
-      <h3 className="edit-user__title">Edit User</h3>
-      <Form
-        initialValues={{
-          firstname: userDetails?.firstName,
-          lastname: userDetails?.lastName,
-          dateOfBirth: moment(userDetails?.dateOfBirth, 'DD/MM/YYYY'),
-          gender: userDetails?.gender,
-          joinedDate: moment(userDetails?.joinedDate, 'DD/MM/YYYY'),
-          type: userDetails?.type,
-          location: userDetails?.location,
-        }}
-        form={form}
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 20 }}
-        layout="horizontal"
-        className="edit-user__form"
-        onFinish={handleSubmitEditUser}
-        colon={false}
-      >
-        <Form.Item name="firstname" label="First Name" disable>
-          <Input id="edit-user__first-name" disabled />
-        </Form.Item>
-        <Form.Item name="lastname" label="Last Name" disable>
-          <Input id="edit-user__last-name" disabled />
-        </Form.Item>
-        <Form.Item name="dateOfBirth" label="Date of Birth" help={dateOfBirthValidate.help}>
-          <DatePicker
-            id="edit-user-date-picker__date-of-birth"
-            placeholder="dd/mm/yyyy"
-            format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
-            onChange={handleValidateDateOfBirth}
-            status={dateOfBirthValidate.status}
-            suffixIcon={<CalendarIcon />}
-          />
-        </Form.Item>
-        <Form.Item name="gender" label="Gender">
-          <Radio.Group id="create-user-radio__gender" value={genderType}>
-            <Radio value={'FEMALE'}>Female</Radio>
-            <Radio value={'MALE'}>Male</Radio>
-          </Radio.Group>
-        </Form.Item>
-        <Form.Item name="joinedDate" label="Joined Date" help={joinedDateValidate.help}>
-          <DatePicker
-            id="edit-user-date-picker__joined-date"
-            placeholder="dd/mm/yyyy"
-            format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
-            onChange={handleValidateJoinedDate}
-            status={joinedDateValidate.status}
-            suffixIcon={<CalendarIcon />}
-          />
-        </Form.Item>
-        <Form.Item name="type" label="Type">
-          <Select id="edit-user-select__type" placeholder="" bordered={false} suffixIcon={<CaretDownOutlined />}>
-            <Option value="STAFF">Staff</Option>
-            <Option value="ADMIN">Admin</Option>
-          </Select>
-        </Form.Item>
-        <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues.type !== currentValues.type}>
-          {({ getFieldValue }) =>
-            getFieldValue('type') === 'ADMIN' ? (
-              <Form.Item name="location" label="Location">
-                <Input id="create-user-input__location" disabled />
-              </Form.Item>
-            ) : null
-          }
-        </Form.Item>
-        <Form.Item>
-          <div className="edit-user__form-action">
-            <Button type="primary" danger htmlType="submit" disabled={isDisabled}>
-              Save
-            </Button>
-            <Button htmlType="button" onClick={handleClickClose}>
-              Cancel
-            </Button>
-          </div>
-        </Form.Item>
-      </Form>
-    </div>
+    <>
+      {isLoading ? (
+        <Space size="middle">
+          <Spin size="large" style={{ paddingLeft: '30rem' }} />
+        </Space>
+      ) : (
+        <div className="edit-user">
+          <h3 className="edit-user__title">Edit User</h3>
+          <Form
+            initialValues={{}}
+            form={form}
+            labelCol={{ span: 6 }}
+            wrapperCol={{ span: 20 }}
+            layout="horizontal"
+            className="edit-user__form"
+            onFinish={handleSubmitEditUser}
+            colon={false}
+          >
+            <Form.Item name="firstname" label="First Name" disable>
+              <Input id="edit-user__first-name" disabled />
+            </Form.Item>
+            <Form.Item name="lastname" label="Last Name" disable>
+              <Input id="edit-user__last-name" disabled />
+            </Form.Item>
+            <Form.Item name="dateOfBirth" label="Date of Birth" help={dateOfBirthValidate.help}>
+              <DatePicker
+                id="edit-user-date-picker__date-of-birth"
+                placeholder="dd/mm/yyyy"
+                format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
+                onChange={handleValidateDateOfBirth}
+                status={dateOfBirthValidate.status}
+                suffixIcon={<CalendarIcon />}
+              />
+            </Form.Item>
+            <Form.Item name="gender" label="Gender">
+              <Radio.Group id="create-user-radio__gender" value={genderType}>
+                <Radio value={'FEMALE'}>Female</Radio>
+                <Radio value={'MALE'}>Male</Radio>
+              </Radio.Group>
+            </Form.Item>
+            <Form.Item name="joinedDate" label="Joined Date" help={joinedDateValidate.help}>
+              <DatePicker
+                id="edit-user-date-picker__joined-date"
+                placeholder="dd/mm/yyyy"
+                format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
+                onChange={handleValidateJoinedDate}
+                status={joinedDateValidate.status}
+                suffixIcon={<CalendarIcon />}
+              />
+            </Form.Item>
+            <Form.Item name="type" label="Type">
+              <Select id="edit-user-select__type" placeholder="" bordered={false} suffixIcon={<CaretDownOutlined />}>
+                <Option value="STAFF">Staff</Option>
+                <Option value="ADMIN">Admin</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues.type !== currentValues.type}>
+              {({ getFieldValue }) =>
+                getFieldValue('type') === 'ADMIN' ? (
+                  <Form.Item name="location" label="Location">
+                    <Input id="create-user-input__location" disabled />
+                  </Form.Item>
+                ) : null
+              }
+            </Form.Item>
+            <Form.Item>
+              <div className="edit-user__form-action">
+                <Button type="primary" danger htmlType="submit" disabled={isDisabled}>
+                  Save
+                </Button>
+                <Button htmlType="button" onClick={handleClickClose}>
+                  Cancel
+                </Button>
+              </div>
+            </Form.Item>
+          </Form>
+        </div>
+      )}
+    </>
   );
 };
 

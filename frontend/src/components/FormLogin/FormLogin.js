@@ -128,7 +128,7 @@ const FormLogin = () => {
           span: 18,
         }}
       >
-        <Button disabled={isSending} htmlType="submit">
+        <Button disabled={isSending} htmlType="submit" className='login-button'>
           Login
         </Button>
       </Form.Item>

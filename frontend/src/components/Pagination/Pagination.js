@@ -6,7 +6,7 @@ const CustomPagination = ({ onChange, current = 1, defaultPageSize = 20, total =
   return (
     <Pagination
       className="custom-pagination"
-      showSizeChange={false}
+      showSizeChanger={false}
       onChange={onChange}
       current={current}
       defaultPageSize={defaultPageSize}

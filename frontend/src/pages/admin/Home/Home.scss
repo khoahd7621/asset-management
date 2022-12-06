@@ -6,13 +6,33 @@
   overflow-x: auto;
   overflow-y: auto;
 
+  .check-icon {
+    fill: #cf2338;
+    height: 18px;
+    width: 18px;
+  }
+
+  .decline-icon {
+    height: 16px;
+    width: 16px;
+  }
+
+  .return-icon {
+    transform: rotate(90deg);
+    fill: rgb(79, 79, 231);
+
+    :disabled {
+      fill: gray;
+    }
+  }
+
   .admin-home-block__title {
     font-size: 20px;
     font-weight: bold;
     color: #cf2338;
   }
 
-  .admin-home-block__table {
+  .home-block__table {
     margin-top: 24px;
 
     .table-assignment {

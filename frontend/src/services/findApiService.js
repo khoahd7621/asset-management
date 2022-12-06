@@ -4,7 +4,7 @@ export const getItems = (url) => {
   return axios.get(url);
 };
 
-export const filterAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination = ({
+export const searchAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination = ({
   keyWord,
   statuses,
   categories,
@@ -23,4 +23,24 @@ export const filterAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination = ({
       `sort-field=${sortField}&` +
       `sort-type=${sortType}`,
   );
+};
+
+export const filterAssignmentList = (name, statuses, assigndate, page) => {
+  return axios.get(`/api/assignment?name=${name}&status=${statuses}&date=${assigndate}&page=${page}`);
+};
+
+export const searchUsersWithKeywordAndTypesWithPagination = ({ keyWord, types, limit, page, sortField, sortType }) => {
+  return axios.get(
+    '/api/user/search?' +
+      `key-word=${keyWord}&` +
+      `types=${types}&` +
+      `limit=${limit}&` +
+      `page=${page}&` +
+      `sort-field=${sortField}&` +
+      `sort-type=${sortType}`,
+  );
+};
+
+export const filterRequestList = ({ query, statuses, date, page }) => {
+  return axios.get(`/api/return-asset?query=${query}&statuses=${statuses}&date=${date}&page=${page}`);
 };

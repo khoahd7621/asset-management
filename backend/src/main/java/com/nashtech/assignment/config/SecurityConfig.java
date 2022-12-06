@@ -45,7 +45,7 @@ public class SecurityConfig {
         httpSecurity.csrf().disable().cors();
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         httpSecurity.authorizeHttpRequests()
-                .antMatchers("/api/user/change-password/**")
+                .antMatchers("/api/user/change-password/**", "/api/assignment/user/**", "/api/return-asset/**")
                 .hasAnyAuthority(EUserType.ADMIN.toString(), EUserType.STAFF.toString())
                 .anyRequest().hasAuthority(EUserType.ADMIN.toString());
         httpSecurity.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);

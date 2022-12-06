@@ -6,7 +6,7 @@ import './ManageAsset.scss';
 
 import { FilterMenu, TableAsset } from '../../../components';
 import { adminRoute } from '../../../routes/routes';
-import { filterAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination } from '../../../services/findApiService';
+import { searchAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination } from '../../../services/findApiService';
 import { getAllCategories } from '../../../services/getApiService';
 
 const ManageAsset = () => {
@@ -28,7 +28,6 @@ const ManageAsset = () => {
   useEffect(() => {
     document.title = 'Manage Asset - Asset List';
   }, []);
-
   useEffect(() => {
     setIsLoading(true);
     fetchListCategories();
@@ -44,7 +43,7 @@ const ManageAsset = () => {
   }, []);
 
   const fetchAssets = async (keyWord, statuses, categories, limit, page, sortField, sortType) => {
-    const response = await filterAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination({
+    const response = await searchAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination({
       keyWord,
       statuses,
       categories,
@@ -94,7 +93,7 @@ const ManageAsset = () => {
   };
 
   const fetchListAssets = async (keyWord, statuses, categories, limit, page, sortField, sortType) => {
-    const response = await filterAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination({
+    const response = await searchAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination({
       keyWord,
       statuses,
       categories,

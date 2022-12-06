@@ -1,6 +1,6 @@
 package com.nashtech.assignment.filters;
 
-import com.nashtech.assignment.services.SecurityContextService;
+import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,0 +1,31 @@
+.report {
+    flex: 1;
+    padding: 80px 50px 0 96px;
+
+    .report__title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #cf2338;
+        padding-bottom: 1px;
+    }
+
+    .report__function {
+        .report__button {
+            float: right;
+            margin-top: 10px;
+            width: 4.5rem;
+            height: 2.3rem;
+            color: aliceblue;
+            border-radius: 0.3rem;
+            background-color: #e5273d;
+            margin-bottom: 10px;
+
+            &:hover {
+                color: #fff;
+                background-color: #a8081a;
+                border-color: #a8081a;
+            }
+        }
+    }
+
+}

@@ -3,7 +3,14 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Admin from './layouts/Admin';
 import Login from './layouts/Login';
 import User from './layouts/User';
-import { CreateUser, Home as AdminHome, ManageAsset, ManageUser } from './pages/admin';
+import {
+  CreateAssignment,
+  CreateUser,
+  EditAssignment,
+  Home as AdminHome,
+  ManageAsset,
+  ManageUser,
+} from './pages/admin';
 import CreateAsset from './pages/admin/CreateAsset/CreateAsset';
 import EditAsset from './pages/admin/EditAsset/EditAsset';
 import { Home as UserHome } from './pages/user';
@@ -12,7 +19,10 @@ import AdminPrivateRoute from './routes/AdminPrivateRoute';
 import { adminRoute, userRoute } from './routes/routes';
 import StaffPrivateRoute from './routes/StaffPrivateRoute';
 import CheckFirstLoginRoute from './routes/CheckFirstLoginRoute';
+import ManageAssignment from './pages/admin/ManageAssignment/ManageAssignment';
 import LoginProtectRoute from './routes/LoginProtectRoute';
+import { Report } from './pages/admin/Report/Report';
+import ManageRequestReturn from './pages/admin/ManageRequestReturn/ManageRequestReturn';
 
 const App = () => {
   return (
@@ -70,7 +80,7 @@ const App = () => {
             }
           />
           <Route
-            path={`${adminRoute.manageUser}/${adminRoute.editUser}`}
+            path={`${adminRoute.manageUser}/${adminRoute.editUser}/:id`}
             element={
               <CheckFirstLoginRoute>
                 <EditUser />
@@ -85,7 +95,48 @@ const App = () => {
               </CheckFirstLoginRoute>
             }
           />
+          <Route
+            path={adminRoute.manageAssignment}
+            element={
+              <CheckFirstLoginRoute>
+                <ManageAssignment />
+              </CheckFirstLoginRoute>
+            }
+          />
+          <Route
+            path={`${adminRoute.manageAssignment}/${adminRoute.createAssignment}`}
+            element={
+              <CheckFirstLoginRoute>
+                <CreateAssignment />
+              </CheckFirstLoginRoute>
+            }
+          />
+          <Route
+            path={`${adminRoute.manageAssignment}/${adminRoute.editAssignment}/:id`}
+            element={
+              <CheckFirstLoginRoute>
+                <EditAssignment />
+              </CheckFirstLoginRoute>
+            }
+          />
+          <Route
+            path={adminRoute.requestForReturning}
+            element={
+              <CheckFirstLoginRoute>
+                <ManageRequestReturn />
+              </CheckFirstLoginRoute>
+            }
+          />
+             <Route
+                path={adminRoute.report}
+                element={
+                    <CheckFirstLoginRoute>
+                        <Report />
+                    </CheckFirstLoginRoute>
+                }
+            />
         </Route>
+
         <Route
           path={userRoute.home}
           element={
