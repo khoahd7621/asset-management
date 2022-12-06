@@ -4,6 +4,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -21,12 +26,14 @@ import com.nashtech.assignment.AssignmentApplication;
 import com.nashtech.assignment.config.CORSConfig;
 import com.nashtech.assignment.config.SecurityConfig;
 import com.nashtech.assignment.data.constants.EReturnStatus;
+import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.return_asset.ReturnAssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.services.create.CreateReturnAssetService;
+import com.nashtech.assignment.services.search.SearchReturnAssetService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 
 @WebMvcTest(value = ReturnAssetController.class)
@@ -34,24 +41,30 @@ import com.nashtech.assignment.utils.JwtTokenUtil;
 @AutoConfigureMockMvc(addFilters = false)
 public class ReturnAssetControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-    @MockBean
-    private JwtTokenUtil jwtTokenUtil;
-    @MockBean
-    private SecurityContextService securityContextService;
-    @MockBean
-    private CreateReturnAssetService createReturnAssetService;
-    private NotFoundException notFoundException;
-    private BadRequestException badRequestException;
-    private ForbiddenException forbiddenException;
+        @Autowired
+        private MockMvc mockMvc;
+        @MockBean
+        private JwtTokenUtil jwtTokenUtil;
+        @MockBean
+        private SecurityContextService securityContextService;
+        @MockBean
+        private CreateReturnAssetService createReturnAssetService;
+        @MockBean
+        private SearchReturnAssetService searchReturnAssetService;
 
-    @BeforeEach
-    void setUp() throws Exception {
-        notFoundException = new NotFoundException("error message");
-        badRequestException = new BadRequestException("error message");
-        forbiddenException = new ForbiddenException("error message");
-    }
+        private NotFoundException notFoundException;
+        private BadRequestException badRequestException;
+        private ForbiddenException forbiddenException;
+        private ReturnAssetResponse returnAssetResponse;
+
+        @BeforeEach
+        void setUp() throws Exception {
+                notFoundException = new NotFoundException("error message");
+                badRequestException = new BadRequestException("error message");
+                forbiddenException = new ForbiddenException("error message");
+                returnAssetResponse = ReturnAssetResponse.builder().assetCode("LP0101")
+                                .assetName("Laptop Lenovo 1009").build();
+        }
 
     @Test
     void createReturnAsset_WhenReturnNotFoundException() throws Exception {
@@ -89,21 +102,80 @@ public class ReturnAssetControllerTest {
         assertThat(actual.getContentAsString(), is("{\"message\":\"error message\"}"));
     }
 
-    @Test
-    void createReturnAsset_WhenReturnData() throws Exception {
-        ReturnAssetResponse expected = ReturnAssetResponse.builder()
-                .status(EReturnStatus.WAITING_FOR_RETURNING)
-                .isDeleted(false)
-                .build();
-        when(createReturnAssetService.createReturnAsset(1L)).thenReturn(expected);
+        @Test
+        void createReturnAsset_WhenReturnData() throws Exception {
+                ReturnAssetResponse expected = ReturnAssetResponse.builder()
+                                .status(EReturnStatus.WAITING_FOR_RETURNING)
+                                .isDeleted(false)
+                                .build();
+                when(createReturnAssetService.createReturnAsset(1L)).thenReturn(expected);
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/return-asset").param("id",
-                String.valueOf(1L));
-        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+                RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/return-asset").param("id",
+                                String.valueOf(1L));
+                MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-        assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
-        assertThat(actual.getContentAsString(), is(
-                "{\"id\":0,\"returnedDate\":null,\"status\":\"WAITING_FOR_RETURNING\",\"assetCode\":null,\"assetName\":null,\"acceptByUser\":null,\"requestedByUser\":null,\"deleted\":false}"));
+                assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
+                assertThat(actual.getContentAsString(), is(
+                                "{\"id\":0,\"returnedDate\":null,\"assignedDate\":null,\"status\":\"WAITING_FOR_RETURNING\",\"assetCode\":null,\"assetName\":null,\"acceptByUser\":null,\"requestedByUser\":null,\"deleted\":false}"));
 
-    }
+        }
+
+        @Test
+        void searchReturnAsset_WhenValid_ShouldReturnPaginationRespponseOfAssignAsset()
+                        throws Exception {
+                List<EReturnStatus> status = new ArrayList<>();
+                status = new ArrayList<>();
+                status.add(EReturnStatus.COMPLETED);
+                List<ReturnAssetResponse> returnAssetPage = new ArrayList<>();
+                returnAssetPage.add(returnAssetResponse);
+
+                PaginationResponse<List<ReturnAssetResponse>> paginationResponse = PaginationResponse
+                                .<List<ReturnAssetResponse>>builder()
+                                .data(returnAssetPage).build();
+
+                when(searchReturnAssetService.searchAllReturnAssetsByStateAndReturnedDateAndSearchWithPagination("test",
+                                status,
+                                "11/30/2022", 0)).thenReturn(paginationResponse);
+
+                RequestBuilder requestBuilder = MockMvcRequestBuilders
+                                .get("/api/return-asset").param("query", "test")
+                                .param("statuses", "COMPLETED")
+                                .param("date", "11/30/2022").param("page", "0");
+                MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+                assertThat(result.getResponse().getStatus(),
+                                is(HttpStatus.OK.value()));
+                assertThat(result.getResponse().getContentAsString(), is(
+                                "{\"data\":[{\"id\":0,\"returnedDate\":null,\"assignedDate\":null,\"status\":null,\"assetCode\":\"LP0101\",\"assetName\":\"Laptop Lenovo 1009\",\"acceptByUser\":null,\"requestedByUser\":null,\"deleted\":false}],\"totalPage\":0,\"totalRow\":0}"));
+
+        }
+
+        @Test
+        void searchReturnAsset_WhenDataEmpty_ShouldReturnPaginationResponseWithDataEmpty()
+                        throws Exception {
+                List<EReturnStatus> status = new ArrayList<>();
+                status = new ArrayList<>();
+                status.add(EReturnStatus.COMPLETED);
+                List<ReturnAssetResponse> returnAssetResponses = new ArrayList<>();
+                returnAssetResponses.add(returnAssetResponse);
+
+                PaginationResponse<List<ReturnAssetResponse>> paginationResponse = PaginationResponse
+                                .<List<ReturnAssetResponse>>builder()
+                                .data(Collections.emptyList()).build();
+
+                when(searchReturnAssetService.searchAllReturnAssetsByStateAndReturnedDateAndSearchWithPagination("test",
+                                status,
+                                "11/30/2022", 0)).thenReturn(paginationResponse);
+
+                RequestBuilder requestBuilder = MockMvcRequestBuilders
+                                .get("/api/return-asset").param("query", "test")
+                                .param("statuses", "COMPLETED")
+                                .param("date", "11/30/2022").param("page", "0");
+                MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+                assertThat(result.getResponse().getStatus(),
+                                is(HttpStatus.OK.value()));
+                assertThat(result.getResponse().getContentAsString(),
+                                is("{\"data\":[],\"totalPage\":0,\"totalRow\":0}"));
+        }
 }

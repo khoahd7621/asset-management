@@ -26,66 +26,66 @@ import com.nashtech.assignment.mappers.AssignAssetMapper;
 import com.nashtech.assignment.services.auth.SecurityContextService;
 
 public class SearchAssignAssetServiceImplTest {
-    private SearchAssignAssetServiceImpl searchAssignAssetServiceImpl;
-    private AssignAssetRepository assignAssetRepository;
-    private AssignAssetMapper assignAssetMapper;
-    private SecurityContextService securityContextService;
-    private User user;
+        private SearchAssignAssetServiceImpl searchAssignAssetServiceImpl;
+        private AssignAssetRepository assignAssetRepository;
+        private AssignAssetMapper assignAssetMapper;
+        private SecurityContextService securityContextService;
+        private User user;
 
-    @BeforeEach
-    void setup() {
-        assignAssetRepository = mock(AssignAssetRepository.class);
-        assignAssetMapper = mock(AssignAssetMapper.class);
-        securityContextService = mock(SecurityContextService.class);
-        searchAssignAssetServiceImpl = SearchAssignAssetServiceImpl.builder()
-                .assignAssetRepository(assignAssetRepository)
-                .assignAssetMapper(assignAssetMapper)
-                .securityContextService(securityContextService).build();
-        user = mock(User.class);
-    }
+        @BeforeEach
+        void setup() {
+                assignAssetRepository = mock(AssignAssetRepository.class);
+                assignAssetMapper = mock(AssignAssetMapper.class);
+                securityContextService = mock(SecurityContextService.class);
+                searchAssignAssetServiceImpl = SearchAssignAssetServiceImpl.builder()
+                                .assignAssetRepository(assignAssetRepository)
+                                .assignAssetMapper(assignAssetMapper)
+                                .securityContextService(securityContextService).build();
+                user = mock(User.class);
+        }
 
-    @Test
-    void filterAndSearchAssignAsset_WhenDataValid_ShouldReturnPaginationObject()
-            throws ParseException {
-        String name = "test";
-        String date = "29/11/2022";
-        List<EAssignStatus> eAssignStatus = new ArrayList<>();
-        eAssignStatus.add(EAssignStatus.ACCEPTED);
-        eAssignStatus.add(EAssignStatus.WAITING_FOR_ACCEPTANCE);
-        Pageable page = PageRequest.of(0, 19);
-        Page<AssignAsset> assignAssetPage = mock(Page.class);
-        List<AssignAssetResponse> assignAssetResponses = mock(List.class);
+        @Test
+        void filterAndSearchAssignAsset_WhenDataValid_ShouldReturnPaginationObject()
+                        throws ParseException {
+                String name = "test";
+                String date = "29/11/2022";
+                List<EAssignStatus> eAssignStatus = new ArrayList<>();
+                eAssignStatus.add(EAssignStatus.ACCEPTED);
+                eAssignStatus.add(EAssignStatus.WAITING_FOR_ACCEPTANCE);
+                Pageable page = PageRequest.of(0, 19);
+                Page<AssignAsset> assignAssetPage = mock(Page.class);
+                List<AssignAssetResponse> assignAssetResponses = mock(List.class);
 
-        when(securityContextService.getCurrentUser()).thenReturn(user);
-        when(assignAssetRepository.searchByNameOrStatusOrDateAndLocation(name,
-                eAssignStatus, date, user.getLocation(), page))
-                        .thenReturn(assignAssetPage);
-        when(assignAssetMapper.mapListEntityToDto(assignAssetPage.getContent()))
-                .thenReturn(assignAssetResponses);
+                when(securityContextService.getCurrentUser()).thenReturn(user);
+                when(assignAssetRepository.searchByNameOrStatusOrDateAndLocation(name,
+                                eAssignStatus, date, user.getLocation(), page))
+                                .thenReturn(assignAssetPage);
+                when(assignAssetMapper.mapListEntityToDto(assignAssetPage.getContent()))
+                                .thenReturn(assignAssetResponses);
 
-        PaginationResponse<List<AssignAssetResponse>> acutal = searchAssignAssetServiceImpl
-                .filterAndSearchAssignAsset(name, eAssignStatus, date, 0);
+                PaginationResponse<List<AssignAssetResponse>> acutal = searchAssignAssetServiceImpl
+                                .filterAndSearchAssignAsset(name, eAssignStatus, date, 0);
 
-        assertThat(acutal.getData(), is(assignAssetResponses));
-    }
+                assertThat(acutal.getData(), is(assignAssetResponses));
+        }
 
-    @Test
-    void filterAndSearchAssignAsset_WhenDataEmpty_ShouldReturnEmptyColection()
-            throws ParseException {
-        String name = "test";
-        String date = "29/11/2022";
-        List<EAssignStatus> eAssignStatus = new ArrayList<>();
-        eAssignStatus.add(EAssignStatus.ACCEPTED);
-        eAssignStatus.add(EAssignStatus.WAITING_FOR_ACCEPTANCE);
-        Pageable page = PageRequest.of(0, 19);
+        @Test
+        void filterAndSearchAssignAsset_WhenDataEmpty_ShouldReturnEmptyColection()
+                        throws ParseException {
+                String name = "test";
+                String date = "29/11/2022";
+                List<EAssignStatus> eAssignStatus = new ArrayList<>();
+                eAssignStatus.add(EAssignStatus.ACCEPTED);
+                eAssignStatus.add(EAssignStatus.WAITING_FOR_ACCEPTANCE);
+                Pageable page = PageRequest.of(0, 19);
 
-        when(securityContextService.getCurrentUser()).thenReturn(user);
-        when(assignAssetRepository.searchByNameOrStatusOrDateAndLocation(name,
-                eAssignStatus, date, user.getLocation(), page)).thenReturn(null);
+                when(securityContextService.getCurrentUser()).thenReturn(user);
+                when(assignAssetRepository.searchByNameOrStatusOrDateAndLocation(name,
+                                eAssignStatus, date, user.getLocation(), page)).thenReturn(null);
 
-        PaginationResponse<List<AssignAssetResponse>> acutal = searchAssignAssetServiceImpl
-                .filterAndSearchAssignAsset(name, eAssignStatus, date, 0);
+                PaginationResponse<List<AssignAssetResponse>> acutal = searchAssignAssetServiceImpl
+                                .filterAndSearchAssignAsset(name, eAssignStatus, date, 0);
 
-        assertThat(acutal.getData(), is(Collections.emptyList()));
-    }
+                assertThat(acutal.getData(), is(Collections.emptyList()));
+        }
 }

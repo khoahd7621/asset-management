@@ -21,6 +21,7 @@ import StaffPrivateRoute from './routes/StaffPrivateRoute';
 import CheckFirstLoginRoute from './routes/CheckFirstLoginRoute';
 import ManageAssignment from './pages/admin/ManageAssignment/ManageAssignment';
 import LoginProtectRoute from './routes/LoginProtectRoute';
+import ManageRequestReturn from './pages/admin/ManageRequestReturn/ManageRequestReturn';
 
 const App = () => {
   return (
@@ -114,6 +115,14 @@ const App = () => {
             element={
               <CheckFirstLoginRoute>
                 <EditAssignment />
+              </CheckFirstLoginRoute>
+            }
+          />
+          <Route
+            path={adminRoute.requestForReturning}
+            element={
+              <CheckFirstLoginRoute>
+                <ManageRequestReturn />
               </CheckFirstLoginRoute>
             }
           />

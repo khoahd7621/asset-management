@@ -14,6 +14,7 @@ import lombok.Setter;
 public class ReturnAssetResponse {
     private long id;
     private Date returnedDate;
+    private Date assignedDate;
     private EReturnStatus status;
     private boolean isDeleted;
     private String assetCode;

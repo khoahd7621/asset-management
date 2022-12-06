@@ -40,3 +40,7 @@ export const searchUsersWithKeywordAndTypesWithPagination = ({ keyWord, types, l
       `sort-type=${sortType}`,
   );
 };
+
+export const filterRequestList = ({ query, statuses, date, page }) => {
+  return axios.get(`/api/return-asset?query=${query}&statuses=${statuses}&date=${date}&page=${page}`);
+};
