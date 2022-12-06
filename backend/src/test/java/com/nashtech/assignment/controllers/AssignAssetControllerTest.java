@@ -11,6 +11,7 @@ import java.util.*;
 import com.nashtech.assignment.dto.request.assignment.CreateNewAssignmentRequest;
 import com.nashtech.assignment.dto.request.assignment.EditAssignmentRequest;
 import com.nashtech.assignment.exceptions.BadRequestException;
+import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.services.create.CreateAssignmentService;
 import com.nashtech.assignment.services.edit.EditAssignAssetService;
 import com.nashtech.assignment.services.get.FindAssignAssetService;
@@ -72,6 +73,7 @@ public class AssignAssetControllerTest {
     private Date date;
     private BadRequestException badRequestException;
     private NotFoundException notFoundException;
+    private ForbiddenException forbiddenException;
 
     @BeforeEach()
     void setUp() throws ParseException {
@@ -85,6 +87,7 @@ public class AssignAssetControllerTest {
         date = formatterDate.parse("01/01/2001");
         badRequestException = new BadRequestException("Error message");
         notFoundException = new NotFoundException("Error message");
+        forbiddenException = new ForbiddenException("Error message");
     }
 
     @Test
@@ -352,7 +355,7 @@ public class AssignAssetControllerTest {
     }
 
     @Test
-    void testFindAllAssignAssetByUser_ReturnException() throws Exception {
+    void findAllAssignAssetByUser_ReturnException() throws Exception {
         when(findAssignAssetService.findAssignAssetByUser()).thenThrow(notFoundException);
         
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user");
@@ -364,7 +367,7 @@ public class AssignAssetControllerTest {
     }
 
     @Test
-    void testFindAllAssignAssetByUser_ReturnData() throws Exception {
+    void findAllAssignAssetByUser_ReturnData() throws Exception {
         List<AssignAssetResponse> assignAssets = new ArrayList<>();
         assignAssets.add(assetResponse);
 
@@ -379,7 +382,7 @@ public class AssignAssetControllerTest {
     }
 
     @Test
-    void testViewDetailAssignAsset_ReturnException() throws Exception {
+    void viewDetailAssignAsset_ReturnException() throws Exception {
         when(findAssignAssetService.detailAssignAsset(1L)).thenThrow(notFoundException);
         
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user/{assignAssetId}", 1L);
@@ -391,7 +394,7 @@ public class AssignAssetControllerTest {
     }
 
     @Test
-    void testViewDetailAssignAsset_ReturnData() throws Exception {
+    void viewDetailAssignAsset_ReturnData() throws Exception {
         when(findAssignAssetService.detailAssignAsset(1L)).thenReturn(assetResponse);
         
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user/{assignAssetId}", 1L);
@@ -403,7 +406,7 @@ public class AssignAssetControllerTest {
     }
 
     @Test
-    void testAcceptAssignAsset_WhenReturnData() throws Exception {
+    void acceptAssignAsset_WhenReturnData() throws Exception {
         AssignAssetResponse assignAssetReponse = AssignAssetResponse.builder().status(EAssignStatus.ACCEPTED).build();
         when(editAssignAssetService.acceptAssignAsset(1L)).thenReturn(assignAssetReponse);
 
@@ -416,7 +419,7 @@ public class AssignAssetControllerTest {
     }
 
     @Test
-    void testAcceptAssignAsset_WhenReturnNotFoundException() throws Exception {
+    void acceptAssignAsset_WhenReturnNotFoundException() throws Exception {
         when(editAssignAssetService.acceptAssignAsset(1L)).thenThrow(notFoundException);
         
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/accept/{idAssignAsset}", 1L);
@@ -428,7 +431,7 @@ public class AssignAssetControllerTest {
     }
 
     @Test
-    void testAcceptAssignAsset_WhenReturnBadRequestException() throws Exception {
+    void acceptAssignAsset_WhenReturnBadRequestException() throws Exception {
         when(editAssignAssetService.acceptAssignAsset(1L)).thenThrow(badRequestException);
         
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/accept/{idAssignAsset}", 1L);
@@ -440,7 +443,19 @@ public class AssignAssetControllerTest {
     }
 
     @Test
-    void testDeclineAssignAsset_WhenReturnNotFoundException() throws Exception {
+    void acceptAssignAsset_WhenReturnForbiddenException() throws Exception {
+        when(editAssignAssetService.acceptAssignAsset(1L)).thenThrow(forbiddenException);
+        
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/accept/{idAssignAsset}", 1L);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.FORBIDDEN.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"Error message\"}"));
+    }
+
+    @Test
+    void declineAssignAsset_WhenReturnNotFoundException() throws Exception {
         when(editAssignAssetService.declineAssignAsset(1L)).thenThrow(notFoundException);
         
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/decline/{idAssignAsset}", 1L);
@@ -452,7 +467,7 @@ public class AssignAssetControllerTest {
     }
 
     @Test
-    void testDeclineAssignAsset_WhenReturnBadRequestException() throws Exception {
+    void declineAssignAsset_WhenReturnBadRequestException() throws Exception {
         when(editAssignAssetService.declineAssignAsset(1L)).thenThrow(badRequestException);
         
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/decline/{idAssignAsset}", 1L);
@@ -464,7 +479,19 @@ public class AssignAssetControllerTest {
     }
 
     @Test
-    void testDeclineAssignAsset_WhenReturnData() throws Exception {
+    void declineAssignAsset_WhenReturnForbiddenException() throws Exception {
+        when(editAssignAssetService.declineAssignAsset(1L)).thenThrow(forbiddenException);
+        
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/decline/{idAssignAsset}", 1L);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.FORBIDDEN.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"Error message\"}"));
+    }
+
+    @Test
+    void declineAssignAsset_WhenReturnData() throws Exception {
         AssignAssetResponse assignAssetReponse = AssignAssetResponse.builder().status(EAssignStatus.DECLINED).build();
 
         when(editAssignAssetService.declineAssignAsset(1L)).thenReturn(assignAssetReponse);

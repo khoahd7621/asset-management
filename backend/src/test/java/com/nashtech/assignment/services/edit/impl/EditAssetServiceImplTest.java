@@ -40,7 +40,7 @@ class EditAssetServiceImplTest {
 
 
     @Test
-    void testEditAssetInformation_WhenFindAssetNull_ShouldReturnException() throws NotFoundException {
+    void editAssetInformation_WhenFindAssetNull_ShouldReturnException() throws NotFoundException {
         long idAsset = 1L;
         EditAssetInformationRequest editAssetInformationRequest = EditAssetInformationRequest.builder().build();
 
@@ -53,7 +53,7 @@ class EditAssetServiceImplTest {
     }
 
     @Test
-    void testEditAssetInformation_WhenAssetStatusAssigned_ShouldReturnException() {
+    void editAssetInformation_WhenAssetStatusAssigned_ShouldReturnException() {
         long idAsset = 1L;
         EditAssetInformationRequest editAssetInformationRequest = EditAssetInformationRequest.builder().build();
 
@@ -70,7 +70,7 @@ class EditAssetServiceImplTest {
     }
 
     @Test
-    void testEditAssetInformation_WhenDataValid_ShouldReturnData() throws ParseException {
+    void editAssetInformation_WhenDataValid_ShouldReturnData() throws ParseException {
         long idAsset = 1L;
         EditAssetInformationRequest editAssetInformationRequest = EditAssetInformationRequest.builder()
                 .assetName("assetName")

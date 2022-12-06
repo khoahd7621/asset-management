@@ -162,7 +162,7 @@ class EditAssignAssetServiceImplTest {
     }
 
     @Test
-    void testAcceptAssignAsset_WhenNotFindEntity_WhenReturnException() throws Exception{
+    void acceptAssignAsset_WhenNotFindEntity_WhenReturnException() throws Exception{
         when(assignAssetRepository.findById(1L)).thenReturn(Optional.empty());
 
         NotFoundException actual = assertThrows(NotFoundException.class, () -> {
@@ -173,7 +173,7 @@ class EditAssignAssetServiceImplTest {
     }
 
     @Test
-    void testAcceptAssignAsset_WhenStatusWaiting_WhenReturnException() throws Exception{
+    void acceptAssignAsset_WhenStatusWaiting_WhenReturnException() throws Exception{
         when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
         when(assignAsset.getStatus()).thenReturn(EAssignStatus.ACCEPTED);
 
@@ -185,7 +185,7 @@ class EditAssignAssetServiceImplTest {
     }
 
     @Test
-    void testAcceptAssignAsset_WhenAssignedDateIsAfterToday_WhenReturnException() throws Exception {
+    void acceptAssignAsset_WhenAssignedDateIsAfterToday_WhenReturnException() throws Exception {
         ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
         ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
         when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
@@ -200,7 +200,7 @@ class EditAssignAssetServiceImplTest {
     }
 
     @Test
-    void testAcceptAssignAsset_WhenCurrentUserIsNotMatchAssignToUser_WhenReturnException() throws Exception {
+    void acceptAssignAsset_WhenCurrentUserIsNotMatchAssignToUser_WhenReturnException() throws Exception {
         ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
         ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
         User userAssignedTo = User.builder().id(1L).build();
@@ -220,7 +220,7 @@ class EditAssignAssetServiceImplTest {
     }
 
     @Test
-    void testAcceptAssignAsset_WhenFindEntity_WhenReturnData() throws Exception {
+    void acceptAssignAsset_WhenFindEntity_WhenReturnData() throws Exception {
         ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
         ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
         AssignAssetResponse assignAssetResponse = AssignAssetResponse.builder().status(EAssignStatus.ACCEPTED).build();
@@ -242,7 +242,7 @@ class EditAssignAssetServiceImplTest {
     }
 
     @Test
-    void testDeclineAssignAsset_WhenNotFindEntity_WhenReturnException() throws Exception{
+    void declineAssignAsset_WhenNotFindEntity_WhenReturnException() throws Exception{
         when(assignAssetRepository.findById(1L)).thenReturn(Optional.empty());
 
         NotFoundException actual = assertThrows(NotFoundException.class, () -> {
@@ -253,7 +253,7 @@ class EditAssignAssetServiceImplTest {
     }
 
     @Test
-    void testDeclineAssignAsset_WhenStatusWaiting_WhenReturnException() throws Exception{
+    void declineAssignAsset_WhenStatusWaiting_WhenReturnException() throws Exception{
         when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
         when(assignAsset.getStatus()).thenReturn(EAssignStatus.ACCEPTED);
 
@@ -265,7 +265,7 @@ class EditAssignAssetServiceImplTest {
     }
 
     @Test
-    void testDeclineAssignAsset_WhenAssignedDateIsAfterToday_WhenReturnException() throws Exception {
+    void declineAssignAsset_WhenAssignedDateIsAfterToday_WhenReturnException() throws Exception {
         ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
         ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
         when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
@@ -280,7 +280,7 @@ class EditAssignAssetServiceImplTest {
     }
 
     @Test
-    void testDeclineAssignAsset_WhenCurrentUserIsNotMatchAssignToUser_WhenReturnException() throws Exception {
+    void declineAssignAsset_WhenCurrentUserIsNotMatchAssignToUser_WhenReturnException() throws Exception {
         ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
         ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
         User userAssignedTo = User.builder().id(1L).build();
@@ -300,7 +300,7 @@ class EditAssignAssetServiceImplTest {
     }
 
     @Test
-    void testDeclineAssignAsset_WhenFindEntity_WhenReturnData() throws Exception {
+    void declineAssignAsset_WhenFindEntity_WhenReturnData() throws Exception {
         ArgumentCaptor<Date> todayCaptor = ArgumentCaptor.forClass(Date.class);
         ArgumentCaptor<Date> assignedDateCaptor = ArgumentCaptor.forClass(Date.class);
         AssignAssetResponse assignAssetResponse = AssignAssetResponse.builder().status(EAssignStatus.DECLINED).build();

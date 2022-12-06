@@ -172,7 +172,7 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void testChangePasswordFirst_WhenPasswordNoChange_ShouldReturnException() throws Exception {
+    void changePasswordFirst_WhenPasswordNoChange_ShouldReturnException() throws Exception {
         ChangePasswordFirstRequest changePasswordFirstRequest = ChangePasswordFirstRequest.builder().build();
 
         when(securityContextService.getCurrentUser()).thenReturn(user);
@@ -187,7 +187,7 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void testChangePasswordFirst_WhenDataValid_ShouldReturnData() throws Exception {
+    void changePasswordFirst_WhenDataValid_ShouldReturnData() throws Exception {
         ChangePasswordFirstRequest changePasswordFirstRequest = ChangePasswordFirstRequest.builder()
                 .newPassword("123456").build();
         ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
@@ -206,7 +206,7 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void testChangePassword_WhenPasswordIncorrect_ShouldReturnException() throws Exception {
+    void changePassword_WhenPasswordIncorrect_ShouldReturnException() throws Exception {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder().build();
 
         when(securityContextService.getCurrentUser()).thenReturn(user);
@@ -221,7 +221,7 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void testChangePassword_WhenPasswordNoChange_ShouldReturnException() throws Exception {
+    void changePassword_WhenPasswordNoChange_ShouldReturnException() throws Exception {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest
                 .builder()
                 .oldPassword("123456")
@@ -238,7 +238,7 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void testChangePassword_WhenPasswordSameGenerated_ShouldReturnException() throws Exception {
+    void changePassword_WhenPasswordSameGenerated_ShouldReturnException() throws Exception {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest
                 .builder()
                 .oldPassword("123456")
@@ -258,7 +258,7 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void testChangePassword_WhenDataVaid_ShouldReturnData() throws Exception {
+    void changePassword_WhenDataVaid_ShouldReturnData() throws Exception {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest
                 .builder()
                 .oldPassword("123456")

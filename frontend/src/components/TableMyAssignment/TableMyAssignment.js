@@ -6,15 +6,18 @@ import './TableMyAssignment.scss';
 import { getAllMyAssignAsset, getAssignAssetDetails } from '../../services/getApiService';
 import { putAcceptAssignAsset, putDeclineAssignAsset } from '../../services/editApiService';
 import FirstPasswordModal from '../FirstPasswordModal/FirstPasswordModal';
+import { postCreateNewRequestReturn } from '../../services/createApiService';
 
 const TableMyAssignment = () => {
   const [isShowModalAssignAssetDetail, setIsShowModalAssignAssetDetail] = useState(false);
   const [data, setData] = useState([]);
   const [modalData, setModalData] = useState({});
+  const [confirmPopUp, setConfirmPopUp] = useState(false);
   const [declinePopUp, setDeclinePopUp] = useState(false);
   const [acceptPopUp, setAcceptPopUp] = useState(false);
   const [idAccept, setIdAccept] = useState();
   const [idDecline, setIdDecline] = useState();
+  const [idRequest, setIdRequest] = useState();
 
   useEffect(() => {
     fetchGetMyAssignAsset();
@@ -50,6 +53,19 @@ const TableMyAssignment = () => {
         }),
       );
     }
+  };
+
+  const onClickToReturn = async () => {
+    const response = await postCreateNewRequestReturn({ idRequest });
+    if (response && response.status === 200) {
+      fetchGetMyAssignAsset();
+    }
+    setConfirmPopUp(false);
+  };
+
+  const onclickShowReturn = (idAssign) => {
+    setIdRequest(idAssign);
+    setConfirmPopUp(true);
   };
 
   const onClickToAccept = async () => {
@@ -206,7 +222,11 @@ const TableMyAssignment = () => {
             >
               <CloseOutlined />
             </button>
-            <button className="return-btn" disabled={record.state === 'Waiting for acceptance'}>
+            <button
+              className="return-btn"
+              disabled={record.state === 'Waiting for acceptance'}
+              onClick={() => onclickShowReturn(record.assignAssetId)}
+            >
               <UndoOutlined />
             </button>
           </div>
@@ -229,6 +249,19 @@ const TableMyAssignment = () => {
         />
       </div>
       <FirstPasswordModal />
+      <Modal
+        open={confirmPopUp}
+        className="user-list__disable-modal"
+        title={'Are you sure?'}
+        centered
+        onOk={onClickToReturn}
+        onCancel={() => setConfirmPopUp(false)}
+        okText="Yes"
+        cancelText="No"
+        closable={false}
+      >
+        <p>Do you want to create a returning request for this asset?</p>
+      </Modal>
       <Modal
         open={acceptPopUp}
         className="user-list__disable-modal"

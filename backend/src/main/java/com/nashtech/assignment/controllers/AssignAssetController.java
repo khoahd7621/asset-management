@@ -6,6 +6,7 @@ import com.nashtech.assignment.dto.request.assignment.EditAssignmentRequest;
 import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.assignment.AssignAssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
+import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.services.create.CreateAssignmentService;
 import com.nashtech.assignment.services.edit.EditAssignAssetService;
@@ -49,6 +50,8 @@ public class AssignAssetController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class)) }),
             @ApiResponse(responseCode = "400", description = "Assignment is not waiting for acceptance", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) }),
+            @ApiResponse(responseCode = "403", description = "Current user is not match to this assignment ", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ForbiddenException.class)) }),
             @ApiResponse(responseCode = "404", description = "Assignment not found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) }) })
     @PutMapping("/user/accept/{id}")
@@ -62,6 +65,8 @@ public class AssignAssetController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = AssignAssetResponse.class)) }),
             @ApiResponse(responseCode = "400", description = "Assignment is not waiting for acceptance", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) }),
+            @ApiResponse(responseCode = "403", description = "Current user is not match to this assignment ", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ForbiddenException.class)) }),
             @ApiResponse(responseCode = "404", description = "Assignment not found", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) }) })
     @PutMapping("/user/decline/{id}")

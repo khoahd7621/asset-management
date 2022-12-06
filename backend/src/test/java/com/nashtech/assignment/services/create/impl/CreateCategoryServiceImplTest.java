@@ -37,7 +37,7 @@ class CreateCategoryServiceImplTest {
 
 
     @Test
-    void testCreateNewCategory_WhenCategoryNameExisted_ShouldReturnException() {
+    void createNewCategory_WhenCategoryNameExisted_ShouldReturnException() {
         CreateNewCategoryRequest createNewCategoryRequest = CreateNewCategoryRequest.builder()
                 .categoryName("categoryName")
                 .prefixAssetCode("CN")
@@ -53,7 +53,7 @@ class CreateCategoryServiceImplTest {
     }
 
     @Test
-    void testCreateNewCategory_WhenAssetCodeExisted_ShouldReturnException() {
+    void createNewCategory_WhenAssetCodeExisted_ShouldReturnException() {
         CreateNewCategoryRequest createNewCategoryRequest = CreateNewCategoryRequest.builder()
                 .categoryName("categoryName")
                 .prefixAssetCode("CN")
@@ -70,7 +70,7 @@ class CreateCategoryServiceImplTest {
     }
 
     @Test
-    void testCreateNewCategory_WhenDataValid_ShouldReturnData() throws BadRequestException {
+    void createNewCategory_WhenDataValid_ShouldReturnData() throws BadRequestException {
         CreateNewCategoryRequest createNewCategoryRequest = CreateNewCategoryRequest.builder()
                 .categoryName("categoryName")
                 .prefixAssetCode("CN")

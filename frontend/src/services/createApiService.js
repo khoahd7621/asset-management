@@ -38,4 +38,14 @@ const createNewAssignment = ({ assetId, userId, assignedDate, note }) => {
   });
 };
 
-export { postCreateNewUser, postCreateNewCategory, postCreateNewAsset, createNewAssignment };
+const postCreateNewRequestReturn = ({ idRequest }) => {
+  return axios.post('/api/return-asset?id=' + `${idRequest}`);
+};
+
+export {
+  postCreateNewUser,
+  postCreateNewCategory,
+  postCreateNewAsset,
+  createNewAssignment,
+  postCreateNewRequestReturn,
+};

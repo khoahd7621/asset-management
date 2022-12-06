@@ -37,10 +37,10 @@ public interface AssignAssetRepository extends JpaRepository<AssignAsset, Long> 
 
     Optional<AssignAsset> findByIdAndIsDeletedFalse(long id);
 
-    @Query(value = "select * from assign_asset_tbl as a where a.assigned_to_user_id = :userId and a.is_deleted = :isDeleted and a.status != :status", nativeQuery = true)
+    @Query(value = "SELECT a FROM AssignAsset as a WHERE a.userAssignedTo.id = :userId AND a.isDeleted = :isDeleted AND a.status != :status")
     public List<AssignAsset> findAllAssignAssetByUser(@Param("userId") Long userId,
-            @Param("isDeleted") Boolean isDeleted, @Param("status") String status);
+            @Param("isDeleted") Boolean isDeleted, @Param("status") EAssignStatus status);
 
-    @Query(value = "select * from assign_asset_tbl as a where a.id = :id and a.assigned_to_user_id = :userId", nativeQuery = true)
+    @Query(value = "SELECT a FROM AssignAsset as a WHERE a.id = :id AND a.userAssignedTo.id = :userId")
     Optional<AssignAsset> findByIdAndUser(@Param("id") Long id, @Param("userId") Long userId);
 }

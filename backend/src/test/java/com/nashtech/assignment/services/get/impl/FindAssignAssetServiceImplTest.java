@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nashtech.assignment.data.constants.EAssignStatus;
 import com.nashtech.assignment.data.entities.AssignAsset;
 import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.data.repositories.AssignAssetRepository;
@@ -39,7 +40,7 @@ public class FindAssignAssetServiceImplTest {
     }
 
     @Test
-    void testDetailAssignAsset_WhenAssignAssetEmpty_ShouldReturnException() {
+    void detailAssignAsset_WhenAssignAssetEmpty_ShouldReturnException() {
         User user = mock(User.class);
 
         when(securityContextService.getCurrentUser()).thenReturn(user);
@@ -52,7 +53,7 @@ public class FindAssignAssetServiceImplTest {
     }
 
     @Test
-    void testDetailAssignAsset_WhenAssignAssetNotEmpty_ShouldReturnException() {
+    void detailAssignAsset_WhenAssignAssetNotEmpty_ShouldReturnException() {
         User user = mock(User.class);
 
         when(securityContextService.getCurrentUser()).thenReturn(user);
@@ -67,11 +68,11 @@ public class FindAssignAssetServiceImplTest {
     }
 
     @Test
-    void testFindAssignAssetByUser_WhenFindNull_ShouldReturnException() {
+    void findAssignAssetByUser_WhenFindNull_ShouldReturnException() {
         User user = mock(User.class);
 
         when(securityContextService.getCurrentUser()).thenReturn(user);
-        when(assignAssetRepository.findAllAssignAssetByUser(user.getId(), false, "DECLINED"))
+        when(assignAssetRepository.findAllAssignAssetByUser(user.getId(), false, EAssignStatus.DECLINED))
                 .thenReturn(Collections.emptyList());
 
         NotFoundException actualException = Assertions.assertThrows(NotFoundException.class,
@@ -82,13 +83,13 @@ public class FindAssignAssetServiceImplTest {
     }
 
     @Test
-    void testFindAssignAssetByUser_WhenFindNotNull_ShouldReturnData() {
+    void findAssignAssetByUser_WhenFindNotNull_ShouldReturnData() {
         List<AssignAssetResponse> expected = mock(List.class);
         List<AssignAsset> assignAssets = mock(List.class);
         User user = mock(User.class);
 
         when(securityContextService.getCurrentUser()).thenReturn(user);
-        when(assignAssetRepository.findAllAssignAssetByUser(user.getId(), false, "DECLINED")).thenReturn(assignAssets);
+        when(assignAssetRepository.findAllAssignAssetByUser(user.getId(), false, EAssignStatus.DECLINED)).thenReturn(assignAssets);
         when(assignAssetMapper.mapListEntityToDto(assignAssets)).thenReturn(expected);
 
         List<AssignAssetResponse> actual = findAssignAssetImpl.findAssignAssetByUser();

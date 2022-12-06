@@ -53,7 +53,7 @@ class CreateAssetServiceImplTest {
     }
 
     @Test
-    void testCreateAssetResponse_WhenDataValid_ShouldReturnData() throws ParseException {
+    void createAssetResponse_WhenDataValid_ShouldReturnData() throws ParseException {
         String prefixAssetCode = "CN";
         User currentUser = User.builder().staffCode("currentUser").build();
 

@@ -307,7 +307,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testChangePassword_WhenPasswordNoChangeOrIncorrect_ShouldReturnException() throws Exception {
+    void changePassword_WhenPasswordNoChangeOrIncorrect_ShouldReturnException() throws Exception {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder()
                 .oldPassword("123456")
                 .newPassword("123456").build();
@@ -328,7 +328,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testChangePassword_WhenDataValid_ShouldReturnData() throws Exception {
+    void changePassword_WhenDataValid_ShouldReturnData() throws Exception {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder()
                 .oldPassword("123456")
                 .newPassword("654321").build();
@@ -355,7 +355,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testChangePasswordFirst_WhenPasswordNoChange_ShouldReturnException() throws Exception {
+    void changePasswordFirst_WhenPasswordNoChange_ShouldReturnException() throws Exception {
         ChangePasswordFirstRequest changeFirstRequest = ChangePasswordFirstRequest.builder().newPassword("123456")
                 .build();
 
@@ -375,7 +375,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testChangePasswordFirst_WhenDataValid_ShouldReturnData() throws Exception {
+    void changePasswordFirst_WhenDataValid_ShouldReturnData() throws Exception {
         ChangePasswordFirstRequest changeFirstRequest = ChangePasswordFirstRequest.builder()
                 .newPassword("654f321").build();
 
@@ -399,7 +399,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void testGetAllUsers_ShouldReturnData() throws Exception {
+    void getAllUsers_ShouldReturnData() throws Exception {
         UserResponse userResponse = UserResponse.builder()
                 .username("username")
                 .staffCode("staffCode")

@@ -46,7 +46,7 @@ public class AuthControllerTest {
         private SecurityContextService securityContextService;
 
         @Test
-        void testLogin_WhenDataValid_ShouldLoginSuccess() throws Exception {
+        void login_WhenDataValid_ShouldLoginSuccess() throws Exception {
                 UserLoginRequest userLoginRequest = UserLoginRequest.builder()
                         .username("username")
                         .password("123456").build();
@@ -66,7 +66,7 @@ public class AuthControllerTest {
         }
 
         @Test
-        void testLogin_WhenDataInvalid_ShouldReturnException() throws Exception {
+        void login_WhenDataInvalid_ShouldReturnException() throws Exception {
                 UserLoginRequest userLoginRequest = UserLoginRequest.builder()
                         .username("username")
                         .password("123456").build();

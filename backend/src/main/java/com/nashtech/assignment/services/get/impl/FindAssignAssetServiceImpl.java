@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.nashtech.assignment.data.constants.EAssignStatus;
 import com.nashtech.assignment.data.entities.AssignAsset;
 import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.data.repositories.AssignAssetRepository;
@@ -31,7 +32,7 @@ public class FindAssignAssetServiceImpl implements FindAssignAssetService {
     public List<AssignAssetResponse> findAssignAssetByUser() {
         User user = securityContextService.getCurrentUser();
         List<AssignAsset> assignAssets = assignAssetRepository.findAllAssignAssetByUser(user.getId(), false,
-                "DECLINED");
+                EAssignStatus.DECLINED);
         if (assignAssets == null || assignAssets.isEmpty()) {
             throw new NotFoundException("User doesn't assign asset");
         }

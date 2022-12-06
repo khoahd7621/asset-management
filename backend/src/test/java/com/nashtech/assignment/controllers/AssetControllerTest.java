@@ -188,7 +188,7 @@ class AssetControllerTest {
     }
 
     @Test
-    void testEditAssetInformation_WhenDataValid_ShouldReturnReponse() throws Exception {
+    void editAssetInformation_WhenDataValid_ShouldReturnReponse() throws Exception {
         EditAssetInformationRequest editAssetInformationRequest = EditAssetInformationRequest.builder()
                 .assetName("assetName")
                 .specification("assetSpecification")
@@ -221,7 +221,7 @@ class AssetControllerTest {
     }
 
     @Test
-    void testEditAssetInformation_WhenAssetNotFound_ShouldReturnException() throws Exception {
+    void editAssetInformation_WhenAssetNotFound_ShouldReturnException() throws Exception {
         EditAssetInformationRequest editAssetInformationRequest = EditAssetInformationRequest.builder()
                 .assetName("assetName")
                 .specification("assetSpecification")
@@ -248,7 +248,7 @@ class AssetControllerTest {
     }
 
     @Test
-    void testEditAssetInformation_WhenAssetHaveStatusAssigned_ShouldReturnException() throws Exception {
+    void editAssetInformation_WhenAssetHaveStatusAssigned_ShouldReturnException() throws Exception {
         EditAssetInformationRequest editAssetInformationRequest = EditAssetInformationRequest.builder()
                 .assetName("assetName")
                 .specification("assetSpecification")
@@ -275,7 +275,7 @@ class AssetControllerTest {
     }
 
     @Test
-    void testCreateAssetResponse_WhenDataValid_ShouldReturnData() throws Exception {
+    void createAssetResponse_WhenDataValid_ShouldReturnData() throws Exception {
         CreateNewAssetRequest request = CreateNewAssetRequest
                 .builder()
                 .assetName("assetName")
@@ -309,7 +309,7 @@ class AssetControllerTest {
     }
 
     @Test
-    void testCheckAssetIsValidForDeleteOrNot_WhenAssetIdExistAndValidForDelete_ShouldReturnNoContent() throws Exception {
+    void checkAssetIsValidForDeleteOrNot_WhenAssetIdExistAndValidForDelete_ShouldReturnNoContent() throws Exception {
         long assetId = 1L;
 
         doNothing().when(getAssetService).checkAssetIsValidForDeleteOrNot(assetId);
@@ -321,7 +321,7 @@ class AssetControllerTest {
     }
 
     @Test
-    void testCheckAssetIsValidForDeleteOrNot_WhenAssetIdNotExist_ShouldThrowNotFoundException() throws Exception {
+    void checkAssetIsValidForDeleteOrNot_WhenAssetIdNotExist_ShouldThrowNotFoundException() throws Exception {
         long assetId = 1L;
 
         doThrow(notFoundException).when(getAssetService).checkAssetIsValidForDeleteOrNot(assetId);
@@ -334,7 +334,7 @@ class AssetControllerTest {
     }
 
     @Test
-    void testCheckAssetIsValidForDeleteOrNot_WhenAssetIdExistButNotValidForDelete_ShouldThrowBadRequestException() throws Exception {
+    void checkAssetIsValidForDeleteOrNot_WhenAssetIdExistButNotValidForDelete_ShouldThrowBadRequestException() throws Exception {
         long assetId = 1L;
 
         doThrow(badRequestException).when(getAssetService).checkAssetIsValidForDeleteOrNot(assetId);
