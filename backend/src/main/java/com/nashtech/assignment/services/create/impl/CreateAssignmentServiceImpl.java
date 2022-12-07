@@ -19,6 +19,8 @@ import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Service
@@ -39,9 +41,10 @@ public class CreateAssignmentServiceImpl implements CreateAssignmentService {
     private ValidationUserService validationUserService;
 
     @Override
-    public AssignAssetResponse createNewAssignment(CreateNewAssignmentRequest createNewAssignmentRequest) {
+    public AssignAssetResponse createNewAssignment(CreateNewAssignmentRequest createNewAssignmentRequest) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date today = new Date();
-        Date assignedDate = createNewAssignmentRequest.getAssignedDate();
+        Date assignedDate = dateFormat.parse(createNewAssignmentRequest.getAssignedDate());
         if (compareDateUtil.isAfter(today, assignedDate)) {
             throw new BadRequestException("Assign date is before today.");
         }
@@ -53,7 +56,7 @@ public class CreateAssignmentServiceImpl implements CreateAssignmentService {
         asset.setStatus(EAssetStatus.ASSIGNED);
         AssignAsset assignAsset = AssignAsset.builder()
                 .asset(asset)
-                .assignedDate(createNewAssignmentRequest.getAssignedDate())
+                .assignedDate(assignedDate)
                 .userAssignedBy(currentUser)
                 .userAssignedTo(userAssignedTo)
                 .status(EAssignStatus.WAITING_FOR_ACCEPTANCE)

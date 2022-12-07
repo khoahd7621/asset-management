@@ -89,7 +89,7 @@ const EditAssignment = () => {
     const payload = {
       assetId: currentAsset.assetId,
       userId: currentUser.userId,
-      assignedDate: assignedDate.utc().format('YYYY-MM-DD'),
+      assignedDate: assignedDate.format('DD/MM/YYYY'),
       note,
     };
     const response = await putEditAssignment(params.id, payload);
