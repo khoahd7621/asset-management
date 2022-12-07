@@ -137,10 +137,20 @@ const Navbar = () => {
       });
       setOpenChangeSuccess(true);
     } else {
-      setOldPasswordValidator({
-        help: '',
-        status: 'error',
-      });
+      if (
+        response.response.data.message ===
+        'newPassword:The password must contain at least 6 characters and be up to 24 characters'
+      ) {
+        setNewPasswordValidate({
+          help: '',
+          status: 'error',
+        });
+      } else {
+        setOldPasswordValidator({
+          help: '',
+          status: 'error',
+        });
+      }
     }
   };
 
