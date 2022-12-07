@@ -94,6 +94,10 @@ public class EditAssignAssetServiceImpl implements EditAssignAssetService {
 
         assignAssetOpt.get().setStatus(EAssignStatus.DECLINED);
         assignAssetRepository.save(assignAssetOpt.get());
+        Asset asset = assignAssetOpt.get().getAsset();
+        asset.setStatus(EAssetStatus.AVAILABLE);
+        assetRepository.save(asset);
+
         return assignAssetMapper.toAssignAssetResponse(assignAssetOpt.get());
     }
 

@@ -23,7 +23,7 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
       render: (text, _record) => {
         return <div className="col-btn">{text}</div>;
       },
-      sorter: (a, b) => a.assetCode.localeCompare(b.assetCode),
+      sorter: (a, b) => a.no - b.no,
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {

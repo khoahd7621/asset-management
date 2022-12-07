@@ -5,6 +5,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +74,7 @@ public class FindAssignAssetServiceImplTest {
         User user = mock(User.class);
 
         when(securityContextService.getCurrentUser()).thenReturn(user);
-        when(assignAssetRepository.findAllAssignAssetByUser(user.getId(), false, EAssignStatus.DECLINED))
+        when(assignAssetRepository.findAllAssignAssetByUser(user.getId(), false, EAssignStatus.DECLINED, ""))
                 .thenReturn(Collections.emptyList());
 
         NotFoundException actualException = Assertions.assertThrows(NotFoundException.class,
@@ -87,9 +89,12 @@ public class FindAssignAssetServiceImplTest {
         List<AssignAssetResponse> expected = mock(List.class);
         List<AssignAsset> assignAssets = mock(List.class);
         User user = mock(User.class);
-
+        LocalDate date = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
         when(securityContextService.getCurrentUser()).thenReturn(user);
-        when(assignAssetRepository.findAllAssignAssetByUser(user.getId(), false, EAssignStatus.DECLINED)).thenReturn(assignAssets);
+        when(assignAssetRepository.findAllAssignAssetByUser(user.getId(), false, EAssignStatus.DECLINED,
+                formatter.format(date)))
+                .thenReturn(assignAssets);
         when(assignAssetMapper.mapListEntityToDto(assignAssets)).thenReturn(expected);
 
         List<AssignAssetResponse> actual = findAssignAssetImpl.findAssignAssetByUser();

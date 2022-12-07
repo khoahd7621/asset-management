@@ -1,5 +1,9 @@
 package com.nashtech.assignment.services.get.impl;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,8 +35,10 @@ public class FindAssignAssetServiceImpl implements FindAssignAssetService {
     @Override
     public List<AssignAssetResponse> findAssignAssetByUser() {
         User user = securityContextService.getCurrentUser();
+        LocalDate date = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
         List<AssignAsset> assignAssets = assignAssetRepository.findAllAssignAssetByUser(user.getId(), false,
-                EAssignStatus.DECLINED);
+                EAssignStatus.DECLINED, formatter.format(date));
         if (assignAssets == null || assignAssets.isEmpty()) {
             throw new NotFoundException("User doesn't assign asset");
         }
