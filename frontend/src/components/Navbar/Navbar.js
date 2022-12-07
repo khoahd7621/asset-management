@@ -145,9 +145,15 @@ const Navbar = () => {
           help: '',
           status: 'error',
         });
+      }
+      if (response.response.data.message === 'Password no change') {
+        setNewPasswordValidate({
+          help: '',
+          status: 'error',
+        });
       } else {
         setOldPasswordValidator({
-          help: '',
+          help: 'Password is incorrect',
           status: 'error',
         });
       }
