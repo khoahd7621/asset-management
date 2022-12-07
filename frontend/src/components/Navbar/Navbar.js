@@ -137,31 +137,29 @@ const Navbar = () => {
       });
       setOpenChangeSuccess(true);
     } else {
-      setOldPasswordValidator({
-        help: '',
-        status: 'error',
-      });
+      if (
+        response.response.data.message ===
+        'newPassword:The password must contain at least 6 characters and be up to 24 characters'
+      ) {
+        setNewPasswordValidate({
+          help: '',
+          status: 'error',
+        });
+      } else {
+        setOldPasswordValidator({
+          help: '',
+          status: 'error',
+        });
+      }
     }
   };
 
-  const items = [
-    {
-      key: 'change-password-btn',
-      label: (
-        <span id="change-password-btn" onClick={handleChangePassword}>
-          Change Password
-        </span>
-      ),
-    },
-    {
-      key: 'logout-btn',
-      label: (
-        <span id="logout-btn" onClick={handleSelectLogout}>
-          Logout
-        </span>
-      ),
-    },
-  ];
+  const menu = (
+    <Menu>
+      <Menu.Item onClick={handleChangePassword}>Change Password</Menu.Item>
+      <Menu.Item onClick={handleSelectLogout}>Logout</Menu.Item>
+    </Menu>
+  );
 
   const [listTitles, setListTitles] = useState([{ title: '', link: '' }]);
   const user = useSelector((state) => state.user.user);
@@ -258,7 +256,7 @@ const Navbar = () => {
           })}
       </div>
       <div className="navbar-header__right">
-        <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
+        <Dropdown overlay={menu} trigger={['click']} placement="bottomRight">
           <a id="username-btn" onClick={(e) => e.preventDefault()}>
             <Space>
               {user.username} <CaretDownOutlined />

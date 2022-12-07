@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button, DatePicker, Form, Input, Radio, Select } from 'antd';
 import moment from 'moment';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import './CreateUser.scss';
 
-import { postCreateNewUser } from '../../../services/createApiService';
 import { adminRoute } from '../../../routes/routes';
-import { toast } from 'react-toastify';
+import { postCreateNewUser } from '../../../services/createApiService';
 
 const CreateUser = () => {
   const navigate = useNavigate();
@@ -78,9 +77,6 @@ const CreateUser = () => {
           userResponse: response.data,
         },
       });
-      toast.success('Create new user successfully');
-    } else {
-      toast.error(response.message);
     }
     setIsDisabled(false);
   };

@@ -45,7 +45,7 @@ const TableMyAssignment = () => {
       setData(
         response?.data?.map((item) => {
           return {
-            key: item.assetCode,
+            key: item.id,
             assignAssetId: item.id,
             assetCode: item.assetCode,
             assetName: item.assetName.replaceAll(' ', '\u00a0'),

@@ -67,7 +67,7 @@ public class ReturnAssetControllerTest {
         }
 
     @Test
-    void createReturnAsset_WhenReturnNotFoundException() throws Exception {
+    void createReturnAsset_WhenAssignNotFound_ShouldReturnNotFoundException() throws Exception {
         when(createReturnAssetService.createReturnAsset(1L)).thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/return-asset").param("id",
@@ -79,7 +79,7 @@ public class ReturnAssetControllerTest {
     }
 
     @Test
-    void createReturnAsset_WhenReturnBadRequestException() throws Exception {
+    void createReturnAsset_WhenAssignInvalid_ShoulReturnBadRequestException() throws Exception {
         when(createReturnAssetService.createReturnAsset(1L)).thenThrow(badRequestException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/return-asset").param("id",
@@ -91,7 +91,7 @@ public class ReturnAssetControllerTest {
     }
 
     @Test
-    void createReturnAsset_WhenReturnForbiddenException() throws Exception {
+    void createReturnAsset_WhenUserNotMatch_ShouldReturnForbiddenException() throws Exception {
         when(createReturnAssetService.createReturnAsset(1L)).thenThrow(forbiddenException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/return-asset").param("id",
@@ -103,7 +103,7 @@ public class ReturnAssetControllerTest {
     }
 
         @Test
-        void createReturnAsset_WhenReturnData() throws Exception {
+        void createReturnAsset_WhenDataValid_ShouldReturnData() throws Exception {
                 ReturnAssetResponse expected = ReturnAssetResponse.builder()
                                 .status(EReturnStatus.WAITING_FOR_RETURNING)
                                 .isDeleted(false)
