@@ -57,7 +57,7 @@ class SearchUserServiceImplTest {
         List<UserResponse> users = mock(List.class);
 
         when(userRepository.findByLocationAndTypeAndIsDeletedFalseOrderByFirstNameAsc("HCM", EUserType.ADMIN, pageable)).thenReturn(page);
-        when(userMapper.mapListEntityUserResponses(page.getContent())).thenReturn(users);
+        when(userMapper.toListUserResponses(page.getContent())).thenReturn(users);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl.filterByType(EUserType.ADMIN, 0, "HCM");
 
@@ -71,7 +71,7 @@ class SearchUserServiceImplTest {
         List<UserResponse> users = mock(List.class);
 
         when(userRepository.findByLocationAndTypeAndIsDeletedFalseOrderByFirstNameAsc("HCM", EUserType.ADMIN, pageable)).thenReturn(null);
-        when(userMapper.mapListEntityUserResponses(page.getContent())).thenReturn(users);
+        when(userMapper.toListUserResponses(page.getContent())).thenReturn(users);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl.filterByType(EUserType.ADMIN, 0, "HCM");
 
@@ -86,7 +86,7 @@ class SearchUserServiceImplTest {
         List<UserResponse> users = mock(List.class);
 
         when(userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc("HCM", pageable)).thenReturn(page);
-        when(userMapper.mapListEntityUserResponses(page.getContent())).thenReturn(users);
+        when(userMapper.toListUserResponses(page.getContent())).thenReturn(users);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl.filterByType(null, 0, "HCM");
 
@@ -101,7 +101,7 @@ class SearchUserServiceImplTest {
         List<UserResponse> users = mock(List.class);
 
         when(userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc("HCM", pageable)).thenReturn(null);
-        when(userMapper.mapListEntityUserResponses(page.getContent())).thenReturn(users);
+        when(userMapper.toListUserResponses(page.getContent())).thenReturn(users);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl.filterByType(null, 0, "HCM");
 
@@ -115,7 +115,7 @@ class SearchUserServiceImplTest {
         List<UserResponse> expected = mock(List.class);
 
         when(userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc("test", page)).thenReturn(pages);
-        when(userMapper.mapListEntityUserResponses(pages.getContent())).thenReturn(expected);
+        when(userMapper.toListUserResponses(pages.getContent())).thenReturn(expected);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl.findByLocation("test", 0);
 
@@ -130,7 +130,7 @@ class SearchUserServiceImplTest {
         List<UserResponse> expected = mock(List.class);
 
         when(userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc("test", page)).thenReturn(null);
-        when(userMapper.mapListEntityUserResponses(pages.getContent())).thenReturn(expected);
+        when(userMapper.toListUserResponses(pages.getContent())).thenReturn(expected);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl.findByLocation("test", 0);
 
@@ -145,7 +145,7 @@ class SearchUserServiceImplTest {
         List<UserResponse> expected = mock(List.class);
 
         when(userRepository.findByLocationAndIsDeletedFalseOrderByFirstNameAsc("test", page)).thenReturn(pages);
-        when(userMapper.mapListEntityUserResponses(pages.getContent())).thenReturn(expected);
+        when(userMapper.toListUserResponses(pages.getContent())).thenReturn(expected);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl.findByLocation("test", 0);
 
@@ -160,7 +160,7 @@ class SearchUserServiceImplTest {
         Page<User> pages = mock(Page.class);
 
         when(userRepository.search("%test%", "test", "test", EUserType.ADMIN, page)).thenReturn(pages);
-        when(userMapper.mapListEntityUserResponses(pages.getContent())).thenReturn(expected);
+        when(userMapper.toListUserResponses(pages.getContent())).thenReturn(expected);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl.searchByNameOrStaffCodeAndFilterByTypeAndLocation(0, "test", "test", EUserType.ADMIN, "test");
         assertThat(actual.getData(), is(expected));
@@ -173,7 +173,7 @@ class SearchUserServiceImplTest {
         Page<User> pages = mock(Page.class);
 
         when(userRepository.search("%test%", "test", "test", null, page)).thenReturn(pages);
-        when(userMapper.mapListEntityUserResponses(pages.getContent())).thenReturn(expected);
+        when(userMapper.toListUserResponses(pages.getContent())).thenReturn(expected);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl.searchByNameOrStaffCodeAndFilterByTypeAndLocation(0, "test", "test", null, "test");
         assertThat(actual.getData(), is(expected));
@@ -185,7 +185,7 @@ class SearchUserServiceImplTest {
         Page<User> pages = new PageImpl<>(Collections.emptyList());
         Pageable page = PageRequest.of(0, 20);
         when(userRepository.search("test", "test", "test", null, page)).thenReturn(pages);
-        when(userMapper.mapListEntityUserResponses(pages.getContent())).thenReturn(expected);
+        when(userMapper.toListUserResponses(pages.getContent())).thenReturn(expected);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl.searchByNameOrStaffCodeAndFilterByTypeAndLocation(0, "test", "test", null, "test");
         assertThat(actual.getData(), is(Collections.emptyList()));
@@ -197,7 +197,7 @@ class SearchUserServiceImplTest {
         Pageable page = PageRequest.of(0, 20);
         Page<User> pages = new PageImpl<>(Collections.emptyList());
         when(userRepository.search("test", "test", "test", null, page)).thenReturn(pages);
-        when(userMapper.mapListEntityUserResponses(pages.getContent())).thenReturn(expected);
+        when(userMapper.toListUserResponses(pages.getContent())).thenReturn(expected);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl.searchByNameOrStaffCodeAndFilterByTypeAndLocation(0, "test", "test", null, "test");
         assertThat(actual.getData(), is(Collections.emptyList()));
@@ -238,7 +238,7 @@ class SearchUserServiceImplTest {
                 typesCaptor.capture(),
                 locationCaptor.capture(),
                 pageableCaptor.capture())).thenReturn(userPage);
-        when(userMapper.mapListEntityUserResponses(userPage.toList())).thenReturn(userResponseList);
+        when(userMapper.toListUserResponses(userPage.toList())).thenReturn(userResponseList);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl
                 .searchAllUsersByKeyWordInTypesWithPagination(searchUserRequest);
@@ -285,7 +285,7 @@ class SearchUserServiceImplTest {
                 typesCaptor.capture(),
                 locationCaptor.capture(),
                 pageableCaptor.capture())).thenReturn(userPage);
-        when(userMapper.mapListEntityUserResponses(userPage.toList())).thenReturn(userResponseList);
+        when(userMapper.toListUserResponses(userPage.toList())).thenReturn(userResponseList);
 
         PaginationResponse<List<UserResponse>> actual = searchUserServiceImpl
                 .searchAllUsersByKeyWordInTypesWithPagination(searchUserRequest);

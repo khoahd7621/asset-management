@@ -1,10 +1,5 @@
 package com.nashtech.assignment.services.delete.impl;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.nashtech.assignment.data.constants.EAssetStatus;
 import com.nashtech.assignment.data.constants.EAssignStatus;
 import com.nashtech.assignment.data.entities.Asset;
@@ -14,8 +9,11 @@ import com.nashtech.assignment.data.repositories.AssignAssetRepository;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.services.delete.DeleteAssignAssetService;
-
 import lombok.Builder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @Builder
@@ -46,7 +44,6 @@ public class DeleteAssignAssetServiceImpl implements DeleteAssignAssetService {
         assignAsset.setDeleted(true);
         assetRepository.save(asset);
         assignAssetRepository.save(assignAsset);
-
     }
 
 }

@@ -81,7 +81,7 @@ class CreateCategoryServiceImplTest {
         when(categoryRepository.findByName(createNewCategoryRequest.getCategoryName())).thenReturn(Optional.empty());
         when(categoryRepository.findByPrefixAssetCode(createNewCategoryRequest.getPrefixAssetCode()))
                 .thenReturn(Optional.empty());
-        when(categoryMapper.mapCategoryRequestToEntity(createNewCategoryRequest)).thenReturn(category);
+        when(categoryMapper.toCategory(createNewCategoryRequest)).thenReturn(category);
         when(categoryRepository.save(category)).thenReturn(category);
         when(categoryMapper.toCategoryResponse(category)).thenReturn(expected);
 

@@ -28,7 +28,7 @@ public class CreateCategoryServiceImpl implements CreateCategoryService {
         if (!categoryRepository.findByPrefixAssetCode(createNewCategoryRequest.getPrefixAssetCode()).isEmpty()){
             throw new BadRequestException("Prefix is already existed. Please enter a different prefix");
         }
-        Category category = categoryMapper.mapCategoryRequestToEntity(createNewCategoryRequest);
+        Category category = categoryMapper.toCategory(createNewCategoryRequest);
         categoryRepository.save(category);
         return categoryMapper.toCategoryResponse(category);
     }

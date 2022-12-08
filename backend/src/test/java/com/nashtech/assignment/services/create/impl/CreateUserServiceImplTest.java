@@ -28,6 +28,7 @@ class CreateUserServiceImplTest {
     private UserRepository userRepository;
     private UserMapper userMapper;
     private PasswordEncoder passwordEncoder;
+
     private User user;
 
     @BeforeEach
@@ -125,7 +126,7 @@ class CreateUserServiceImplTest {
                 .joinedDate("17/11/2022")
                 .gender(EGender.MALE)
                 .type(EUserType.ADMIN)
-                .location("hehe")
+                .location("location")
                 .build();
         ArgumentCaptor<String> staffCodeCaptor = ArgumentCaptor.forClass(String.class);
         SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
@@ -137,7 +138,7 @@ class CreateUserServiceImplTest {
         when(user.getFirstName()).thenReturn(createNewUserRequest.getFirstName());
         when(userMapper.toUser(createNewUserRequest)).thenReturn(user);
         when(user.getUsername()).thenReturn("haud");
-        when(userMapper.mapEntityToResponseDto(user)).thenReturn(expected);
+        when(userMapper.toUserResponse(user)).thenReturn(expected);
 
         UserResponse actual = createUserServiceImpl.createNewUser(createNewUserRequest);
 

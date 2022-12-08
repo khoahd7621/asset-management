@@ -21,6 +21,7 @@ class DeleteUserServiceImplTest {
     private AssignAssetRepository assignAssetRepository;
     private SecurityContextService securityContextService;
     private User currentUser;
+    private User user;
 
     @BeforeEach
     void setUpTest() {
@@ -33,12 +34,11 @@ class DeleteUserServiceImplTest {
                 .securityContextService(securityContextService).build();
 
         currentUser = User.builder().staffCode("currentUser").build();
+        user = mock(User.class);
     }
 
     @Test
     void deleteUser_WhenDataValid_ShouldReturnVoid() {
-        User user = mock(User.class);
-
         when(securityContextService.getCurrentUser()).thenReturn(currentUser);
         when(userRepository.findByStaffCode("test")).thenReturn(user);
         when(assignAssetRepository.existsByUserAssignedToAndIsDeletedFalse(user)).thenReturn(false);
@@ -51,7 +51,6 @@ class DeleteUserServiceImplTest {
 
     @Test
     void deleteUser_WhenUserNotExist_ShouldThrowNotFoundException() {
-
         when(securityContextService.getCurrentUser()).thenReturn(currentUser);
         when(userRepository.findByStaffCode("test")).thenReturn(null);
 
@@ -64,8 +63,6 @@ class DeleteUserServiceImplTest {
 
     @Test
     void deleteUser_WhenUserHaveAssign_ShouldThrowBadRequestException() {
-        User user = mock(User.class);
-
         when(securityContextService.getCurrentUser()).thenReturn(currentUser);
         when(userRepository.findByStaffCode("test")).thenReturn(user);
         when(assignAssetRepository.existsByUserAssignedToAndIsDeletedFalse(user)).thenReturn(true);
@@ -79,8 +76,6 @@ class DeleteUserServiceImplTest {
 
     @Test
     void deleteUser_WhenUserHaveAssignBy_ShouldThrowBadRequestException() {
-        User user = mock(User.class);
-
         when(securityContextService.getCurrentUser()).thenReturn(currentUser);
         when(userRepository.findByStaffCode("test")).thenReturn(user);
         when(assignAssetRepository.existsByUserAssignedToAndIsDeletedFalse(user)).thenReturn(true);
@@ -95,21 +90,17 @@ class DeleteUserServiceImplTest {
 
     @Test
     void deleteUser_WhenUserDeleteIsCurrentUser_ShouldThrowBadRequestException() {
-        User user = User.builder().staffCode("currentUser").build();
-
         when(securityContextService.getCurrentUser()).thenReturn(currentUser);
-        when(userRepository.findByStaffCode("currentUser")).thenReturn(user);
+        when(userRepository.findByStaffCode("currentUser")).thenReturn(currentUser);
 
         BadRequestException actual = assertThrows(BadRequestException.class,
                 () -> deleteUserServiceImpl.deleteUser("currentUser"));
 
-        assertThat(actual.getMessage(), is("Cannot disable yourselft"));
+        assertThat(actual.getMessage(), is("Cannot disable yourself"));
     }
 
     @Test
     void checkValidUser_WhenDataValid_ShouldReturnTrue() {
-        User user = mock(User.class);
-
         when(securityContextService.getCurrentUser()).thenReturn(currentUser);
         when(userRepository.findByStaffCode("test")).thenReturn(user);
         when(assignAssetRepository.existsByUserAssignedToAndIsDeletedFalse(user)).thenReturn(false);
@@ -121,20 +112,17 @@ class DeleteUserServiceImplTest {
 
     @Test
     void checkValidUser_WhenUserIsCurrentUser_ShouldThrowBadRequestException() {
-        User user = User.builder().staffCode("currentUser").build();
-
         when(securityContextService.getCurrentUser()).thenReturn(currentUser);
-        when(userRepository.findByStaffCode("currentUser")).thenReturn(user);
+        when(userRepository.findByStaffCode("currentUser")).thenReturn(currentUser);
 
         BadRequestException actual = assertThrows(BadRequestException.class,
                 () -> deleteUserServiceImpl.checkValidUser("currentUser"));
 
-        assertThat(actual.getMessage(), is("Cannot disable yourselft"));
+        assertThat(actual.getMessage(), is("Cannot disable yourself"));
     }
 
     @Test
     void checkValidUser_WhenUserNotExist_ShouldThrowNotFoundException() {
-
         when(securityContextService.getCurrentUser()).thenReturn(currentUser);
         when(userRepository.findByStaffCode("test")).thenReturn(null);
 
@@ -142,8 +130,6 @@ class DeleteUserServiceImplTest {
                 deleteUserServiceImpl.checkValidUser("test"));
 
         assertThat(actual.getMessage(), is("Cannot found user with staff code test"));
-
-
     }
 
     @Test
@@ -159,7 +145,6 @@ class DeleteUserServiceImplTest {
 
         assertThat(actual.getMessage(), is(
                 "There are valid assignments belonging to this user. Please close all assignments before disabling user."));
-
     }
 
     @Test
@@ -176,7 +161,6 @@ class DeleteUserServiceImplTest {
 
         assertThat(actual.getMessage(), is(
                 "There are valid assignments belonging to this user. Please close all assignments before disabling user."));
-
     }
 
 }

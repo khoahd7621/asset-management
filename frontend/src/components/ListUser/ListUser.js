@@ -212,7 +212,7 @@ const ListUser = () => {
       sorter: (a, b) => a.staffCode.match(/\d+/)[0] - b.staffCode.match(/\d+/)[0],
     },
     {
-      width: '10em',
+      width: '9em',
       title: title('Full Name'),
       dataIndex: 'fullName',
       ellipsis: true,
@@ -227,14 +227,14 @@ const ListUser = () => {
       ),
     },
     {
-      width: '10em',
+      width: '9em',
       title: 'Username',
       dataIndex: 'username',
       ellipsis: true,
       key: 'username',
     },
     {
-      width: '12em',
+      width: '10em',
       title: title('Joined Date'),
       dataIndex: 'joinedDate',
       key: 'joineddate',
@@ -252,6 +252,7 @@ const ListUser = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.type.localeCompare(b.type),
       render: (text) => toTitle(text),
+      responsive: ['xxl'],
     },
     {
       width: '4em',
@@ -262,12 +263,7 @@ const ListUser = () => {
       render: (_text, record) => (
         <div id="frame">
           <div className="edit-icon">
-            <Button
-              data-id={record.staffCode}
-              type="link"
-              icon={<EditIcon />}
-              onClick={onClickToEdit}
-            ></Button>
+            <Button data-id={record.staffCode} type="link" icon={<EditIcon />} onClick={onClickToEdit}></Button>
           </div>
           <div></div>
           <div>
@@ -387,21 +383,17 @@ const ListUser = () => {
             </Popover>
           </Col>
           <Col xs={20} sm={16} md={12} lg={10} xl={8}>
-            <Search
-              maxLength={100}
-              className="handle-search"
-              allowClear
-              onSearch={onSearch}
-              id="search-user"
-            ></Search>
+            <Search maxLength={100} className="handle-search" allowClear onSearch={onSearch} id="search-user"></Search>
           </Col>
-          <Col xs={2} sm={4} md={6} lg={4} xl={4}>
-            <Button
-              className="handle-button"
-              onClick={() => navigate(`/${adminRoute.home}/${adminRoute.manageUser}/${adminRoute.createUser}`)}
-            >
-              Create new user
-            </Button>
+          <Col xs={2} sm={4} md={6} lg={4} xl={5}>
+            <Row justify={'end'}>
+              <Button
+                className="handle-button"
+                onClick={() => navigate(`/${adminRoute.home}/${adminRoute.manageUser}/${adminRoute.createUser}`)}
+              >
+                Create new user
+              </Button>
+            </Row>
           </Col>
         </Row>
       </div>

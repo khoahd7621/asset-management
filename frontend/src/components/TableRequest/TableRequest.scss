@@ -5,7 +5,6 @@
     fill: #cf2338;
     height: 20px;
     width: 20px;
-    
   }
 
   .decline-icon {
@@ -13,12 +12,10 @@
     width: 16px;
   }
 
-
   table {
     border-collapse: inherit;
-    border-spacing: 10px 0px;
-    width: calc(100% + 60px);
-    margin-left: -10px;
+    border-spacing: 20px 0px;
+    width: calc(100% + 10px);
 
     .ant-table-thead {
       tr {
@@ -65,7 +62,7 @@
     .ant-table-tbody {
       tr {
         td {
-          padding: 10px;
+          padding: 0px;
           border-bottom: 1px solid #d5d5d5;
           font-size: 14px;
 
@@ -94,6 +91,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            padding: 10px;
 
             &:hover {
               color: #d90000;
@@ -103,7 +101,7 @@
           .col-action {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: end;
             gap: 16px;
 
             button {

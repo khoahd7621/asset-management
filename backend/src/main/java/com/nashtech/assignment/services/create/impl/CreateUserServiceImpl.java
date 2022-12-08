@@ -90,6 +90,6 @@ public class CreateUserServiceImpl implements CreateUserService {
         user.setPassword(passwordEncoder.encode(password));
 
         userRepository.save(user);
-        return userMapper.mapEntityToResponseDto(user);
+        return userMapper.toUserResponse(user);
     }
 }

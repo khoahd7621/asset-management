@@ -16,7 +16,6 @@ import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.services.create.CreateAssignmentService;
 import com.nashtech.assignment.services.delete.DeleteAssignAssetService;
 import com.nashtech.assignment.services.edit.EditAssignAssetService;
-import com.nashtech.assignment.services.get.FindAssignAssetService;
 import com.nashtech.assignment.services.get.GetAssignAssetService;
 import com.nashtech.assignment.services.search.SearchAssignAssetService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
@@ -46,8 +45,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(value = AssignAssetController.class)
-@ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class,
-        CORSConfig.class})
+@ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class, CORSConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
 public class AssignAssetControllerTest {
 
@@ -57,8 +55,6 @@ public class AssignAssetControllerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private SearchAssignAssetService searchAssignAssetService;
-    @MockBean
-    private FindAssignAssetService findAssignAssetService;
     @MockBean
     private GetAssignAssetService getAssignAssetService;
     @MockBean
@@ -93,10 +89,8 @@ public class AssignAssetControllerTest {
     }
 
     @Test
-    void searchAssignAsset_WhenValid_ShouldReturnPaginationRespponseOfAssignAsset()
-            throws Exception {
+    void searchAssignAsset_WhenValid_ShouldReturnPaginationResponseOfAssignAsset() throws Exception {
         List<EAssignStatus> status = new ArrayList<>();
-        status = new ArrayList<>();
         status.add(EAssignStatus.ACCEPTED);
         List<AssignAssetResponse> assignAssetPage = new ArrayList<>();
         assignAssetPage.add(assetResponse);
@@ -119,22 +113,15 @@ public class AssignAssetControllerTest {
         assertThat(result.getResponse().getContentAsString(), is(
                 "{\"data\":[{\"id\":0,\"assetId\":0,\"assetCode\":\"LP0101\"," +
                         "\"assetName\":\"Laptop Lenovo 1009\",\"userAssignedToId\":0," +
-                        "\"userAssignedTo\":null,\"userAssignedToFullName\":null,\"userAssignedBy\":null,"
-                        +
-                        "\"assignedDate\":null,\"category\":\"Laptop\",\"note\":\"note\",\"specification\":null,"
-                        +
+                        "\"userAssignedTo\":null,\"userAssignedToFullName\":null,\"userAssignedBy\":null," +
+                        "\"assignedDate\":null,\"category\":\"Laptop\",\"note\":\"note\",\"specification\":null," +
                         "\"status\":null,\"returnAsset\":null}],\"totalPage\":0,\"totalRow\":0}"));
-
     }
 
     @Test
-    void searchAssignAsset_WhenDataEmpty_ShouldReturnPaginationResponseWithDataEmpty()
-            throws Exception {
+    void searchAssignAsset_WhenDataEmpty_ShouldReturnPaginationResponseWithDataEmpty() throws Exception {
         List<EAssignStatus> status = new ArrayList<>();
-        status = new ArrayList<>();
         status.add(EAssignStatus.ACCEPTED);
-        List<AssignAssetResponse> assignAssetPage = new ArrayList<>();
-        assignAssetPage.add(assetResponse);
 
         PaginationResponse<List<AssignAssetResponse>> paginationResponse = PaginationResponse
                 .<List<AssignAssetResponse>>builder()
@@ -149,18 +136,15 @@ public class AssignAssetControllerTest {
                 .param("date", "11/30/2022").param("page", "0");
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-        assertThat(result.getResponse().getStatus(),
-                is(HttpStatus.OK.value()));
-        assertThat(result.getResponse().getContentAsString(),
-                is("{\"data\":[],\"totalPage\":0,\"totalRow\":0}"));
-
+        assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
+        assertThat(result.getResponse().getContentAsString(), is("{\"data\":[],\"totalPage\":0,\"totalRow\":0}"));
     }
 
     @Test
-    void getAssignmentDetails_WhenDataValid_ShouldReturnAssignAssetRespone() throws Exception {
+    void getAssignmentDetails_WhenDataValid_ShouldReturnAssignAssetResponse() throws Exception {
         AssignAssetResponse expected = AssignAssetResponse.builder()
-                .assetCode("test").assetId(1l).build();
-        when(getAssignAssetService.getAssignAssetDetails(1l)).thenReturn(expected);
+                .assetCode("test").assetId(1L).build();
+        when(getAssignAssetService.getAssignAssetDetails(1L)).thenReturn(expected);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/assignment/details").param("id", "1");
@@ -169,18 +153,15 @@ public class AssignAssetControllerTest {
         assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
         assertThat(result.getResponse().getContentAsString(), is(
                 "{\"id\":0,\"assetId\":1,\"assetCode\":\"test\",\"assetName\":null," +
-                        "\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null,"
-                        +
-                        "\"userAssignedBy\":null,\"assignedDate\":null,\"category\":null,\"note\":null,"
-                        +
+                        "\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null," +
+                        "\"userAssignedBy\":null,\"assignedDate\":null,\"category\":null,\"note\":null," +
                         "\"specification\":null,\"status\":null,\"returnAsset\":null}"));
-
     }
 
     @Test
     void getAssignmentDetails_WhenAssignNotFound_ShouldThrowNotFoundException() throws Exception {
         NotFoundException exception = new NotFoundException("Mess");
-        when(getAssignAssetService.getAssignAssetDetails(1l)).thenThrow(exception);
+        when(getAssignAssetService.getAssignAssetDetails(1L)).thenThrow(exception);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/assignment/details").param("id", "1");
@@ -188,7 +169,6 @@ public class AssignAssetControllerTest {
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.NOT_FOUND.value()));
         assertThat(result.getResponse().getContentAsString(), is("{\"message\":\"Mess\"}"));
-
     }
 
     @Test
@@ -222,12 +202,9 @@ public class AssignAssetControllerTest {
 
         assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
         assertThat(actual.getContentAsString(), is(
-                "{\"id\":1,\"assetId\":0,\"assetCode\":\"assetCode\",\"assetName\":\"assetName\",\"userAssignedToId\":0,"
-                        +
-                        "\"userAssignedTo\":\"userAssignedTo\",\"userAssignedToFullName\":null,\"userAssignedBy\":\"userAssignedBy\","
-                        +
-                        "\"assignedDate\":\"2001-01-01T00:00:00.000+00:00\",\"category\":\"category\",\"note\":\"note\","
-                        +
+                "{\"id\":1,\"assetId\":0,\"assetCode\":\"assetCode\",\"assetName\":\"assetName\",\"userAssignedToId\":0," +
+                        "\"userAssignedTo\":\"userAssignedTo\",\"userAssignedToFullName\":null,\"userAssignedBy\":\"userAssignedBy\"," +
+                        "\"assignedDate\":\"2001-01-01T00:00:00.000+00:00\",\"category\":\"category\",\"note\":\"note\"," +
                         "\"specification\":\"specification\",\"status\":\"WAITING_FOR_ACCEPTANCE\",\"returnAsset\":null}"));
     }
 
@@ -314,12 +291,9 @@ public class AssignAssetControllerTest {
         assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
         assertThat(actual.getContentAsString(), is(
                 "{\"id\":1,\"assetId\":1,\"assetCode\":\"assetCode\",\"assetName\":\"assetName\"," +
-                        "\"userAssignedToId\":1,\"userAssignedTo\":\"userAssignedTo\",\"userAssignedToFullName\":\"fullName\","
-                        +
-                        "\"userAssignedBy\":\"userAssignedBy\",\"assignedDate\":\"2001-01-01T00:00:00.000+00:00\","
-                        +
-                        "\"category\":\"categoryName\",\"note\":\"note\",\"specification\":\"specification\","
-                        +
+                        "\"userAssignedToId\":1,\"userAssignedTo\":\"userAssignedTo\",\"userAssignedToFullName\":\"fullName\"," +
+                        "\"userAssignedBy\":\"userAssignedBy\",\"assignedDate\":\"2001-01-01T00:00:00.000+00:00\"," +
+                        "\"category\":\"categoryName\",\"note\":\"note\",\"specification\":\"specification\"," +
                         "\"status\":\"WAITING_FOR_ACCEPTANCE\",\"returnAsset\":null}"));
     }
 
@@ -375,7 +349,7 @@ public class AssignAssetControllerTest {
 
     @Test
     void findAllAssignAssetByUser_ReturnException() throws Exception {
-        when(findAssignAssetService.findAssignAssetByUser()).thenThrow(notFoundException);
+        when(getAssignAssetService.getAssignAssetOfUser()).thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user");
 
@@ -390,25 +364,22 @@ public class AssignAssetControllerTest {
         List<AssignAssetResponse> assignAssets = new ArrayList<>();
         assignAssets.add(assetResponse);
 
-        when(findAssignAssetService.findAssignAssetByUser()).thenReturn(assignAssets);
+        when(getAssignAssetService.getAssignAssetOfUser()).thenReturn(assignAssets);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user");
 
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
         assertThat(actual.getContentAsString(), is(
-                "[{\"id\":0,\"assetId\":0,\"assetCode\":\"LP0101\",\"assetName\":\"Laptop Lenovo 1009\","
-                        +
-                        "\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null,"
-                        +
-                        "\"userAssignedBy\":null,\"assignedDate\":null,\"category\":\"Laptop\",\"note\":\"note\","
-                        +
+                "[{\"id\":0,\"assetId\":0,\"assetCode\":\"LP0101\",\"assetName\":\"Laptop Lenovo 1009\"," +
+                        "\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null," +
+                        "\"userAssignedBy\":null,\"assignedDate\":null,\"category\":\"Laptop\",\"note\":\"note\"," +
                         "\"specification\":null,\"status\":null,\"returnAsset\":null}]"));
     }
 
     @Test
     void viewDetailAssignAsset_ReturnException() throws Exception {
-        when(findAssignAssetService.detailAssignAsset(1L)).thenThrow(notFoundException);
+        when(getAssignAssetService.getDetailAssignAssetOfUser(1L)).thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user/{assignAssetId}", 1L);
 
@@ -420,23 +391,24 @@ public class AssignAssetControllerTest {
 
     @Test
     void viewDetailAssignAsset_ReturnData() throws Exception {
-        when(findAssignAssetService.detailAssignAsset(1L)).thenReturn(assetResponse);
+        when(getAssignAssetService.getDetailAssignAssetOfUser(1L)).thenReturn(assetResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user/{assignAssetId}", 1L);
 
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-        assertThat(actual.getContentAsString(), is("{\"id\":0,\"assetId\":0,\"assetCode\":\"LP0101\",\"assetName\":\"Laptop Lenovo 1009\"," +
-                "\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null,\"userAssignedBy\":null," +
-                "\"assignedDate\":null,\"category\":\"Laptop\",\"note\":\"note\",\"specification\":null,\"status\":null,\"returnAsset\":null}"
+        assertThat(actual.getContentAsString(), is(
+                "{\"id\":0,\"assetId\":0,\"assetCode\":\"LP0101\",\"assetName\":\"Laptop Lenovo 1009\"," +
+                        "\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null,\"userAssignedBy\":null," +
+                        "\"assignedDate\":null,\"category\":\"Laptop\",\"note\":\"note\",\"specification\":null,\"status\":null,\"returnAsset\":null}"
         ));
     }
 
     @Test
     void acceptAssignAsset_WhenReturnData() throws Exception {
-        AssignAssetResponse assignAssetReponse = AssignAssetResponse.builder().status(EAssignStatus.ACCEPTED)
+        AssignAssetResponse assignAssetResponse = AssignAssetResponse.builder().status(EAssignStatus.ACCEPTED)
                 .build();
-        when(editAssignAssetService.acceptAssignAsset(1L)).thenReturn(assignAssetReponse);
+        when(editAssignAssetService.acceptAssignAsset(1L)).thenReturn(assignAssetResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/assignment/user/accept/{idAssignAsset}", 1L);
@@ -445,10 +417,8 @@ public class AssignAssetControllerTest {
 
         assertThat(actual.getContentAsString(), is(
                 "{\"id\":0,\"assetId\":0,\"assetCode\":null,\"assetName\":null," +
-                        "\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null,"
-                        +
-                        "\"userAssignedBy\":null,\"assignedDate\":null,\"category\":null,\"note\":null,"
-                        +
+                        "\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null," +
+                        "\"userAssignedBy\":null,\"assignedDate\":null,\"category\":null,\"note\":null," +
                         "\"specification\":null,\"status\":\"ACCEPTED\",\"returnAsset\":null}"));
     }
 
@@ -526,10 +496,10 @@ public class AssignAssetControllerTest {
 
     @Test
     void declineAssignAsset_WhenReturnData() throws Exception {
-        AssignAssetResponse assignAssetReponse = AssignAssetResponse.builder().status(EAssignStatus.DECLINED)
+        AssignAssetResponse assignAssetResponse = AssignAssetResponse.builder().status(EAssignStatus.DECLINED)
                 .build();
 
-        when(editAssignAssetService.declineAssignAsset(1L)).thenReturn(assignAssetReponse);
+        when(editAssignAssetService.declineAssignAsset(1L)).thenReturn(assignAssetResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/assignment/user/decline/{idAssignAsset}", 1L);
@@ -538,21 +508,18 @@ public class AssignAssetControllerTest {
 
         assertThat(actual.getContentAsString(), is(
                 "{\"id\":0,\"assetId\":0,\"assetCode\":null,\"assetName\":null," +
-                        "\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null,"
-                        +
-                        "\"userAssignedBy\":null,\"assignedDate\":null,\"category\":null,\"note\":null,"
-                        +
+                        "\"userAssignedToId\":0,\"userAssignedTo\":null,\"userAssignedToFullName\":null," +
+                        "\"userAssignedBy\":null,\"assignedDate\":null,\"category\":null,\"note\":null," +
                         "\"specification\":null,\"status\":\"DECLINED\",\"returnAsset\":null}"));
     }
 
     @Test
     void deleteAssignAsset_WhenDataValid_ShouldReturnStatus204() throws Exception {
-
-        doNothing().when(deleteAssignAssetService).deleteAssignAsset(1l);
+        doNothing().when(deleteAssignAssetService).deleteAssignAsset(1L);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .delete("/api/assignment")
-                .param("assignmentId", String.valueOf(1l));
+                .param("assignmentId", String.valueOf(1L));
 
         MvcResult result = mockMvc.perform(request).andReturn();
 
@@ -560,13 +527,12 @@ public class AssignAssetControllerTest {
     }
 
     @Test
-    void deleteAssignAsset_WhenAssigmentNotExsit_ShouldThrowNotFoundException() throws Exception {
-
-        doThrow(NotFoundException.class).when(deleteAssignAssetService).deleteAssignAsset(1l);
+    void deleteAssignAsset_WhenAssigmentNotExist_ShouldThrowNotFoundException() throws Exception {
+        doThrow(NotFoundException.class).when(deleteAssignAssetService).deleteAssignAsset(1L);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .delete("/api/assignment")
-                .param("assignmentId", String.valueOf(1l));
+                .param("assignmentId", String.valueOf(1L));
 
         MvcResult result = mockMvc.perform(request).andReturn();
 
@@ -575,12 +541,11 @@ public class AssignAssetControllerTest {
 
     @Test
     void deleteAssignAsset_WhenAssigmentValidForDelete_ShouldThrowBadRequestException() throws Exception {
-
-        doThrow(BadRequestException.class).when(deleteAssignAssetService).deleteAssignAsset(1l);
+        doThrow(BadRequestException.class).when(deleteAssignAssetService).deleteAssignAsset(1L);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .delete("/api/assignment")
-                .param("assignmentId", String.valueOf(1l));
+                .param("assignmentId", String.valueOf(1L));
 
         MvcResult result = mockMvc.perform(request).andReturn();
 

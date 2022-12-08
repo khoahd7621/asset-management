@@ -1,4 +1,3 @@
-@import "~antd/dist/antd.css";
 .navbar-header {
   background-color: #cf2338;
   display: flex;
@@ -57,6 +56,22 @@
     height: 70px;
   }
 }
+
+.username-dropdown {
+  ul {
+    li {
+      padding: 0;
+
+      .change-password-btn,
+      .logout-btn {
+        display: block;
+        width: 100%;
+        padding: 5px 12px;
+      }
+    }
+  }
+}
+
 .change-password-form {
   .ant-form-item-explain {
     color: #cf2338 !important;

@@ -21,8 +21,8 @@ class GetCategoryServiceImplTest {
     private GetCategoryServiceImpl getCategoryServiceImpl;
     private CategoryRepository categoryRepository;
     private CategoryMapper categoryMapper;
-    private Category category;
 
+    private Category category;
 
     @BeforeEach
     void setup() {

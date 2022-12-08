@@ -32,12 +32,13 @@ class EditUserServiceImplTest {
     private EditUserServiceImpl editUserServiceImpl;
     private UserRepository userRepository;
     private UserMapper userMapper;
-    private User userRepo;
-    private UserResponse userResponse;
-    private User user;
     private SecurityContextService securityContextService;
     private PasswordEncoder passwordEncoder;
     private GeneratePassword generatePassword;
+
+    private User userRepo;
+    private UserResponse userResponse;
+    private User user;
 
     @BeforeEach
     void setUp() {
@@ -74,7 +75,7 @@ class EditUserServiceImplTest {
 
         when(userRepository.findByStaffCode("test")).thenReturn(userRepo);
         when(userRepository.save(userRepo)).thenReturn(userRepo);
-        when(userMapper.mapEntityToResponseDto(userRepo)).thenReturn(userResponse);
+        when(userMapper.toUserResponse(userRepo)).thenReturn(userResponse);
 
         UserResponse actual = editUserServiceImpl.editUserInformation(user);
 
@@ -88,7 +89,7 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void editUserInformation_WhenUserNotFound_ShouldThrowBadRequestException() throws ParseException {
+    void editUserInformation_WhenUserNotFound_ShouldThrowBadRequestException() {
         EditUserRequest user = EditUserRequest.builder()
                 .dateOfBirth("21/9/2022")
                 .joinedDate("25/11/2022")
@@ -102,11 +103,10 @@ class EditUserServiceImplTest {
                 () -> editUserServiceImpl.editUserInformation(user));
 
         assertThat(actual.getMessage(), is("Cannot found staff with Id " + "test"));
-
     }
 
     @Test
-    void editUserInformation_WhenDateOfBirthNotValid_ShouldThrowBadRequestException() throws ParseException {
+    void editUserInformation_WhenDateOfBirthNotValid_ShouldThrowBadRequestException() {
         EditUserRequest user = EditUserRequest.builder()
                 .dateOfBirth("21/9/2022")
                 .joinedDate("25/11/2022")
@@ -120,11 +120,10 @@ class EditUserServiceImplTest {
                 () -> editUserServiceImpl.editUserInformation(user));
 
         assertThat(actual.getMessage(), is("Age cannot below 18."));
-
     }
 
     @Test
-    void editUserInformation_WhenJoinDateIsSundayOrSaturday_ShouldThrowBadRequestException() throws ParseException {
+    void editUserInformation_WhenJoinDateIsSundayOrSaturday_ShouldThrowBadRequestException() {
         EditUserRequest user = EditUserRequest.builder()
                 .dateOfBirth("21/9/2001")
                 .joinedDate("26/11/2022")
@@ -136,11 +135,10 @@ class EditUserServiceImplTest {
                 () -> editUserServiceImpl.editUserInformation(user));
 
         assertThat(actual.getMessage(), is("Joined date cannot be Saturday or Sunday."));
-
     }
 
     @Test
-    void editUserInformation_WhenJoinDateIsAfterDateOfBirth_ShouldThrowBadRequestException() throws ParseException {
+    void editUserInformation_WhenJoinDateIsAfterDateOfBirth_ShouldThrowBadRequestException() {
         EditUserRequest user = EditUserRequest.builder()
                 .dateOfBirth("21/9/2001")
                 .joinedDate("25/11/2000")
@@ -152,11 +150,10 @@ class EditUserServiceImplTest {
                 () -> editUserServiceImpl.editUserInformation(user));
 
         assertThat(actual.getMessage(), is("Joined date must lager or equal 18 years."));
-
     }
 
     @Test
-    void editUserInformation_WhenJoinDateIsLagerThan100Years_ShouldThrowBadRequestException() throws ParseException {
+    void editUserInformation_WhenJoinDateIsLagerThan100Years_ShouldThrowBadRequestException() {
         EditUserRequest user = EditUserRequest.builder()
                 .dateOfBirth("21/9/2001")
                 .joinedDate("29/11/2900")
@@ -168,11 +165,10 @@ class EditUserServiceImplTest {
                 () -> editUserServiceImpl.editUserInformation(user));
 
         assertThat(actual.getMessage(), is("Joined date cannot lager than 100 years."));
-
     }
 
     @Test
-    void changePasswordFirst_WhenPasswordNoChange_ShouldReturnException() throws Exception {
+    void changePasswordFirst_WhenPasswordNoChange_ShouldReturnException() {
         ChangePasswordFirstRequest changePasswordFirstRequest = ChangePasswordFirstRequest.builder().build();
 
         when(securityContextService.getCurrentUser()).thenReturn(user);
@@ -187,7 +183,23 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void changePasswordFirst_WhenDataValid_ShouldReturnData() throws Exception {
+    void changePasswordFirst_WhenNotFirstLogin_ShouldReturnException() {
+        ChangePasswordFirstRequest changePasswordFirstRequest = ChangePasswordFirstRequest.builder().build();
+
+        when(securityContextService.getCurrentUser()).thenReturn(user);
+        when(passwordEncoder.matches(changePasswordFirstRequest.getNewPassword(), user.getPassword()))
+                .thenReturn(true);
+        when(passwordEncoder.matches(generatePassword.firstPassword(user), user.getPassword())).thenReturn(false);
+
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            editUserServiceImpl.changePasswordFirst(changePasswordFirstRequest);
+        });
+
+        assertThat(actual.getMessage(), is("Is not first login"));
+    }
+
+    @Test
+    void changePasswordFirst_WhenDataValid_ShouldReturnData() {
         ChangePasswordFirstRequest changePasswordFirstRequest = ChangePasswordFirstRequest.builder()
                 .newPassword("123456").build();
         ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
@@ -195,7 +207,9 @@ class EditUserServiceImplTest {
         when(securityContextService.getCurrentUser()).thenReturn(user);
         when(passwordEncoder.matches(changePasswordFirstRequest.getNewPassword(), user.getPassword()))
                 .thenReturn(false);
-        when(userMapper.mapEntityToResponseDto(userArgumentCaptor.capture())).thenReturn(userResponse);
+        when(passwordEncoder.matches(generatePassword.firstPassword(user), user.getPassword())).thenReturn(true);
+
+        when(userMapper.toUserResponse(userArgumentCaptor.capture())).thenReturn(userResponse);
 
         UserResponse actual = editUserServiceImpl.changePasswordFirst(changePasswordFirstRequest);
 
@@ -206,7 +220,7 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void changePassword_WhenPasswordIncorrect_ShouldReturnException() throws Exception {
+    void changePassword_WhenPasswordIncorrect_ShouldReturnException() {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest.builder().build();
 
         when(securityContextService.getCurrentUser()).thenReturn(user);
@@ -221,7 +235,7 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void changePassword_WhenPasswordNoChange_ShouldReturnException() throws Exception {
+    void changePassword_WhenPasswordNoChange_ShouldReturnException() {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest
                 .builder()
                 .oldPassword("123456")
@@ -238,7 +252,7 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void changePassword_WhenPasswordSameGenerated_ShouldReturnException() throws Exception {
+    void changePassword_WhenPasswordSameGenerated_ShouldReturnException() {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest
                 .builder()
                 .oldPassword("123456")
@@ -258,7 +272,7 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void changePassword_WhenDataVaid_ShouldReturnData() throws Exception {
+    void changePassword_WhenDataValid_ShouldReturnData() {
         ChangePasswordRequest changePasswordRequest = ChangePasswordRequest
                 .builder()
                 .oldPassword("123456")
@@ -270,7 +284,7 @@ class EditUserServiceImplTest {
         when(passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())).thenReturn(true);
         when(passwordEncoder.matches(changePasswordRequest.getNewPassword(), generatePassword.firstPassword(user)))
                 .thenReturn(false);
-        when(userMapper.mapEntityToResponseDto(userArgumentCaptor.capture())).thenReturn(userResponse);
+        when(userMapper.toUserResponse(userArgumentCaptor.capture())).thenReturn(userResponse);
 
         UserResponse actual = editUserServiceImpl.changePassword(changePasswordRequest);
 

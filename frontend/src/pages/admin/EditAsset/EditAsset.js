@@ -10,7 +10,6 @@ import { adminRoute } from '../../../routes/routes';
 import { getAssetDetailAndItsHistories } from '../../../services/getApiService';
 
 const EditAsset = () => {
-  const navigate = useNavigate();
   const formLayout = {
     labelCol: {
       span: 6,
@@ -19,11 +18,10 @@ const EditAsset = () => {
       span: 20,
     },
   };
-
   const { TextArea } = Input;
 
+  const navigate = useNavigate();
   const [form] = Form.useForm();
-
   const params = useParams();
 
   const initialError = { help: '', status: '' };
@@ -192,17 +190,17 @@ const EditAsset = () => {
               <Radio.Group id="edit-asset-radio__gender" value={stateType} style={{ paddingTop: '0.4rem' }}>
                 <Space direction="vertical">
                   <Radio value={'AVAILABLE'}>Available</Radio>
-                  <Radio value={'NOT_AVAILABLE'}>Not Available</Radio>
+                  <Radio value={'NOT_AVAILABLE'}>Not available</Radio>
                   <Radio value={'WAITING_FOR_RECYCLING'}>Waiting for recycling</Radio>
                   <Radio value={'RECYCLED'}>Recycled</Radio>
                 </Space>
               </Radio.Group>
             </Form.Item>
             <div className="edit-asset__form-action">
-              <Button className='edit-asset-button' htmlType="submit" disabled={isDisabled}>
+              <Button className="edit-asset-button" htmlType="submit" disabled={isDisabled}>
                 Save
               </Button>
-              <Button className='cancel-edit-asset-button' htmlType="button" onClick={handleClickClose}>
+              <Button className="cancel-edit-asset-button" htmlType="button" onClick={handleClickClose}>
                 Cancel
               </Button>
             </div>

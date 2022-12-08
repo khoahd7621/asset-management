@@ -1,18 +1,16 @@
 package com.nashtech.assignment.mappers;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Component;
-
 import com.nashtech.assignment.data.entities.Asset;
 import com.nashtech.assignment.data.entities.AssignAsset;
 import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.dto.response.assignment.AssignAssetResponse;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class AssignAssetMapper {
-
     public AssignAssetResponse toAssignAssetResponse(AssignAsset assignAsset) {
         Asset asset = assignAsset.getAsset();
         User userAssignedTo = assignAsset.getUserAssignedTo();
@@ -33,9 +31,7 @@ public class AssignAssetMapper {
                 .status(assignAsset.getStatus()).build();
     }
 
-    public List<AssignAssetResponse> mapListEntityToDto(
-            List<AssignAsset> assignAssets) {
-        return assignAssets.stream().map(assignAsset -> toAssignAssetResponse(assignAsset))
-                .collect(Collectors.toList());
+    public List<AssignAssetResponse> toListAssignAssetResponses(List<AssignAsset> assignAssets) {
+        return assignAssets.stream().map(this::toAssignAssetResponse).collect(Collectors.toList());
     }
 }

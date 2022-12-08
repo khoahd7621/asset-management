@@ -85,21 +85,22 @@ public class EditUserServiceImpl implements EditUserService {
         user.setGender(userRequest.getGender());
         user.setType(userRequest.getType());
         user = userRepository.save(user);
-        return userMapper.mapEntityToResponseDto(user);
+        return userMapper.toUserResponse(user);
     }
 
     @Override
-    public UserResponse changePasswordFirst(
-            ChangePasswordFirstRequest changePasswordFirstRequest) {
+    public UserResponse changePasswordFirst(ChangePasswordFirstRequest changePasswordFirstRequest) {
         User user = securityContextService.getCurrentUser();
-        if (passwordEncoder.matches(changePasswordFirstRequest.getNewPassword(),
-                user.getPassword())) {
+        if (!passwordEncoder.matches(generatePassword.firstPassword(user), user.getPassword())) {
+            throw new BadRequestException("Is not first login");
+        }
+        if (passwordEncoder.matches(changePasswordFirstRequest.getNewPassword(), user.getPassword())) {
             throw new BadRequestException("Password no change");
         }
         user.setPassword(
                 passwordEncoder.encode(changePasswordFirstRequest.getNewPassword()));
         user = userRepository.save(user);
-        return userMapper.mapEntityToResponseDto(user);
+        return userMapper.toUserResponse(user);
     }
 
     @Override
@@ -117,9 +118,8 @@ public class EditUserServiceImpl implements EditUserService {
                 generatePassword.firstPassword(user))) {
             throw new BadRequestException("Password same password generated");
         }
-        user.setPassword(
-                passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         user = userRepository.save(user);
-        return userMapper.mapEntityToResponseDto(user);
+        return userMapper.toUserResponse(user);
     }
 }

@@ -4,25 +4,27 @@ import Admin from './layouts/Admin';
 import Login from './layouts/Login';
 import User from './layouts/User';
 import {
+  Home as AdminHome,
+  CreateAsset,
   CreateAssignment,
   CreateUser,
+  EditAsset,
   EditAssignment,
-  Home as AdminHome,
+  EditUser,
   ManageAsset,
+  ManageAssignment,
+  ManageRequestReturn,
   ManageUser,
+  Report,
 } from './pages/admin';
-import CreateAsset from './pages/admin/CreateAsset/CreateAsset';
-import EditAsset from './pages/admin/EditAsset/EditAsset';
 import { Home as UserHome } from './pages/user';
-import EditUser from './pages/admin/EditUser/EditUser';
-import AdminPrivateRoute from './routes/AdminPrivateRoute';
+
 import { adminRoute, userRoute } from './routes/routes';
+
+import AdminPrivateRoute from './routes/AdminPrivateRoute';
 import StaffPrivateRoute from './routes/StaffPrivateRoute';
 import CheckFirstLoginRoute from './routes/CheckFirstLoginRoute';
-import ManageAssignment from './pages/admin/ManageAssignment/ManageAssignment';
 import LoginProtectRoute from './routes/LoginProtectRoute';
-import { Report } from './pages/admin/Report/Report';
-import ManageRequestReturn from './pages/admin/ManageRequestReturn/ManageRequestReturn';
 
 const App = () => {
   return (
@@ -45,8 +47,6 @@ const App = () => {
           }
         >
           <Route index element={<AdminHome />} />
-          {/* Add more route here - like format below ... */}
-          {/* <Route path={adminRoute.[your-path]} element={[your-component]} /> */}
           <Route
             path={adminRoute.manageUser}
             element={
@@ -127,14 +127,14 @@ const App = () => {
               </CheckFirstLoginRoute>
             }
           />
-             <Route
-                path={adminRoute.report}
-                element={
-                    <CheckFirstLoginRoute>
-                        <Report />
-                    </CheckFirstLoginRoute>
-                }
-            />
+          <Route
+            path={adminRoute.report}
+            element={
+              <CheckFirstLoginRoute>
+                <Report />
+              </CheckFirstLoginRoute>
+            }
+          />
         </Route>
 
         <Route

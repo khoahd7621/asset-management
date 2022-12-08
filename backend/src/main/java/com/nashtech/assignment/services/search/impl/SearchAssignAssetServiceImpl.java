@@ -1,16 +1,5 @@
 package com.nashtech.assignment.services.search.impl;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import com.nashtech.assignment.data.constants.EAssignStatus;
 import com.nashtech.assignment.data.entities.AssignAsset;
 import com.nashtech.assignment.data.entities.User;
@@ -20,8 +9,17 @@ import com.nashtech.assignment.dto.response.assignment.AssignAssetResponse;
 import com.nashtech.assignment.mappers.AssignAssetMapper;
 import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.services.search.SearchAssignAssetService;
-
 import lombok.Builder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @Builder
@@ -52,8 +50,7 @@ public class SearchAssignAssetServiceImpl implements SearchAssignAssetService {
             return PaginationResponse.<List<AssignAssetResponse>>builder()
                     .data(Collections.emptyList()).build();
         }
-        List<AssignAssetResponse> result = assignAssetMapper
-                .mapListEntityToDto(assignAsset.getContent());
+        List<AssignAssetResponse> result = assignAssetMapper.toListAssignAssetResponses(assignAsset.getContent());
         return PaginationResponse.<List<AssignAssetResponse>>builder().data(result)
                 .totalPage(assignAsset.getTotalPages())
                 .totalRow(assignAsset.getTotalElements()).build();

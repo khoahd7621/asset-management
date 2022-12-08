@@ -1,14 +1,39 @@
 import { Table } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 
 import './TableRequest.scss';
 
 import Pagination from '../Pagination/Pagination';
-import { adminRoute } from '../../routes/routes';
 import { CheckIcon, DeclineIcon } from '../../assets/CustomIcon';
+import ModalRequestCompleted from './ModalRequestCompleted';
+import ModalRequestCanceled from './ModalRequestCanceled';
 
-const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize = 20, handleChangeCurrentPage }) => {
+const TableRequest = ({
+  listAssets = [],
+  currentPage = 1,
+  totalRow = 1,
+  pageSize = 20,
+  handleChangeCurrentPage,
+  fetchListRequest,
+  searchKeywords,
+  statuses,
+  date,
+}) => {
+  const [isComplete, setIsComplete] = useState();
+  const [isCancel, setIsCancel] = useState();
+  const [returnAssetId, setReturnAssetId] = useState();
+
+  const onClickToCompleteRequest = (requestId) => {
+    setReturnAssetId(requestId);
+    setIsComplete(true);
+  };
+
+  const onClickToCancelRequest = (requestId) => {
+    setReturnAssetId(requestId);
+    setIsCancel(true);
+  };
+
   const TableAssetColumns = [
     {
       title: (
@@ -16,7 +41,7 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
           No <CaretDownOutlined />
         </span>
       ),
-      width: '3.5rem',
+      width: '4.2em',
       dataIndex: 'no',
       key: 'no',
       ellipsis: true,
@@ -32,7 +57,6 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
           Asset Code <CaretDownOutlined />
         </span>
       ),
-      width: '104px',
       dataIndex: 'assetCode',
       key: 'assetCode',
       ellipsis: true,
@@ -48,7 +72,6 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
           Asset Name <CaretDownOutlined />
         </span>
       ),
-      width: '10rem',
       dataIndex: 'assetName',
       key: 'assetName',
       ellipsis: true,
@@ -64,7 +87,6 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
           Requested By <CaretDownOutlined />
         </span>
       ),
-      width: '115px',
       dataIndex: 'requestBy',
       key: 'requestBy',
       ellipsis: true,
@@ -80,7 +102,6 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
           Assigned Date <CaretDownOutlined />
         </span>
       ),
-      width: '124px',
       dataIndex: 'date',
       key: 'date',
       ellipsis: true,
@@ -96,7 +117,6 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
           Accepted By <CaretDownOutlined />
         </span>
       ),
-      width: '102px',
       dataIndex: 'acceptedBy',
       key: 'acceptedBy',
       ellipsis: true,
@@ -105,6 +125,7 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
       },
       sorter: (a, b) => checkString(a.acceptedBy).localeCompare(checkString(b.acceptedBy)),
       sortDirections: ['ascend', 'descend', 'ascend'],
+      responsive: ['sm'],
     },
     {
       title: (
@@ -112,7 +133,6 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
           Returned Date <CaretDownOutlined />
         </span>
       ),
-      width: '120px',
       dataIndex: 'returnDate',
       key: 'returnDate',
       ellipsis: true,
@@ -128,7 +148,6 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
           State <CaretDownOutlined />
         </span>
       ),
-      width: '135px',
       key: 'state',
       dataIndex: 'state',
       ellipsis: true,
@@ -140,15 +159,23 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
     },
     {
       key: 'action',
-      width: '5rem',
+      width: '60px',
       render: (_text, record) => {
         return (
           <div className="col-action in-active">
-            <button className="check-icon" disabled={record.state === 'Completed'}>
+            <button
+              onClick={() => onClickToCompleteRequest(record.assetId)}
+              className="check-icon"
+              disabled={record.state === 'Completed'}
+            >
               <CheckIcon />
             </button>
 
-            <button className="decline-icon" disabled={record.state === 'Completed'}>
+            <button
+              onClick={() => onClickToCancelRequest(record.assetId)}
+              className="decline-icon"
+              disabled={record.state === 'Completed'}
+            >
               <DeclineIcon />
             </button>
           </div>
@@ -193,6 +220,34 @@ const TableRequest = ({ listAssets = [], currentPage = 1, totalRow = 1, pageSize
         pagination={false}
       />
       <Pagination onChange={handleChangePage} current={currentPage} defaultPageSize={pageSize} total={totalRow} />
+
+      <ModalRequestCompleted
+        open={isComplete}
+        onCancel={() => {
+          setIsComplete(false);
+          setReturnAssetId(0);
+        }}
+        data={returnAssetId}
+        searchKeywords={searchKeywords}
+        statuses={statuses}
+        date={date}
+        fetchListRequest={fetchListRequest}
+        handleChangePage={handleChangeCurrentPage}
+      />
+
+      <ModalRequestCanceled
+        open={isCancel}
+        onCancel={() => {
+          setIsCancel(false);
+          setReturnAssetId(0);
+        }}
+        data={returnAssetId}
+        searchKeywords={searchKeywords}
+        statuses={statuses}
+        date={date}
+        fetchListRequest={fetchListRequest}
+        handleChangePage={handleChangeCurrentPage}
+      />
     </>
   );
 };

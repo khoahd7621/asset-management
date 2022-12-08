@@ -1,11 +1,18 @@
 package com.nashtech.assignment.dto.response.report;
 
-public interface AssetReportResponse {
-    Integer getCount();
-    String getName();
-    Integer getAssigned();
-    Integer getAvailable();
-    Integer getNotAvailable();
-    Integer getWaitingForRecycling();
-    Integer getRecycling();
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Builder
+@Getter
+@Setter
+public class AssetReportResponse {
+    private String name;
+    private Integer count;
+    private Integer assigned;
+    private Integer available;
+    private Integer notAvailable;
+    private Integer waitingForRecycling;
+    private Integer recycling;
 }

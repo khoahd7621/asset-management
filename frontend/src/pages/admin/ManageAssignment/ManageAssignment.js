@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Table, Modal, Button, Popover, Checkbox, DatePicker, Input } from 'antd';
+import { Row, Col, Table, Modal, Button, Popover, Checkbox, DatePicker, Input, Space, Spin } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
 import './ManageAssignment.scss';
 
 import { filterAssignmentList } from '../../../services/findApiService';
-import { CloseIcon, EditIcon, SortIcon, FilterIcon, RefreshIcon, CalendarIcon } from '../../../assets/CustomIcon';
+import { CloseIcon, EditIcon, SortIcon, FilterIcon, RefreshIcon } from '../../../assets/CustomIcon';
 import CustomPagination from '../../../components/Pagination/Pagination';
 import { getAssignmentDetails } from '../../../services/getApiService';
 import { adminRoute } from '../../../routes/routes';
 import { deleteAssignment } from '../../../services/disableApiService';
+import { postCreateNewRequestReturn } from '../../../services/createApiService';
 
 const ManageAssignment = () => {
   const { Search } = Input;
@@ -19,9 +20,12 @@ const ManageAssignment = () => {
   const [assignmentList, setAssignmentList] = useState([]);
   const [assignmentDetails, setAssignmentDetails] = useState();
   const [assignmentId, setAssignmentId] = useState();
+  const [idRequest, setIdRequest] = useState();
   const [isModalAssignmentDetails, SetIsModalAssignmentDetails] = useState(false);
   const [confirmPopUp, setConfirmPopUp] = useState(false);
+  const [requestReturnPopUp, setRequestReturnPopUp] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const plainOptions = ['Accepted', 'Waiting for acceptance', 'Declined'];
   const defaultCheckedList = ['ALL'];
@@ -41,6 +45,7 @@ const ManageAssignment = () => {
   }, []);
 
   useEffect(() => {
+    setIsLoading(true);
     getData();
   }, [current, assigndate, getSearchData, state, isDelete]);
 
@@ -52,6 +57,7 @@ const ManageAssignment = () => {
       current - 1,
     );
     if (response.status === 200) {
+      setIsLoading(false);
       const assignmentResponse = location.state?.assignmentResponse;
       if (assignmentResponse && isDelete === false) {
         const listDatas = response?.data?.data.filter((item) => item.id !== assignmentResponse.id);
@@ -76,6 +82,7 @@ const ManageAssignment = () => {
   const showAssignmentDetailsModal = async (assignmentId) => {
     const response = await getAssignmentDetails(assignmentId.currentTarget.dataset.id);
     if (response.status === 200) {
+      setIsLoading(false);
       setAssignmentDetails(response.data);
       SetIsModalAssignmentDetails(true);
     }
@@ -119,6 +126,19 @@ const ManageAssignment = () => {
   const onClickToAbleDelete = (data) => {
     setAssignmentId(data.currentTarget.dataset.id);
     setConfirmPopUp(true);
+  };
+
+  const onClickToAbleRequestReturn = (assignmentId) => {
+    setIdRequest(assignmentId);
+    setRequestReturnPopUp(true);
+  };
+
+  const onClickToRequestReturn = async () => {
+    const response = await postCreateNewRequestReturn({ idRequest });
+    if (response.status === 200) {
+      getData();
+      setRequestReturnPopUp(false);
+    }
   };
 
   const CheckboxGroup = Checkbox.Group;
@@ -201,9 +221,9 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.no - b.no,
       render: (text, record) => (
-        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {text}
-        </a>
+        </div>
       ),
       responsive: ['md'],
     },
@@ -216,9 +236,9 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.assetCode.localeCompare(b.assetCode),
       render: (text, record) => (
-        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {text}
-        </a>
+        </div>
       ),
       responsive: ['lg'],
     },
@@ -231,9 +251,9 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.assetName.localeCompare(b.assetName),
       render: (text, record) => (
-        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {text}
-        </a>
+        </div>
       ),
       responsive: ['lg'],
     },
@@ -246,9 +266,9 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.userAssignedTo.localeCompare(b.userAssignedTo),
       render: (text, record) => (
-        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {text}
-        </a>
+        </div>
       ),
       responsive: ['xl'],
     },
@@ -261,9 +281,9 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.userAssignedBy.localeCompare(b.userAssignedBy),
       render: (text, record) => (
-        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {text}
-        </a>
+        </div>
       ),
       responsive: ['xxl'],
     },
@@ -276,9 +296,9 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => formatDate(convertStrDate(a.assignedDate)) - formatDate(convertStrDate(b.assignedDate)),
       render: (text, record) => (
-        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {convertStrDate(text)}
-        </a>
+        </div>
       ),
       responsive: ['xxl'],
     },
@@ -291,9 +311,9 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.status.localeCompare(b.status),
       render: (text, record) => (
-        <a className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {toTitle(text)}
-        </a>
+        </div>
       ),
       responsive: ['xxl'],
     },
@@ -326,94 +346,72 @@ const ManageAssignment = () => {
             </div>
             <div className="manage-assignment__return-icon">
               <Button
-                data-id={record.assetCode}
+                onClick={() => onClickToAbleRequestReturn(record.id)}
                 type="link"
                 icon={<RefreshIcon />}
-                disabled={record.status === 'ACCEPTED' ? false : true}
+                disabled={record.status === 'ACCEPTED' && record.returnAsset === null ? false : true}
               ></Button>
             </div>
           </div>
         );
       },
     },
-    {
-      title: title(''),
-      dataIndex: 'id',
-      key: 'id',
-      hidden: true,
-    },
   ].filter((item) => !item.hidden);
 
   return (
     <div className="manage-assignment">
       <h1 className="manage-assignment__title">Assignment List</h1>
-      <div className="manage-assignment__fucntion">
-        <Row
-          gutter={{
-            xs: 300,
-            sm: 300,
-            md: 250,
-            lg: 300,
-            xl: 400,
-            xxl: 100,
-          }}
+      <div className="manage-assignment__function">
+        <Popover content={content} placement="bottom" trigger="click" overlayClassName="function--popover">
+          <Button className="function--button">
+            <Row>
+              <Col span={21}>Type</Col>
+              <Col span={1} className="border-right"></Col>
+              <Col span={2}>
+                <FilterIcon type="filter" />
+              </Col>
+            </Row>
+          </Button>
+        </Popover>
+        <DatePicker
+          id="manage-assignment__date-picker"
+          className="manage-assignment-date"
+          placeholder="Assigned Date"
+          format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
+          onChange={FilterByJoinedDate}
+        />
+        <Search
+          id="manage-assignment__search"
+          maxLength={100}
+          className="manage-assignment-search"
+          allowClear
+          onSearch={FilterBySearch}
+        ></Search>
+        <Button
+          className="manage-assignment-button"
+          onClick={() => navigate(`/${adminRoute.home}/${adminRoute.manageAssignment}/${adminRoute.createAssignment}`)}
         >
-          <Col className="gutter-row" span={6}>
-            <Popover content={content} placement="bottom" trigger="click" overlayClassName="function--popover">
-              <Button className="function--button">
-                <Row>
-                  <Col span={21}>Type</Col>
-                  <Col span={1} className="border-right"></Col>
-                  <Col span={2}>
-                    <FilterIcon type="filter" />
-                  </Col>
-                </Row>
-              </Button>
-            </Popover>
-          </Col>
-          <Col className="gutter-row" span={6}>
-            <DatePicker
-              id="manage-assignment__date-picker"
-              className="manage-assignment-date"
-              placeholder="Assigned Date"
-              format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
-              onChange={FilterByJoinedDate}
-              suffixIcon={<CalendarIcon />}
-            />
-          </Col>
-          <Col className="gutter-row" span={6}>
-            <Search
-              id="manage-assignment__search"
-              maxLength={100}
-              className="manage-assignment-search"
-              allowClear
-              onSearch={FilterBySearch}
-            ></Search>
-          </Col>
-          <Col className="gutter-row" span={6}>
-            <Button
-              className="manage-assignment-button"
-              onClick={() =>
-                navigate(`/${adminRoute.home}/${adminRoute.manageAssignment}/${adminRoute.createAssignment}`)
-              }
-            >
-              Create new assignment
-            </Button>
-          </Col>
-        </Row>
+          Create new assignment
+        </Button>
       </div>
       <br></br>
       <div className="manage-assignment__body">
-        <Table
-          id="manage-assignment__table"
-          showSorterTooltip={false}
-          size="small"
-          sortDirections={'ascend'}
-          pagination={false}
-          className="user-list"
-          dataSource={assignmentList}
-          columns={columns}
-        />
+        {isLoading ? (
+          <Space size="middle">
+            <Spin size="large" style={{ paddingLeft: '30rem', paddingTop: '10rem' }} />
+          </Space>
+        ) : (
+          <Table
+            id="manage-assignment__table"
+            showSorterTooltip={false}
+            size="small"
+            sortDirections={'ascend'}
+            pagination={false}
+            className="user-list"
+            dataSource={assignmentList}
+            columns={columns}
+          />
+        )}
         <CustomPagination onChange={setCurrent} current={current} total={totalRow}></CustomPagination>
 
         <Modal
@@ -508,6 +506,19 @@ const ManageAssignment = () => {
           closable={false}
         >
           <p>Do you want to delete this assignment?</p>
+        </Modal>
+        <Modal
+          open={requestReturnPopUp}
+          className="user-list__disable-modal"
+          title={'Are you sure?'}
+          centered
+          onOk={onClickToRequestReturn}
+          onCancel={() => setRequestReturnPopUp(false)}
+          okText="Yes"
+          cancelText="No"
+          closable={false}
+        >
+          <p>Do you want to create a returning request for this asset?</p>
         </Modal>
       </div>
     </div>

@@ -11,6 +11,14 @@
 }
 
 .user-list {
+  .ant-pagination.custom-pagination {
+    margin-right: 2.1rem;
+
+    @media (max-width: 1390px) {
+      margin-right: 0.1rem;
+    }
+  }
+
   table {
     display: table;
     background-color: white;
@@ -33,6 +41,9 @@
     background-color: white;
     height: -100px;
     font-size: 14.1px;
+    &.ant-table-cell-row-hover {
+      background: rgba(0, 0, 0, 0.04) !important;
+    }
   }
 
   .ant-table-container table > thead > tr:first-child th:last-child {
@@ -45,22 +56,15 @@
     width: 100px;
     background-color: #ffffff;
     border-bottom: 1.5px solid white;
+    &.ant-table-cell-row-hover {
+      background: white !important;
+    }
   }
 
   .ant-table-thead
     > tr
     > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan]):before {
     background-color: white;
-  }
-
-  .ant-pagination {
-    text-align: end;
-  }
-
-  .ant-pagination-item-active {
-    font-weight: 500;
-    color: #ffffff;
-    border-color: #cf2338;
   }
 
   .ant-table-column-sorter {
@@ -70,7 +74,9 @@
   a {
     color: rgb(14, 12, 12);
   }
-  a:hover {
+
+  .assignment-details:hover {
+    cursor: pointer;
     color: #cf2338;
   }
 

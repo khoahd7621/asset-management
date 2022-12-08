@@ -68,7 +68,7 @@ class CreateAssetServiceImplTest {
         AssetResponse expected = mock(AssetResponse.class);
         List<Asset> assets = new ArrayList<Asset>();
 
-        when(assetMapper.mapAssetRequestToEntity(createNewAssetRequest)).thenReturn(asset);
+        when(assetMapper.toAsset(createNewAssetRequest)).thenReturn(asset);
         when(assetRepository.save(asset)).thenReturn(asset);
 
         when(categoryRepository.findByName(createNewAssetRequest.getCategoryName())).thenReturn(Optional.of(category));

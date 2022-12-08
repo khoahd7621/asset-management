@@ -50,6 +50,6 @@ public class EditAssetServiceImpl implements EditAssetService {
         asset.setStatus(editAssetInformationRequest.getAssetStatus());
         asset.setInstalledDate(installedDate);
         assetRepository.save(asset);
-        return assetMapper.mapEntityToEditAssetInformationResponse(asset);
+        return assetMapper.toAssetResponse(asset);
     }
 }

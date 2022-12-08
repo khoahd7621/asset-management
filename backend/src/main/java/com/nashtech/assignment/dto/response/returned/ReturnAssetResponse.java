@@ -1,4 +1,4 @@
-package com.nashtech.assignment.dto.response.return_asset;
+package com.nashtech.assignment.dto.response.returned;
 
 import java.util.Date;
 

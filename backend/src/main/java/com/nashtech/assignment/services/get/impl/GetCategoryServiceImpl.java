@@ -21,7 +21,6 @@ public class GetCategoryServiceImpl implements GetCategoryService {
     @Autowired
     private CategoryMapper categoryMapper;
 
-
     @Override
     public List<CategoryResponse> getAllCategories() {
         List<Category> categoryList = categoryRepository.findAll(Sort.by("name").ascending());

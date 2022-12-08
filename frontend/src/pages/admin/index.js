@@ -1,6 +1,12 @@
 export { default as Home } from './Home/Home';
-export { default as ManageUser } from './ManageUser/ManageUser';
-export { default as CreateUser } from './CreateUser/CreateUser';
-export { default as ManageAsset } from './ManageAsset/ManageAsset';
+export { default as CreateAsset } from './CreateAsset/CreateAsset';
 export { default as CreateAssignment } from './CreateAssignment/CreateAssignment';
+export { default as CreateUser } from './CreateUser/CreateUser';
+export { default as EditAsset } from './EditAsset/EditAsset';
 export { default as EditAssignment } from './EditAssignment/EditAssignment';
+export { default as EditUser } from './EditUser/EditUser';
+export { default as ManageAsset } from './ManageAsset/ManageAsset';
+export { default as ManageAssignment } from './ManageAssignment/ManageAssignment';
+export { default as ManageRequestReturn } from './ManageRequestReturn/ManageRequestReturn';
+export { default as ManageUser } from './ManageUser/ManageUser';
+export { default as Report } from './Report/Report';

@@ -26,9 +26,9 @@ import java.util.List;
 public class SearchUserServiceImpl implements SearchUserService {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
     @Autowired
     private PageableUtil pageableUtil;
     @Autowired
@@ -45,7 +45,7 @@ public class SearchUserServiceImpl implements SearchUserService {
         }
 
         return new PaginationResponse<>(
-                userMapper.mapListEntityUserResponses(user.getContent()),
+                userMapper.toListUserResponses(user.getContent()),
                 user.getTotalPages(),
                 user.getTotalElements());
     }
@@ -62,7 +62,7 @@ public class SearchUserServiceImpl implements SearchUserService {
                 return new PaginationResponse<>(Collections.emptyList(), 0, 0);
             }
             return new PaginationResponse<>(
-                    userMapper.mapListEntityUserResponses(result.getContent()),
+                    userMapper.toListUserResponses(result.getContent()),
                     result.getTotalPages(),
                     result.getTotalElements());
         }
@@ -72,7 +72,7 @@ public class SearchUserServiceImpl implements SearchUserService {
                     Collections.emptyList(), 0, 0);
         }
         return new PaginationResponse<>(
-                userMapper.mapListEntityUserResponses(result.getContent()),
+                userMapper.toListUserResponses(result.getContent()),
                 result.getTotalPages(),
                 result.getTotalElements());
     }
@@ -89,7 +89,7 @@ public class SearchUserServiceImpl implements SearchUserService {
                         Collections.emptyList(), 0, 0);
             }
             result = new PaginationResponse<>(
-                    userMapper.mapListEntityUserResponses(pageUsers.getContent()),
+                    userMapper.toListUserResponses(pageUsers.getContent()),
                     pageUsers.getTotalPages(),
                     pageUsers.getTotalElements());
             return result;
@@ -100,7 +100,7 @@ public class SearchUserServiceImpl implements SearchUserService {
                     Collections.emptyList(), 0, 0);
         }
         result = new PaginationResponse<>(
-                userMapper.mapListEntityUserResponses(users.getContent()),
+                userMapper.toListUserResponses(users.getContent()),
                 users.getTotalPages(),
                 users.getTotalElements());
         return result;
@@ -117,7 +117,7 @@ public class SearchUserServiceImpl implements SearchUserService {
                 searchUserRequest.getTypes(),
                 user.getLocation(),
                 pageable);
-        List<UserResponse> userResponseList = userMapper.mapListEntityUserResponses(userPage.toList());
+        List<UserResponse> userResponseList = userMapper.toListUserResponses(userPage.toList());
         return PaginationResponse.<List<UserResponse>>builder()
                 .data(userResponseList)
                 .totalRow(userPage.getTotalElements())

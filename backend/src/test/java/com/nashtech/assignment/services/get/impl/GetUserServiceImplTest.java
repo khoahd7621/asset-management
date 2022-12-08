@@ -19,6 +19,7 @@ class GetUserServiceImplTest {
     private GetUserServiceImpl getUserServiceImpl;
     private UserRepository userRepository;
     private UserMapper userMapper;
+
     private User user;
     private UserResponse userResponse;
 
@@ -36,7 +37,7 @@ class GetUserServiceImplTest {
     @Test
     void viewUserDetails_WhenDataValid_ShouldReturnUserDetails() {
         when(userRepository.findByStaffCode("test")).thenReturn(user);
-        when(userMapper.mapEntityToResponseDto(user)).thenReturn(userResponse);
+        when(userMapper.toUserResponse(user)).thenReturn(userResponse);
 
         UserResponse actual = getUserServiceImpl.viewUserDetails("test");
 
@@ -46,11 +47,11 @@ class GetUserServiceImplTest {
     @Test
     void viewUserDetails_WhenNotFound_ShouldReturnNull() {
         when(userRepository.findByStaffCode("test")).thenReturn(null);
-        when(userMapper.mapEntityToResponseDto(user)).thenReturn(userResponse);
+        when(userMapper.toUserResponse(user)).thenReturn(userResponse);
 
         NotFoundException actual = assertThrows(NotFoundException.class, () ->
                 getUserServiceImpl.viewUserDetails("test"));
 
-        assertThat(actual.getMessage(), is("Cannot Found Staff With Code: " + "test"));
+        assertThat(actual.getMessage(), is("Cannot Found Staff With Code: test"));
     }
 }

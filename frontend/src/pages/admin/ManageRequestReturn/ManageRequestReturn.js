@@ -21,7 +21,7 @@ const ManageRequestReturn = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    document.title = 'Manage Asset - Asset List';
+    document.title = 'Request For Returning - Request List';
   }, []);
 
   useEffect(() => {
@@ -82,7 +82,7 @@ const ManageRequestReturn = () => {
     }
   };
 
-  const handleValidateDateOfBirth = (date, dateString) => {
+  const handleValidateDateOfBirth = (date, _dateString) => {
     if (date) {
       setCurrentPage(1);
       setDate(date.format('DD/MM/YYYY'));
@@ -143,6 +143,10 @@ const ManageRequestReturn = () => {
             totalRow={totalRow}
             pageSize={PAGE_SIZE}
             handleChangeCurrentPage={handleChangeCurrentPage}
+            searchKeywords={searchKeywords}
+            statuses={convertListStatus(currentChoosedStatus)}
+            date={date}
+            fetchListRequest={fetchListRequest}
           />
         )}
       </div>
