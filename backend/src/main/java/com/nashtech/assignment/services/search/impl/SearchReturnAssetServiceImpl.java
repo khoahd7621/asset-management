@@ -16,7 +16,7 @@ import com.nashtech.assignment.data.entities.ReturnAsset;
 import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.data.repositories.ReturnAssetRepository;
 import com.nashtech.assignment.dto.response.PaginationResponse;
-import com.nashtech.assignment.dto.response.return_asset.ReturnAssetResponse;
+import com.nashtech.assignment.dto.response.returned.ReturnAssetResponse;
 import com.nashtech.assignment.mappers.ReturnAssetMapper;
 import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.services.search.SearchReturnAssetService;

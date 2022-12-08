@@ -22,6 +22,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api")
 public class AuthController {
+
     @Autowired
     LoginService loginService;
 

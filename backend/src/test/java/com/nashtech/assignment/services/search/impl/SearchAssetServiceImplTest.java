@@ -31,6 +31,7 @@ class SearchAssetServiceImplTest {
     private AssetMapper assetMapper;
     private PageableUtil pageableUtil;
     private SecurityContextService securityContextService;
+
     private Asset asset;
     private AssetResponse assetResponse;
     private User user;

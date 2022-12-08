@@ -30,13 +30,13 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public UserLoginResponse login(UserLoginRequest userLoginRequest) {
-        Boolean isFirstLogin = false;
+        boolean isFirstLogin = false;
         String username = userLoginRequest.getUsername();
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) {
-            throw new BadRequestException("Username not found");
+            throw new BadRequestException("Username or password is incorrect. Please try again");
         }
-        if (userOpt.get().isDeleted() == true) {
+        if (userOpt.get().isDeleted()) {
             throw new BadRequestException("This account has been disabled");
         }
         if (!passwordEncoder.matches(userLoginRequest.getPassword(), userOpt.get().getPassword())) {
@@ -46,9 +46,7 @@ public class LoginServiceImpl implements LoginService {
             isFirstLogin = true;
         }
         String token = jwtTokenUtil.generateJwtToken(userOpt.get());
-        UserLoginResponse userLoginResponse = UserLoginResponse.builder().accessToken(token).isFirstLogin(isFirstLogin)
-                .build();
-        return userLoginResponse;
+        return UserLoginResponse.builder().accessToken(token).isFirstLogin(isFirstLogin).build();
     }
 
 }

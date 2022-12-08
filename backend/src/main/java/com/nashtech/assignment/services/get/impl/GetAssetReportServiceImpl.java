@@ -1,28 +1,26 @@
 package com.nashtech.assignment.services.get.impl;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.nashtech.assignment.data.repositories.AssetRepository;
+import com.nashtech.assignment.dto.response.report.AssetReportResponse;
+import com.nashtech.assignment.mappers.AssetReportMapper;
+import com.nashtech.assignment.services.get.GetAssetReportService;
+import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.nashtech.assignment.data.entities.Category;
-import com.nashtech.assignment.data.repositories.AssetRepository;
-import com.nashtech.assignment.data.repositories.CategoryRepository;
-import com.nashtech.assignment.dto.response.report.AssetReportResponse;
-import com.nashtech.assignment.services.get.GetAssetReportService;
-
-import lombok.Builder;
+import java.util.List;
 
 @Service
 @Builder
 public class GetAssetReportServiceImpl implements GetAssetReportService {
 
-    @Autowired AssetRepository assetRepository;
+    @Autowired
+    private AssetRepository assetRepository;
+    @Autowired
+    private AssetReportMapper assetReportMapper;
 
     @Override
     public List<AssetReportResponse> getAssetReport() {
-        return assetRepository.getAssetReport();
+        return assetReportMapper.toListAssetReportResponses(assetRepository.getAssetReport());
     }
-    
 }

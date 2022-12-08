@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Dropdown, Layout, Space, Button, Form, Input, Menu } from 'antd';
+import { Dropdown, Layout, Space, Button, Form, Input } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 import { removeDataUserLogout } from '../../redux/slice/userSlice';
 
@@ -160,12 +160,24 @@ const Navbar = () => {
     }
   };
 
-  const menu = (
-    <Menu>
-      <Menu.Item onClick={handleChangePassword}>Change Password</Menu.Item>
-      <Menu.Item onClick={handleSelectLogout}>Logout</Menu.Item>
-    </Menu>
-  );
+  const items = [
+    {
+      label: (
+        <span className="change-password-btn" onClick={handleChangePassword}>
+          Change Password
+        </span>
+      ),
+      key: 'change-password-btn',
+    }, // remember to pass the key prop
+    {
+      label: (
+        <span className="logout-btn" onClick={handleSelectLogout}>
+          Logout
+        </span>
+      ),
+      key: 'logout-btn',
+    },
+  ];
 
   const [listTitles, setListTitles] = useState([{ title: '', link: '' }]);
   const user = useSelector((state) => state.user.user);
@@ -262,7 +274,7 @@ const Navbar = () => {
           })}
       </div>
       <div className="navbar-header__right">
-        <Dropdown overlay={menu} trigger={['click']} placement="bottomRight">
+        <Dropdown overlayClassName="username-dropdown" menu={{ items }} trigger={['click']} placement="bottomRight">
           <a id="username-btn" onClick={(e) => e.preventDefault()}>
             <Space>
               {user.username} <CaretDownOutlined />

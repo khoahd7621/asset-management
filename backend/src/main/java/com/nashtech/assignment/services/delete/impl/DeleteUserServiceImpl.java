@@ -16,16 +16,16 @@ import org.springframework.stereotype.Service;
 public class DeleteUserServiceImpl implements DeleteUserService {
 
     @Autowired
-    AssignAssetRepository assignAssetRepository;
+    private AssignAssetRepository assignAssetRepository;
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    SecurityContextService securityContextService;
+    private SecurityContextService securityContextService;
 
     @Override
     public void deleteUser(String staffCode) {
         if (securityContextService.getCurrentUser().getStaffCode().equals(staffCode)) {
-            throw new BadRequestException("Cannot disable yourselft");
+            throw new BadRequestException("Cannot disable yourself");
         }
         User user = userRepository.findByStaffCode(staffCode);
 
@@ -41,13 +41,12 @@ public class DeleteUserServiceImpl implements DeleteUserService {
 
         user.setDeleted(true);
         userRepository.save(user);
-
     }
 
     @Override
     public boolean checkValidUser(String staffCode) {
         if (securityContextService.getCurrentUser().getStaffCode().equals(staffCode)) {
-            throw new BadRequestException("Cannot disable yourselft");
+            throw new BadRequestException("Cannot disable yourself");
         }
         User user = userRepository.findByStaffCode(staffCode);
 

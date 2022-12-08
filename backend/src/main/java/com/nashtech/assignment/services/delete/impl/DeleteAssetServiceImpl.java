@@ -37,4 +37,5 @@ public class DeleteAssetServiceImpl implements DeleteAssetService {
         asset.setDeleted(true);
         assetRepository.save(asset);
     }
+
 }

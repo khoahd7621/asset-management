@@ -1,4 +1,4 @@
-import { Button, Table } from 'antd';
+import { Button, Space, Spin, Table } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import './Report.scss';
@@ -6,14 +6,15 @@ import './Report.scss';
 import { getReportDetails } from '../../../services/getApiService';
 import { SortIcon } from '../../../assets/CustomIcon';
 
-export const Report = () => {
+const Report = () => {
   const [reportDetails, setReportDetails] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const onClickToExport = () => {
     let XLSX = require('xlsx');
     let ws = XLSX.utils.json_to_sheet(reportDetails);
     XLSX.utils.sheet_add_aoa(ws, [
-      ['Category', 'Total', 'Assigned', 'Available', 'Waiting for recycling', 'Not available', 'Recycled'],
+      ['Category', 'Total', 'Assigned', 'Available', 'Not available', 'Waiting for recycling', 'Recycled'],
     ]);
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Report');
@@ -32,12 +33,15 @@ export const Report = () => {
   };
 
   useEffect(() => {
+    document.title = 'Report';
+    setIsLoading(true);
     getData();
   }, []);
 
   const getData = async () => {
     const response = await getReportDetails();
     if (response.status === 200) {
+      setIsLoading(false);
       setReportDetails(response.data);
     }
   };
@@ -126,17 +130,25 @@ export const Report = () => {
       </div>
       <br></br>
       <div className="report__body">
-        <Table
-          id="report__table"
-          showSorterTooltip={false}
-          size="small"
-          sortDirections={'ascend'}
-          pagination={false}
-          className="user-list"
-          dataSource={reportDetails}
-          columns={columns}
-        />
+        {isLoading ? (
+          <Space size="middle">
+            <Spin size="large" style={{ paddingLeft: '30rem', paddingTop: '10rem' }} />
+          </Space>
+        ) : (
+          <Table
+            id="report__table"
+            showSorterTooltip={false}
+            size="small"
+            sortDirections={'ascend'}
+            pagination={false}
+            className="user-list"
+            dataSource={reportDetails}
+            columns={columns}
+          />
+        )}
       </div>
     </div>
   );
 };
+
+export default Report;

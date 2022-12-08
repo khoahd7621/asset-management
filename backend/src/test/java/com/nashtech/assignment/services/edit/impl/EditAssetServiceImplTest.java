@@ -87,7 +87,7 @@ class EditAssetServiceImplTest {
         when(assetRepository.findById(idAsset)).thenReturn(Optional.of(asset));
         when(asset.getStatus())
                 .thenReturn(EAssetStatus.NOT_AVAILABLE);
-        when(assetMapper.mapEntityToEditAssetInformationResponse(asset)).thenReturn(expected);
+        when(assetMapper.toAssetResponse(asset)).thenReturn(expected);
 
         AssetResponse actual = editAssetServiceImpl.editAssetInformation(idAsset,
                 editAssetInformationRequest);
@@ -100,6 +100,5 @@ class EditAssetServiceImplTest {
 
         assertThat(actual, is(expected));
     }
-
 
 }

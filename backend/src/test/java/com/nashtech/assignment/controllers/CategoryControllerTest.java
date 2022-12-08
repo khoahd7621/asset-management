@@ -34,90 +34,88 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
 @WebMvcTest(value = CategoryController.class)
-@ContextConfiguration(classes = { AssignmentApplication.class, SecurityConfig.class, CORSConfig.class })
+@ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class, CORSConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
 class CategoryControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
-  @Autowired
-  private ObjectMapper objectMapper;
-  @MockBean
-  private GetCategoryService getCategoryService;
-  @MockBean
-  private CreateCategoryService createCategoryService;
-  @MockBean
-  private JwtTokenUtil jwtTokenUtil;
-  @MockBean
-  private SecurityContextService securityContextService;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @MockBean
+    private GetCategoryService getCategoryService;
+    @MockBean
+    private CreateCategoryService createCategoryService;
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
+    @MockBean
+    private SecurityContextService securityContextService;
 
-  private CategoryResponse categoryResponse;
-  private BadRequestException badRequestException;
+    private CategoryResponse categoryResponse;
+    private BadRequestException badRequestException;
 
-  @BeforeEach
-  void setup() {
-    badRequestException = new BadRequestException("error message");
-    categoryResponse = CategoryResponse.builder()
-        .id(1)
-        .name("name")
-        .prefixAssetCode("prefix").build();
-  }
+    @BeforeEach
+    void setup() {
+        badRequestException = new BadRequestException("error message");
+        categoryResponse = CategoryResponse.builder()
+                .id(1)
+                .name("name")
+                .prefixAssetCode("prefix").build();
+    }
 
-  @Test
-  void getAllCategories_ShouldReturnData() throws Exception {
-    List<CategoryResponse> response = new ArrayList<>();
-    response.add(categoryResponse);
+    @Test
+    void getAllCategories_ShouldReturnData() throws Exception {
+        List<CategoryResponse> response = new ArrayList<>();
+        response.add(categoryResponse);
 
-    when(getCategoryService.getAllCategories()).thenReturn(response);
+        when(getCategoryService.getAllCategories()).thenReturn(response);
 
-    RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/category");
-    MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/category");
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
 
-    assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
-    assertThat(actual.getContentAsString(), is("[{\"id\":1,\"name\":\"name\",\"prefixAssetCode\":\"prefix\"}]"));
-  }
+        assertThat(actual.getStatus(), is(HttpStatus.OK.value()));
+        assertThat(actual.getContentAsString(), is("[{\"id\":1,\"name\":\"name\",\"prefixAssetCode\":\"prefix\"}]"));
+    }
 
-  @Test
-  void createNewCategory_ShouldReturnData() throws Exception {
-    CreateNewCategoryRequest request = CreateNewCategoryRequest
-        .builder()
-        .categoryName("categoryName")
-        .prefixAssetCode("CN")
-        .build();
+    @Test
+    void createNewCategory_ShouldReturnData() throws Exception {
+        CreateNewCategoryRequest request = CreateNewCategoryRequest
+                .builder()
+                .categoryName("categoryName")
+                .prefixAssetCode("CN")
+                .build();
 
-    ArgumentCaptor<CreateNewCategoryRequest> categoryCaptor = ArgumentCaptor
-        .forClass(CreateNewCategoryRequest.class);
+        ArgumentCaptor<CreateNewCategoryRequest> categoryCaptor = ArgumentCaptor
+                .forClass(CreateNewCategoryRequest.class);
 
-    CategoryResponse response = CategoryResponse
-        .builder()
-        .name("categoryName")
-        .prefixAssetCode("CN")
-        .build();
+        CategoryResponse response = CategoryResponse
+                .builder()
+                .name("categoryName")
+                .prefixAssetCode("CN")
+                .build();
 
-    when(createCategoryService.createNewCategory(categoryCaptor.capture())).thenReturn(response);
+        when(createCategoryService.createNewCategory(categoryCaptor.capture())).thenReturn(response);
 
-    RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/category")
-        .content(objectMapper.writeValueAsString(request))
-        .contentType(MediaType.APPLICATION_JSON);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/category")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON);
 
-    MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
-    assertThat(actual.getContentAsString(),
-        is("{\"id\":0,\"name\":\"categoryName\",\"prefixAssetCode\":\"CN\"}"));
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+        assertThat(actual.getContentAsString(), is("{\"id\":0,\"name\":\"categoryName\",\"prefixAssetCode\":\"CN\"}"));
+    }
 
-  }
+    @Test
+    void createNewCategory_WhenDataInvalid_ShouldReturnException() throws Exception {
+        CreateNewCategoryRequest request = CreateNewCategoryRequest
+                .builder()
+                .categoryName("categoryName")
+                .prefixAssetCode("CN")
+                .build();
 
-  @Test
-  void createNewCategory_WhenDataInvalid_ShouldReturnException() throws Exception {
-    CreateNewCategoryRequest request = CreateNewCategoryRequest
-        .builder()
-        .categoryName("categoryName")
-        .prefixAssetCode("CN")
-        .build();
+        when(createCategoryService.createNewCategory(request)).thenThrow(badRequestException);
 
-    when(createCategoryService.createNewCategory(request)).thenThrow(badRequestException);
-
-    RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/category");
-    MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
-    assertThat(actual.getStatus(),is(HttpStatus.BAD_REQUEST.value()));
-  }
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/category");
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+        assertThat(actual.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
+    }
 }

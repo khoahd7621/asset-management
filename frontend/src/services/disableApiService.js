@@ -16,4 +16,8 @@ const deleteAssignment = (assignmentId) => {
   return axios.delete(`/api/assignment?assignmentId=${assignmentId}`);
 };
 
-export { disableUser, checkValid, deleteAsset, deleteAssignment };
+const deleteRequestForReturning = (requestId) => {
+  return axios.delete(`/api/return-asset?id=${requestId}`);
+};
+
+export { disableUser, checkValid, deleteAsset, deleteAssignment, deleteRequestForReturning };

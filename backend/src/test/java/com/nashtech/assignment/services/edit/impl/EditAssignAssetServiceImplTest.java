@@ -42,6 +42,7 @@ class EditAssignAssetServiceImplTest {
     private ValidationUserService validationUserService;
     private CompareDateUtil compareDateUtil;
     private SecurityContextService securityContextService;
+
     private AssignAsset assignAsset;
     private AssignAssetResponse assignAssetResponse;
     private Date today;

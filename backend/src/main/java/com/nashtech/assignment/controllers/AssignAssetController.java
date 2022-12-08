@@ -29,7 +29,6 @@ import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.services.create.CreateAssignmentService;
 import com.nashtech.assignment.services.delete.DeleteAssignAssetService;
 import com.nashtech.assignment.services.edit.EditAssignAssetService;
-import com.nashtech.assignment.services.get.FindAssignAssetService;
 import com.nashtech.assignment.services.get.GetAssignAssetService;
 import com.nashtech.assignment.services.search.SearchAssignAssetService;
 
@@ -51,8 +50,6 @@ public class AssignAssetController {
     private CreateAssignmentService createAssignmentService;
     @Autowired
     private EditAssignAssetService editAssignAssetService;
-    @Autowired
-    private FindAssignAssetService findAssignAsset;
     @Autowired
     private EditAssignAssetService editStatusAssignAssetService;
     @Autowired
@@ -87,12 +84,10 @@ public class AssignAssetController {
     public ResponseEntity<AssignAssetResponse> declineAssignAsset(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(editStatusAssignAssetService.declineAssignAsset(id));
     }
-    
 
     @Operation(summary = "Search assign by receive name, status, date, page")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Return list of assignAsset, total page and total row that suitable with the information that user provided", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = PaginationResponse.class)) }) })
+            @ApiResponse(responseCode = "200", description = "Return list of assignAsset, total page and total row that suitable with the information that user provided") })
     @GetMapping
     public ResponseEntity<PaginationResponse<List<AssignAssetResponse>>> searchAssignAsset(
             @RequestParam(required = false) String name,
@@ -156,7 +151,7 @@ public class AssignAssetController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) }) })
     @GetMapping("/user")
     public ResponseEntity<List<AssignAssetResponse>> findAllAssignAssetByUser() {
-        return ResponseEntity.status(HttpStatus.OK).body(findAssignAsset.findAssignAssetByUser());
+        return ResponseEntity.status(HttpStatus.OK).body(getAssignAssetService.getAssignAssetOfUser());
     }
 
     @Operation(summary = "View detail assign asset")
@@ -167,19 +162,20 @@ public class AssignAssetController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) }) })
     @GetMapping("/user/{assignAssetId}")
     public ResponseEntity<AssignAssetResponse> viewDetailAssignAsset(@PathVariable Long assignAssetId) {
-        return ResponseEntity.status(HttpStatus.OK).body(findAssignAsset.detailAssignAsset(assignAssetId));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(getAssignAssetService.getDetailAssignAssetOfUser(assignAssetId));
     }
 
     @Operation(summary = "Delete assignment")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Delete assignment successfully", content = {
-                    @Content(mediaType = "application/json")}),
+                    @Content(mediaType = "application/json") }),
             @ApiResponse(responseCode = "400", description = "Assignment not valid for delete", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class))}),
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)) }),
             @ApiResponse(responseCode = "404", description = "Assignment not found", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))})})
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class)) }) })
     @DeleteMapping
-    public ResponseEntity<Void> deleteAssignAsset(@RequestParam Long assignmentId){
+    public ResponseEntity<Void> deleteAssignAsset(@RequestParam Long assignmentId) {
         deleteAssignAssetService.deleteAssignAsset(assignmentId);
         return ResponseEntity.noContent().build();
     }

@@ -1,23 +1,21 @@
 package com.nashtech.assignment.mappers;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Component;
-
 import com.nashtech.assignment.data.entities.Category;
 import com.nashtech.assignment.dto.request.category.CreateNewCategoryRequest;
 import com.nashtech.assignment.dto.response.category.CategoryResponse;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class CategoryMapper {
 
-    public Category mapCategoryRequestToEntity(CreateNewCategoryRequest createNewCategoryRequest) {
-        Category categoryResponse = Category.builder()
+    public Category toCategory(CreateNewCategoryRequest createNewCategoryRequest) {
+        return Category.builder()
                 .name(createNewCategoryRequest.getCategoryName())
                 .prefixAssetCode(createNewCategoryRequest.getPrefixAssetCode())
                 .build();
-        return categoryResponse;
     }
 
     public CategoryResponse toCategoryResponse(Category category) {

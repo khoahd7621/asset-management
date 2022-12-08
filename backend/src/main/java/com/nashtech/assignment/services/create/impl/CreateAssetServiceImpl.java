@@ -39,7 +39,7 @@ public class CreateAssetServiceImpl implements CreateAssetService {
         Optional<Category> categoryOpt = categoryRepository.findByName(createNewAssetRequest.getCategoryName());
         List<Asset> assets = assetRepository.findAssetsByCategoryId(categoryOpt.get().getId());
 
-        Asset asset = assetMapper.mapAssetRequestToEntity(createNewAssetRequest);
+        Asset asset = assetMapper.toAsset(createNewAssetRequest);
         asset = assetRepository.save(asset);
         String prefixAssetCode = categoryOpt.get().getPrefixAssetCode();
 

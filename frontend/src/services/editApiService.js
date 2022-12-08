@@ -49,6 +49,10 @@ const putDeclineAssignAsset = ({ idDecline }) => {
   return axios.put(`/api/assignment/user/decline/${idDecline}`);
 };
 
+const patchCompleteRequestReturnAsset = (returnAssetId) => {
+  return axios.patch(`/api/return-asset?id=${returnAssetId}`);
+};
+
 export {
   postEditUser,
   putEditAsset,
@@ -57,4 +61,5 @@ export {
   putEditAssignment,
   putAcceptAssignAsset,
   putDeclineAssignAsset,
+  patchCompleteRequestReturnAsset
 };

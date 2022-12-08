@@ -19,7 +19,7 @@ import com.nashtech.assignment.data.entities.ReturnAsset;
 import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.data.repositories.AssignAssetRepository;
 import com.nashtech.assignment.data.repositories.ReturnAssetRepository;
-import com.nashtech.assignment.dto.response.return_asset.ReturnAssetResponse;
+import com.nashtech.assignment.dto.response.returned.ReturnAssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.exceptions.NotFoundException;
@@ -101,6 +101,25 @@ public class CreateReturnAssetServiceImplTest {
         ArgumentCaptor<ReturnAsset> returnAssetCaptor = ArgumentCaptor.forClass(ReturnAsset.class);
         User userAssignedTo = User.builder().id(1L).build();
         User userCurrent = User.builder().id(1L).type(EUserType.STAFF).build();
+
+        when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
+        when(securityContextService.getCurrentUser()).thenReturn(userCurrent);
+        when(assignAsset.getUserAssignedTo()).thenReturn(userAssignedTo);
+        when(assignAsset.getStatus()).thenReturn(EAssignStatus.ACCEPTED);
+        when(returnAssetRepository.findByAssignAssetId(1L)).thenReturn(Optional.empty());
+        when(returnAssetRepository.save(returnAssetCaptor.capture())).thenReturn(returnAsset);
+        when(returnAssetMapper.toReturnAssetResponse(returnAsset)).thenReturn(expected);
+
+        ReturnAssetResponse actual = createReturnAssetServiceImp.createReturnAsset(1L);
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    void createReturnAsset_WhenUserIsAdmin_ShouldReturnData() throws Exception {
+        ReturnAssetResponse expected = mock(ReturnAssetResponse.class);
+        ArgumentCaptor<ReturnAsset> returnAssetCaptor = ArgumentCaptor.forClass(ReturnAsset.class);
+        User userAssignedTo = User.builder().id(1L).build();
+        User userCurrent = User.builder().id(1L).type(EUserType.ADMIN).build();
 
         when(assignAssetRepository.findById(1L)).thenReturn(Optional.of(assignAsset));
         when(securityContextService.getCurrentUser()).thenReturn(userCurrent);

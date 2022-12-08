@@ -103,7 +103,7 @@ const TableAsset = ({
     },
     {
       key: 'action',
-      width: '100px',
+      width: '60px',
       render: (text, record) => {
         return (
           <div className="col-action in-active">

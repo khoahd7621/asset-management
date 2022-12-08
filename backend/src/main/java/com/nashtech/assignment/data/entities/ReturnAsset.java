@@ -37,12 +37,12 @@ public class ReturnAsset {
     @JsonIgnore
     private AssignAsset assignAsset;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "requested_user_id")
     @JsonIgnore
     private User userRequestedReturn;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "accepted_user_id")
     @JsonIgnore
     private User userAcceptedReturn;

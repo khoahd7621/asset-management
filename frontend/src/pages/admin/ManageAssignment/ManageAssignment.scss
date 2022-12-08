@@ -3,6 +3,14 @@
   padding: 80px 50px 0 96px;
   height: 100vh;
 
+  .ant-pagination.custom-pagination {
+    margin-right: 1.8rem;
+
+    @media (max-width: 1390px) {
+      margin-right: 1.6rem;
+    }
+  }
+
   .border-right {
     border-right: 0.1rem solid rgb(168, 163, 163);
     top: -5px;
@@ -20,10 +28,6 @@
   .manage-assignment__return-icon {
     transform: rotate(90deg);
     fill: rgb(79, 79, 231);
-
-    :disabled {
-      fill: gray;
-    }
   }
 
   .ant-picker {
@@ -31,26 +35,27 @@
     width: 15rem;
     border: 0.1rem solid rgb(168, 163, 163);
     border-radius: 6px;
+
+    @media (max-width: 1390px) {
+      width: 11rem;
+    }
+
     &:hover {
-      color:rgb(168, 163, 163);
+      color: rgb(168, 163, 163);
       border-color: #292b2c;
     }
 
     .ant-picker-suffix {
-      padding-right: 0px;
-      transform: translatex(calc(570%));
-      border-left: 0.09rem solid rgb(168, 163, 163);
-      padding: 10px 10px;
-      position: absolute;
+      color: #292b2c;
     }
   }
 
   .manage-assignment__function {
-    column-gap: 2em;
     display: flex;
-    justify-content: space-evenly;
-    align-items: flex-start;
-    background-color: #a8081a;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2px;
+    flex-wrap: wrap;
   }
 
   .function--button {
@@ -60,9 +65,13 @@
     width: 15rem;
     border-radius: 0.3rem;
     border: 0.1rem solid rgb(168, 163, 163);
-    
+
+    @media (max-width: 1390px) {
+      width: 12rem;
+    }
+
     &:hover {
-      color:rgb(168, 163, 163);
+      color: rgb(168, 163, 163);
       border-color: #292b2c;
     }
 
@@ -76,6 +85,11 @@
 
 .manage-assignment-search {
   width: 15rem;
+
+  @media (max-width: 1390px) {
+    width: 11rem;
+  }
+
   .ant-input-group .ant-input-affix-wrapper:not(:last-child) {
     height: 36px;
     border-top-left-radius: 5px;
@@ -93,12 +107,17 @@
 }
 
 .manage-assignment-button {
+  margin-right: 1.8rem;
   height: 36px;
   width: 15rem;
   color: aliceblue;
   border-radius: 0.3rem;
   background-color: #e5273d;
-  margin-bottom: 10px;
+
+  @media (max-width: 1390px) {
+    margin-right: 1.8rem;
+    width: 11rem;
+  }
 
   &:hover {
     color: #fff;
@@ -108,6 +127,14 @@
 }
 
 .function--popover {
+  .ant-popover-inner-content {
+    border-bottom-right-radius: 4px;
+
+    @media (max-width: 1390px) {
+      padding: 10px 8px;
+    }
+  }
+
   .ant-popover-content {
     top: -19px;
     position: relative;
@@ -115,6 +142,18 @@
     width: 15rem;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
+
+    @media (max-width: 1390px) {
+      width: 12rem;
+    }
+
+    .ant-checkbox-wrapper {
+      span {
+        &:last-child {
+          padding-right: 0;
+        }
+      }
+    }
   }
 
   .ant-popover.ant-popover-placement-bottom {

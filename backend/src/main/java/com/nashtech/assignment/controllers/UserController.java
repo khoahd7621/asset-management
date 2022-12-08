@@ -123,8 +123,7 @@ public class UserController {
             @RequestParam(name = "limit", defaultValue = "20") Integer limit,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "sort-field", defaultValue = "firstName") String sortField,
-            @RequestParam(name = "sort-type", defaultValue = "ASC") String sortType
-    ) {
+            @RequestParam(name = "sort-type", defaultValue = "ASC") String sortType) {
         SearchUserRequest searchUserRequest = SearchUserRequest.builder()
                 .keyword(keyword.trim().length() == 0 ? null : keyword)
                 .types(types.isEmpty() ? null : types)
@@ -135,5 +134,4 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(searchUserService
                 .searchAllUsersByKeyWordInTypesWithPagination(searchUserRequest));
     }
-
 }

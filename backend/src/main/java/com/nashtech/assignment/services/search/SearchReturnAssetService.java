@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.nashtech.assignment.data.constants.EReturnStatus;
 import com.nashtech.assignment.dto.response.PaginationResponse;
-import com.nashtech.assignment.dto.response.return_asset.ReturnAssetResponse;
+import com.nashtech.assignment.dto.response.returned.ReturnAssetResponse;
 
 public interface SearchReturnAssetService {
     PaginationResponse<List<ReturnAssetResponse>> searchAllReturnAssetsByStateAndReturnedDateAndSearchWithPagination(

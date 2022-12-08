@@ -1,22 +1,19 @@
 package com.nashtech.assignment.mappers;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.nashtech.assignment.data.constants.EReturnStatus;
 import com.nashtech.assignment.data.entities.Asset;
 import com.nashtech.assignment.data.entities.AssignAsset;
 import com.nashtech.assignment.data.entities.ReturnAsset;
+import com.nashtech.assignment.data.repositories.CategoryRepository;
 import com.nashtech.assignment.dto.request.asset.CreateNewAssetRequest;
 import com.nashtech.assignment.dto.response.asset.AssetAndHistoriesResponse;
 import com.nashtech.assignment.dto.response.asset.AssetHistory;
 import com.nashtech.assignment.dto.response.asset.AssetResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import com.nashtech.assignment.data.repositories.CategoryRepository;
-import com.nashtech.assignment.dto.response.category.CategoryResponse;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class AssetMapper {
@@ -61,29 +58,13 @@ public class AssetMapper {
                 .build();
     }
 
-    public Asset mapAssetRequestToEntity(CreateNewAssetRequest createNewAssetRequest) {
-        Asset asset = Asset.builder()
+    public Asset toAsset(CreateNewAssetRequest createNewAssetRequest) {
+        return Asset.builder()
                 .name(createNewAssetRequest.getAssetName())
                 .category(categoryRepository.findByName(createNewAssetRequest.getCategoryName()).get())
                 .specification(createNewAssetRequest.getSpecification())
                 .status(createNewAssetRequest.getAssetStatus())
                 .isDeleted(false)
                 .build();
-        return asset;
-    }
-
-    public AssetResponse mapEntityToEditAssetInformationResponse(Asset asset) {
-        CategoryResponse category = categoryMapper.toCategoryResponse(asset.getCategory());
-        AssetResponse assetResponse = AssetResponse.builder()
-                .id(asset.getId())
-                .assetCode(asset.getAssetCode())
-                .assetName(asset.getName())
-                .installedDate(asset.getInstalledDate())
-                .specification(asset.getSpecification())
-                .status(asset.getStatus())
-                .location(asset.getLocation())
-                .category(category)
-                .build();
-        return assetResponse;
     }
 }

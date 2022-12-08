@@ -1,13 +1,12 @@
 package com.nashtech.assignment.mappers;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Component;
-
 import com.nashtech.assignment.data.constants.EReturnStatus;
 import com.nashtech.assignment.data.entities.ReturnAsset;
-import com.nashtech.assignment.dto.response.return_asset.ReturnAssetResponse;
+import com.nashtech.assignment.dto.response.returned.ReturnAssetResponse;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ReturnAssetMapper {

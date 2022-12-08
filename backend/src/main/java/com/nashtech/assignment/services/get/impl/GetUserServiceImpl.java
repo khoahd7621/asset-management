@@ -25,6 +25,6 @@ public class GetUserServiceImpl implements GetUserService {
         if (user == null) {
             throw new NotFoundException("Cannot Found Staff With Code: " + staffCode);
         }
-        return userMapper.mapEntityToResponseDto(user);
+        return userMapper.toUserResponse(user);
     }
 }

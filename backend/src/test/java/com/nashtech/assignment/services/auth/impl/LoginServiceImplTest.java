@@ -54,7 +54,7 @@ class LoginServiceImplTest {
         BadRequestException actualException = Assertions.assertThrows(BadRequestException.class,
                 () -> loginServiceImpl.login(userLoginRequest));
 
-        Assertions.assertEquals("Username not found", actualException.getMessage());
+        Assertions.assertEquals("Username or password is incorrect. Please try again", actualException.getMessage());
     }
 
     @Test
