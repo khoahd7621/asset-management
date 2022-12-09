@@ -213,7 +213,7 @@ const ManageAssignment = () => {
 
   const columns = [
     {
-      width: '4em',
+      width: '6%',
       title: title('No.'),
       dataIndex: 'no',
       key: 'no',
@@ -225,10 +225,9 @@ const ManageAssignment = () => {
           {text}
         </div>
       ),
-      responsive: ['md'],
     },
     {
-      width: '8em',
+      width: '16%',
       title: title('Asset Code'),
       dataIndex: 'assetCode',
       ellipsis: true,
@@ -240,10 +239,9 @@ const ManageAssignment = () => {
           {text}
         </div>
       ),
-      responsive: ['lg'],
     },
     {
-      width: '11em',
+      width: '23%',
       title: title('Asset Name'),
       dataIndex: 'assetName',
       key: 'assetname',
@@ -255,10 +253,9 @@ const ManageAssignment = () => {
           {text}
         </div>
       ),
-      responsive: ['lg'],
     },
     {
-      width: '8em',
+      width: '16%',
       title: title('Assigned to'),
       dataIndex: 'userAssignedTo',
       key: 'userassignedto',
@@ -270,10 +267,9 @@ const ManageAssignment = () => {
           {text}
         </div>
       ),
-      responsive: ['xl'],
     },
     {
-      width: '8em',
+      width: '16%',
       title: title('Assigned by'),
       dataIndex: 'userAssignedBy',
       key: 'userassignedby',
@@ -285,10 +281,9 @@ const ManageAssignment = () => {
           {text}
         </div>
       ),
-      responsive: ['xxl'],
     },
     {
-      width: '8em',
+      width: '16%',
       title: title('Assigned Date'),
       dataIndex: 'assignedDate',
       key: 'assigneddate',
@@ -300,10 +295,9 @@ const ManageAssignment = () => {
           {convertStrDate(text)}
         </div>
       ),
-      responsive: ['xxl'],
     },
     {
-      width: '12em',
+      width: '23%',
       title: title('State'),
       dataIndex: 'status',
       key: 'status',
@@ -315,11 +309,10 @@ const ManageAssignment = () => {
           {toTitle(text)}
         </div>
       ),
-      responsive: ['xxl'],
     },
     {
-      responsive: ['sm'],
-      align: 'center',
+      width: '23%',
+      align: 'left',
       key: 'options',
       dataIndex: 'status',
       title: '',
@@ -501,7 +494,7 @@ const ManageAssignment = () => {
           centered
           onOk={onClickToDelete}
           onCancel={() => setConfirmPopUp(false)}
-          okText="Disable"
+          okText="Delete"
           cancelText="Cancel"
           closable={false}
         >

@@ -4,10 +4,10 @@
   height: 100vh;
 
   .ant-pagination.custom-pagination {
-    margin-right: 1.8rem;
+    margin-right: 6.5rem;
 
     @media (max-width: 1390px) {
-      margin-right: 1.6rem;
+      margin-right: 0rem;
     }
   }
 
@@ -107,7 +107,7 @@
 }
 
 .manage-assignment-button {
-  margin-right: 1.8rem;
+  margin-right: 6.5rem;
   height: 36px;
   width: 15rem;
   color: aliceblue;
@@ -115,7 +115,7 @@
   background-color: #e5273d;
 
   @media (max-width: 1390px) {
-    margin-right: 1.8rem;
+    margin-right: 0rem;
     width: 11rem;
   }
 

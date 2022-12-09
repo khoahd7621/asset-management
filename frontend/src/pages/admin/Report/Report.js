@@ -1,25 +1,66 @@
-import { Button, Space, Spin, Table } from 'antd';
+import { Button, Dropdown, Space, Spin, Table } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import './Report.scss';
 
 import { getReportDetails } from '../../../services/getApiService';
 import { SortIcon } from '../../../assets/CustomIcon';
+import exportFile from '../../../utils/exportFileUtil';
 
 const Report = () => {
   const [reportDetails, setReportDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const onClickToExport = () => {
-    let XLSX = require('xlsx');
-    let ws = XLSX.utils.json_to_sheet(reportDetails);
-    XLSX.utils.sheet_add_aoa(ws, [
-      ['Category', 'Total', 'Assigned', 'Available', 'Not available', 'Waiting for recycling', 'Recycled'],
-    ]);
-    let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Report');
-    XLSX.writeFile(wb, 'Report.xlsx');
+  const onClickToExportXlsx = () => {
+    exportFile.xlsx(reportDetails);
   };
+
+  const onClickToExportPdf = () => {
+    exportFile.pdf(reportDetails);
+  };
+
+  const items = [
+    {
+      key: '1',
+      label: (
+        <a target={'_blank'} rel="noopener noreferrer" onClick={onClickToExportXlsx}>
+          XLSX
+        </a>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <a target={'_blank'} rel="noopener noreferrer" onClick={onClickToExportPdf}>
+          PDF
+        </a>
+      ),
+    },
+    {
+      key: '3',
+      label: (
+        <a href target={'_blank'} rel="noopener noreferrer">
+          CSV
+        </a>
+      ),
+    },
+    {
+      key: '4',
+      label: (
+        <a href target={'_blank'} rel="noopener noreferrer">
+          DOCX
+        </a>
+      ),
+    },
+    {
+      key: '5',
+      label: (
+        <a href target={'_blank'} rel="noopener noreferrer">
+          HTML
+        </a>
+      ),
+    },
+  ];
 
   const title = (title) => {
     return (
@@ -124,9 +165,16 @@ const Report = () => {
     <div className="report">
       <div className="report__title">Report</div>
       <div className="report__function">
-        <Button className="report__button" onClick={onClickToExport}>
-          Export
-        </Button>
+        <Dropdown
+          overlayClassName="report__drop-down"
+          menu={{
+            items,
+          }}
+          placement="bottomLeft"
+          trigger={'click'}
+        >
+          <Button className="report__button">Export</Button>
+        </Dropdown>
       </div>
       <br></br>
       <div className="report__body">
