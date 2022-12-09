@@ -1,5 +1,4 @@
 const exportFile = {
-
   pdf: (data) => {
     const { jsPDF } = require('jspdf');
     require('jspdf-autotable');
@@ -34,7 +33,7 @@ const exportFile = {
     doc.save('report.pdf');
   },
 
-  xlsx: (data) => {
+  xlsxCsv: (data, key) => {
     let XLSX = require('xlsx');
     let ws = XLSX.utils.json_to_sheet(data);
     XLSX.utils.sheet_add_aoa(ws, [
@@ -42,7 +41,12 @@ const exportFile = {
     ]);
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Report');
-    XLSX.writeFile(wb, 'Report.csv');
+    if (key === 'xlsx') {
+      XLSX.writeFile(wb, 'Report.xlsx');
+    }
+    if (key === 'csv') {
+      XLSX.writeFile(wb, 'Report.csv');
+    }
   },
 };
 

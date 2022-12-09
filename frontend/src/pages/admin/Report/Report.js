@@ -12,11 +12,15 @@ const Report = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const onClickToExportXlsx = () => {
-    exportFile.xlsx(reportDetails);
+    exportFile.xlsxCsv(reportDetails, 'xlsx');
   };
 
   const onClickToExportPdf = () => {
     exportFile.pdf(reportDetails);
+  };
+
+  const onClickToExportCsv = () => {
+    exportFile.xlsxCsv(reportDetails, 'csv');
   };
 
   const items = [
@@ -39,7 +43,7 @@ const Report = () => {
     {
       key: '3',
       label: (
-        <a href target={'_blank'} rel="noopener noreferrer">
+        <a target={'_blank'} rel="noopener noreferrer" onClick={onClickToExportCsv}>
           CSV
         </a>
       ),
