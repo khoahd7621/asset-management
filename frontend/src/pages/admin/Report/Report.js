@@ -23,6 +23,10 @@ const Report = () => {
     exportFile.xlsxCsv(reportDetails, 'csv');
   };
 
+  const onClickToExportDocx = () => {
+    exportFile.docx(reportDetails, 'csv');
+  };
+
   const items = [
     {
       key: '1',
@@ -51,7 +55,7 @@ const Report = () => {
     {
       key: '4',
       label: (
-        <a href target={'_blank'} rel="noopener noreferrer">
+        <a target={'_blank'} rel="noopener noreferrer" onClick={onClickToExportDocx}>
           DOCX
         </a>
       ),
@@ -59,7 +63,7 @@ const Report = () => {
     {
       key: '5',
       label: (
-        <a href target={'_blank'} rel="noopener noreferrer">
+        <a target={'_blank'} rel="noopener noreferrer">
           HTML
         </a>
       ),
