@@ -81,6 +81,8 @@ const EditAsset = () => {
     const response = await getAssetDetailAndItsHistories(params.id);
     if (response && response.status === 200) {
       setAssetInformation(response.data.asset);
+    } else {
+      navigate(`/${adminRoute.home}/${adminRoute.manageAsset}`);
     }
   };
 

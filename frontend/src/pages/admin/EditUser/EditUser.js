@@ -1,6 +1,6 @@
 import { Form, Input, DatePicker, Radio, Select, Button, Space, Spin } from 'antd';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams} from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { CaretDownOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
@@ -35,19 +35,7 @@ const EditUser = () => {
 
   useEffect(() => {
     document.title = 'Manage User - Edit User';
-    window.history.replaceState({}, document.title);
   }, []);
-
-  const decrypt = (salt, encoded) => {
-    const textToChars = (text) => text.split('').map((c) => c.charCodeAt(0));
-    const applySaltToChar = (code) => textToChars(salt).reduce((a, b) => a ^ b, code);
-    return encoded
-      .match(/.{1,2}/g)
-      .map((hex) => parseInt(hex, 16))
-      .map(applySaltToChar)
-      .map((charCode) => String.fromCharCode(charCode))
-      .join('');
-  };
 
   useEffect(() => {
     ApiUserDetails();
@@ -55,10 +43,11 @@ const EditUser = () => {
 
   const ApiUserDetails = async () => {
     setIsLoading(true);
-    const item = await decrypt('salt', params.id);
-    const response = await getItems(`/api/find/get/${item}`);
+    const response = await getItems(`/api/find/get/${params.id}`);
     if (response && response.status === 200) {
       setUserDetails(response.data);
+    } else {
+      navigate(`/${adminRoute.home}/${adminRoute.manageUser}`);
     }
   };
 

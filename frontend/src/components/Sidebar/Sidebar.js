@@ -55,7 +55,7 @@ const Sizebar = () => {
 
   useEffect(() => {
     const pathArray = location.pathname.split('/');
-    const currentPath = Number(pathArray[pathArray.length - 1])
+    const currentPath = pathArray[pathArray.length - 1].startsWith('SD') || Number(pathArray[pathArray.length - 1])
       ? pathArray[pathArray.length - 2]
       : pathArray[pathArray.length - 1];
     if (currentPath === '' || currentPath === adminRoute.home || currentPath === userRoute.home) {

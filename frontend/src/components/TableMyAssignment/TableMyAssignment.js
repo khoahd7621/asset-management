@@ -173,7 +173,7 @@ const TableMyAssignment = () => {
     {
       title: (
         <span>
-          AssignedDate <CaretDownOutlined />
+          Assigned Date <CaretDownOutlined />
         </span>
       ),
       key: 'assignedDate',

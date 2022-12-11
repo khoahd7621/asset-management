@@ -27,6 +27,11 @@
       .ant-picker-suffix {
         color: black !important;
       }
+
+      .ant-picker-input>input::placeholder {
+        font-size: 15px;
+        color: #000;
+      }
     }
 
     .search-input {

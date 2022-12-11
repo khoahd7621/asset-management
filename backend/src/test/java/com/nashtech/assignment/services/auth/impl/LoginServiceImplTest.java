@@ -90,7 +90,8 @@ class LoginServiceImplTest {
         when(userRepository.findByUsername(userLoginRequest.getUsername())).thenReturn(Optional.of(user));
         when(user.isDeleted()).thenReturn(false);
         when(passwordEncoder.matches(userLoginRequest.getPassword(), user.getPassword())).thenReturn(true);
-        when(passwordEncoder.matches(userLoginRequest.getPassword(), generatePassword.firstPassword(user)))
+        when(passwordEncoder.matches(userLoginRequest.getPassword(),
+                passwordEncoder.encode(generatePassword.generatePassword(user))))
                 .thenReturn(true);
 
         UserLoginResponse actual = loginServiceImpl.login(userLoginRequest);

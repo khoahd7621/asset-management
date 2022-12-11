@@ -42,7 +42,8 @@ public class LoginServiceImpl implements LoginService {
         if (!passwordEncoder.matches(userLoginRequest.getPassword(), userOpt.get().getPassword())) {
             throw new BadRequestException("Username or password is incorrect. Please try again");
         }
-        if (passwordEncoder.matches(userLoginRequest.getPassword(), generatePassword.firstPassword(userOpt.get()))) {
+        if (passwordEncoder.matches(userLoginRequest.getPassword(),
+                passwordEncoder.encode(generatePassword.generatePassword(userOpt.get())))) {
             isFirstLogin = true;
         }
         String token = jwtTokenUtil.generateJwtToken(userOpt.get());

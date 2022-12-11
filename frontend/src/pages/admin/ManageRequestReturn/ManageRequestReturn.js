@@ -116,7 +116,7 @@ const ManageRequestReturn = () => {
           />
           <DatePicker
             id="manage-request-block__date-picker"
-            placeholder="Returned date"
+            placeholder="Returned Date"
             format={['DD/MM/YYYY', 'D/MM/YYYY', 'D/M/YYYY', 'DD/M/YYYY']}
             onChange={handleValidateDateOfBirth}
             style={{ marginLeft: '20px' }}

@@ -1,25 +1,78 @@
-import { Button, Space, Spin, Table } from 'antd';
+import { Button, Dropdown, Space, Spin, Table } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import './Report.scss';
 
 import { getReportDetails } from '../../../services/getApiService';
 import { SortIcon } from '../../../assets/CustomIcon';
+import exportFile from '../../../utils/exportFileUtil';
 
 const Report = () => {
   const [reportDetails, setReportDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const onClickToExport = () => {
-    let XLSX = require('xlsx');
-    let ws = XLSX.utils.json_to_sheet(reportDetails);
-    XLSX.utils.sheet_add_aoa(ws, [
-      ['Category', 'Total', 'Assigned', 'Available', 'Not available', 'Waiting for recycling', 'Recycled'],
-    ]);
-    let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Report');
-    XLSX.writeFile(wb, 'Report.xlsx');
+  const onClickToExportXlsx = () => {
+    exportFile.xlsxCsv(reportDetails, 'xlsx');
   };
+
+  const onClickToExportPdf = () => {
+    exportFile.pdf(reportDetails);
+  };
+
+  const onClickToExportCsv = () => {
+    exportFile.xlsxCsv(reportDetails, 'csv');
+  };
+
+  const onClickToExportDocx = () => {
+    exportFile.docx(reportDetails);
+  };
+
+  const onClickToExportHTML = () => {
+    exportFile.html(reportDetails);
+  };
+
+  const items = [
+    {
+      key: '1',
+      label: (
+        <a target={'_blank'} rel="noopener noreferrer" onClick={onClickToExportXlsx}>
+          XLSX
+        </a>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <a target={'_blank'} rel="noopener noreferrer" onClick={onClickToExportPdf}>
+          PDF
+        </a>
+      ),
+    },
+    {
+      key: '3',
+      label: (
+        <a target={'_blank'} rel="noopener noreferrer" onClick={onClickToExportCsv}>
+          CSV
+        </a>
+      ),
+    },
+    {
+      key: '4',
+      label: (
+        <a target={'_blank'} rel="noopener noreferrer" onClick={onClickToExportDocx}>
+          DOCX
+        </a>
+      ),
+    },
+    {
+      key: '5',
+      label: (
+        <a target={'_blank'} rel="noopener noreferrer" onClick={onClickToExportHTML}>
+          HTML
+        </a>
+      ),
+    },
+  ];
 
   const title = (title) => {
     return (
@@ -124,9 +177,16 @@ const Report = () => {
     <div className="report">
       <div className="report__title">Report</div>
       <div className="report__function">
-        <Button className="report__button" onClick={onClickToExport}>
-          Export
-        </Button>
+        <Dropdown
+          overlayClassName="report__drop-down"
+          menu={{
+            items,
+          }}
+          placement="bottomLeft"
+          trigger={'click'}
+        >
+          <Button className="report__button">Export</Button>
+        </Dropdown>
       </div>
       <br></br>
       <div className="report__body">

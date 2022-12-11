@@ -39,6 +39,7 @@ class EditUserServiceImplTest {
     private User userRepo;
     private UserResponse userResponse;
     private User user;
+    private Date date;
 
     @BeforeEach
     void setUp() {
@@ -56,6 +57,7 @@ class EditUserServiceImplTest {
         userRepo = mock(User.class);
         userResponse = mock(UserResponse.class);
         user = mock(User.class);
+        date = new Date();
     }
 
     @Test
@@ -168,6 +170,21 @@ class EditUserServiceImplTest {
     }
 
     @Test
+    void changePasswordFirst_WhenNotFirstLogin_ShouldReturnException() throws ParseException {
+        ChangePasswordFirstRequest changePasswordFirstRequest = ChangePasswordFirstRequest.builder().build();
+
+        when(securityContextService.getCurrentUser()).thenReturn(user);
+
+        when(passwordEncoder.matches(generatePassword.generatePassword(user), user.getPassword())).thenReturn(false);
+
+        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
+            editUserServiceImpl.changePasswordFirst(changePasswordFirstRequest);
+        });
+
+        assertThat(actual.getMessage(), is("Is not first login"));
+    }
+
+    @Test
     void changePasswordFirst_WhenPasswordNoChange_ShouldReturnException() {
         ChangePasswordFirstRequest changePasswordFirstRequest = ChangePasswordFirstRequest.builder().build();
 
@@ -183,22 +200,6 @@ class EditUserServiceImplTest {
     }
 
     @Test
-    void changePasswordFirst_WhenNotFirstLogin_ShouldReturnException() {
-        ChangePasswordFirstRequest changePasswordFirstRequest = ChangePasswordFirstRequest.builder().build();
-
-        when(securityContextService.getCurrentUser()).thenReturn(user);
-        when(passwordEncoder.matches(changePasswordFirstRequest.getNewPassword(), user.getPassword()))
-                .thenReturn(true);
-        when(passwordEncoder.matches(generatePassword.firstPassword(user), user.getPassword())).thenReturn(false);
-
-        BadRequestException actual = assertThrows(BadRequestException.class, () -> {
-            editUserServiceImpl.changePasswordFirst(changePasswordFirstRequest);
-        });
-
-        assertThat(actual.getMessage(), is("Is not first login"));
-    }
-
-    @Test
     void changePasswordFirst_WhenDataValid_ShouldReturnData() {
         ChangePasswordFirstRequest changePasswordFirstRequest = ChangePasswordFirstRequest.builder()
                 .newPassword("123456").build();
@@ -207,7 +208,7 @@ class EditUserServiceImplTest {
         when(securityContextService.getCurrentUser()).thenReturn(user);
         when(passwordEncoder.matches(changePasswordFirstRequest.getNewPassword(), user.getPassword()))
                 .thenReturn(false);
-        when(passwordEncoder.matches(generatePassword.firstPassword(user), user.getPassword())).thenReturn(true);
+        when(passwordEncoder.matches(generatePassword.generatePassword(user), user.getPassword())).thenReturn(true);
 
         when(userMapper.toUserResponse(userArgumentCaptor.capture())).thenReturn(userResponse);
 
@@ -261,7 +262,8 @@ class EditUserServiceImplTest {
         when(securityContextService.getCurrentUser()).thenReturn(user);
         when(passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword()))
                 .thenReturn(true);
-        when(passwordEncoder.matches(changePasswordRequest.getNewPassword(), generatePassword.firstPassword(user)))
+        when(passwordEncoder.matches(changePasswordRequest.getNewPassword(),
+                passwordEncoder.encode(generatePassword.generatePassword(user))))
                 .thenReturn(true);
 
         BadRequestException actual = assertThrows(BadRequestException.class, () -> {
@@ -282,7 +284,8 @@ class EditUserServiceImplTest {
 
         when(securityContextService.getCurrentUser()).thenReturn(user);
         when(passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())).thenReturn(true);
-        when(passwordEncoder.matches(changePasswordRequest.getNewPassword(), generatePassword.firstPassword(user)))
+        when(passwordEncoder.matches(changePasswordRequest.getNewPassword(),
+                passwordEncoder.encode(generatePassword.generatePassword(user))))
                 .thenReturn(false);
         when(userMapper.toUserResponse(userArgumentCaptor.capture())).thenReturn(userResponse);
 
