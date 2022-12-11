@@ -24,7 +24,11 @@ const Report = () => {
   };
 
   const onClickToExportDocx = () => {
-    exportFile.docx(reportDetails, 'csv');
+    exportFile.docx(reportDetails);
+  };
+
+  const onClickToExportHTML = () => {
+    exportFile.html(reportDetails);
   };
 
   const items = [
@@ -63,7 +67,7 @@ const Report = () => {
     {
       key: '5',
       label: (
-        <a target={'_blank'} rel="noopener noreferrer">
+        <a target={'_blank'} rel="noopener noreferrer" onClick={onClickToExportHTML}>
           HTML
         </a>
       ),

@@ -125,6 +125,23 @@ const exportFile = {
       saveAs(blob, 'Report.docx');
     });
   },
+  html: (data) => {
+    let htmlFile = `<!DOCTYPE html> <html> <head> <style> table {font-family: arial, sans-serif;border-collapse: collapse;width: 100%;}  td,
+       th {   border: 1px solid #dddddd;   text-align: left;padding: 8px;} tr:nth-child(even) { background-color: #dddddd;} </style></head>
+      <body> <h2>Asset Report</h2> 
+      <table> <tr> <th>Category</th> <th>Total</th> <th>Assigned</th>  <th>Available</th>  <th>Not available</th>  <th>Waiting for recycling</th>  <th>Recycled</th></tr>`;
+    for (let item in data) {
+      htmlFile += `<tr><td>${data[item].name}</td> <td>${data[item].count}</td> <td>${data[item].assigned}</td> <td>${data[item].available}</td>
+       <td>${data[item].notAvailable}</td> <td>${data[item].waitingForRecycling}</td> <td>${data[item].recycling}</td></tr>`;
+    }
+    htmlFile += '</table></body></html>';
+    const blob = new Blob([htmlFile], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = 'Report.html';
+    link.href = url;
+    link.click();
+  },
 };
 
 export default exportFile;

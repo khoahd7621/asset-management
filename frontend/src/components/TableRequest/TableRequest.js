@@ -38,10 +38,10 @@ const TableRequest = ({
     {
       title: (
         <span>
-          No <CaretDownOutlined />
+          No. <CaretDownOutlined />
         </span>
       ),
-      width: '4.2em',
+      width: '4.5em',
       dataIndex: 'no',
       key: 'no',
       ellipsis: true,

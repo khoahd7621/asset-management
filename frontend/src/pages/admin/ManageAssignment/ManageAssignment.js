@@ -358,7 +358,7 @@ const ManageAssignment = () => {
         <Popover content={content} placement="bottom" trigger="click" overlayClassName="function--popover">
           <Button className="function--button">
             <Row>
-              <Col span={21}>Type</Col>
+              <Col span={21}>State</Col>
               <Col span={1} className="border-right"></Col>
               <Col span={2}>
                 <FilterIcon type="filter" />

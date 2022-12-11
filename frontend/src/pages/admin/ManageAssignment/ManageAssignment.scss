@@ -36,6 +36,11 @@
     border: 0.1rem solid rgb(168, 163, 163);
     border-radius: 6px;
 
+    .ant-picker-input > input::placeholder {
+      color: #000;
+      font-size: 15px;
+    }
+
     @media (max-width: 1390px) {
       width: 11rem;
     }
@@ -59,6 +64,7 @@
   }
 
   .function--button {
+    font-size: 15px;
     height: 36px;
     color: #292b2c;
     text-align: left;
@@ -162,6 +168,10 @@
 
   .ant-popover-inner-content {
     background-color: #f5f5f5;
+
+    .ant-checkbox-group-item {
+      font-size: 15px;
+    }
   }
 
   .ant-popover-arrow {
@@ -170,6 +180,7 @@
 
   // checkbox
   .checkbox-filter {
+    font-size: 15px;
     // before check
     .ant-checkbox .ant-checkbox-inner {
       border-radius: 4px;

@@ -91,7 +91,8 @@ public class EditUserServiceImpl implements EditUserService {
     @Override
     public UserResponse changePasswordFirst(ChangePasswordFirstRequest changePasswordFirstRequest) {
         User user = securityContextService.getCurrentUser();
-        if (!passwordEncoder.matches(generatePassword.firstPassword(user), user.getPassword())) {
+
+        if (!passwordEncoder.matches(generatePassword.generatePassword(user), user.getPassword())) {
             throw new BadRequestException("Is not first login");
         }
         if (passwordEncoder.matches(changePasswordFirstRequest.getNewPassword(), user.getPassword())) {
@@ -115,7 +116,7 @@ public class EditUserServiceImpl implements EditUserService {
             throw new BadRequestException("Password no change");
         }
         if (passwordEncoder.matches(changePasswordRequest.getNewPassword(),
-                generatePassword.firstPassword(user))) {
+                passwordEncoder.encode(generatePassword.generatePassword(user)))) {
             throw new BadRequestException("Password same password generated");
         }
         user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));

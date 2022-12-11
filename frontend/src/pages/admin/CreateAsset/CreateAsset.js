@@ -101,7 +101,6 @@ const CreateAsset = () => {
         ...initialError,
       });
     } else {
-      
       setCategoryNameValidate({
         help:
           response.response.data.message === 'Category is already existed. Please enter a different category'
@@ -354,7 +353,7 @@ const CreateAsset = () => {
           <Radio.Group id="create-asset-radio__gender" value={stateType} style={{ paddingTop: '0.4rem' }}>
             <Space direction="vertical">
               <Radio value={'AVAILABLE'}>Available</Radio>
-              <Radio value={'NOT_AVAILABLE'}>Not Available</Radio>
+              <Radio value={'NOT_AVAILABLE'}>Not available</Radio>
             </Space>
           </Radio.Group>
         </Form.Item>
