@@ -9,6 +9,7 @@ import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.services.create.CreateUserService;
 import com.nashtech.assignment.services.delete.DeleteUserService;
 import com.nashtech.assignment.services.edit.EditUserService;
+import com.nashtech.assignment.services.get.GetUserService;
 import com.nashtech.assignment.services.search.SearchUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -37,6 +38,18 @@ public class UserController {
     private EditUserService editUserService;
     @Autowired
     private SearchUserService searchUserService;
+    @Autowired
+    private GetUserService getUserService;
+
+
+    @Operation(summary = "View user detail by receive staff code")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Return user detail base on staffcode ")
+    })
+    @GetMapping("/get/{staffCode}")
+    public UserResponse viewUserDetails(@PathVariable String staffCode) {
+        return getUserService.viewUserDetails(staffCode);
+    }
 
     @Operation(summary = "Create new user")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Create user successfully", content = {

@@ -1,5 +1,9 @@
 import axios from '../utils/customAxios';
 
+export const getUserDetails = (staffCode) => {
+  return axios.get(`/api/user/get/${staffCode}`);
+};
+
 export const getAllCategories = () => {
   return axios.get('/api/category');
 };
@@ -25,5 +29,5 @@ export const getAssignAssetDetails = (asignAssetId) => {
 };
 
 export const getReportDetails = () => {
-  return axios.get('/api/report')
-}
+  return axios.get('/api/report');
+};

@@ -187,6 +187,7 @@ const ManageAssignment = () => {
   };
 
   const FilterBySearch = (data) => {
+    setCurrent(1);
     setGetSearchData(data);
   };
 

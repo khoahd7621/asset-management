@@ -11,7 +11,7 @@ import { adminRoute } from '../../../routes/routes';
 import { CalendarIcon } from '../../../assets/CustomIcon';
 import { postEditUser } from '../../../services/editApiService';
 import { removeDataUserLogout } from '../../../redux/slice/userSlice';
-import { getItems } from '../../../services/findApiService';
+import { getUserDetails } from '../../../services/getApiService';
 
 const EditUser = () => {
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ const EditUser = () => {
 
   const ApiUserDetails = async () => {
     setIsLoading(true);
-    const response = await getItems(`/api/find/get/${params.id}`);
+    const response = await getUserDetails(params.id);
     if (response && response.status === 200) {
       setUserDetails(response.data);
     } else {

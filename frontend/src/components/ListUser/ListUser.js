@@ -4,13 +4,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Table, Row, Col, Modal, Input, Button, Checkbox, Popover, Space, Spin } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
-import { getItems } from '../../services/findApiService';
-import { adminRoute } from '../../routes/routes';
-
-import { CloseIcon, EditIcon, SortIcon, FilterIcon } from '../../assets/CustomIcon';
-
 import './ListUser.scss';
+
+import { searchUsersWithKeywordAndTypesWithPagination } from '../../services/findApiService';
+import { adminRoute } from '../../routes/routes';
+import { CloseIcon, EditIcon, SortIcon, FilterIcon } from '../../assets/CustomIcon';
 import { checkValid, disableUser } from '../../services/disableApiService';
+import { getUserDetails } from '../../services/getApiService';
 import CustomPagination from '../Pagination/Pagination';
 
 const ListUser = () => {
@@ -20,7 +20,7 @@ const ListUser = () => {
   const { Search } = Input;
   const [userList, setUserList] = useState([]);
   const [current, setCurrent] = useState(1);
-  const [type, setType] = useState(['ALL']);
+  const [type, setType] = useState(['ADMIN', 'STAFF']);
   const [userDetail, setUserDetail] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
@@ -30,8 +30,6 @@ const ListUser = () => {
   const defaultCheckedList = ['ALL'];
   const [checkedList, setCheckedList] = useState([]);
   const [checkAll, setCheckAll] = useState(true);
-  const [isFilter, setIsFilter] = useState(false);
-  const [isSearch, setIsSearch] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -67,50 +65,21 @@ const ListUser = () => {
   };
 
   const onChange = async (list) => {
-    let url = `/api/find/filter/0?location=${user.location}`;
-    setType(list.map(toUpper));
-    setIsFilter(true);
     setCurrent(1);
-    if (list.map(toUpper).some((data) => data === 'STAFF' || data === 'ADMIN') && list.length < 2) {
-      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&type=${list.map(toUpper)}&location=${
-        user.location
-      }&page=${current - 1}`;
-    }
-    const response = await getItems(url);
-    if (response.status === 200) {
-      setUserList(response.data);
-    }
+    setType(list.map(toUpper));
     setCheckedList(list);
     setCheckAll(list.length === plainOptions.length);
     if (list.length === plainOptions.length) {
       setType(['ADMIN', 'STAFF']);
-
       setCheckAll(true);
       setCheckedList(defaultCheckedList);
-      const response = await getItems(
-        `/api/find/search?name=${searchValue}&staffCode=${searchValue}&location=${user.location}&page=${current - 1}`,
-      );
-      if (response.status === 200) {
-        setUserList(response.data);
-      }
     }
   };
 
   const onCheckAllChange = async (e) => {
     setCurrent(1);
     setCheckedList([]);
-    setIsFilter(false);
     setType(['ADMIN', 'STAFF']);
-    let url = `/api/find/filter/0?location=${user.location}`;
-    if (isSearch === true) {
-      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&location=${user.location}&page=${
-        current - 1
-      }`;
-    }
-    const response = await getItems(url);
-    if (response.status === 200) {
-      setUserList(response.data);
-    }
     setCheckAll(e.target.checked);
   };
 
@@ -128,31 +97,24 @@ const ListUser = () => {
     </div>
   );
 
+  const limit = 20;
+  const sortField = 'firstName';
+  const sortType = 'ASC';
+
   useEffect(() => {
     setIsLoading(true);
-    getData();
-  }, [current, isDisabled]);
+    getData(searchValue, type, limit, current - 1, sortField, sortType);
+  }, [current, isDisabled, searchValue, type]);
 
-  const getData = async () => {
-    let url = `/api/find?location=${user.location}&pageNumber=${current - 1}`;
-    if (isFilter === true && isSearch === false) {
-      if (type.length < 2) {
-        url = `/api/find/filter/${current - 1}?type=${type.map(toUpper)}&location=${user.location}`;
-      } else {
-        url = `/api/find/filter/${current - 1}?location=${user.location}`;
-      }
-    }
-    if (isFilter === true && isSearch === true) {
-      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&type=${type}&location=${
-        user.location
-      }&page=${current - 1}`;
-    }
-    if (isFilter === false && isSearch === true) {
-      url = `/api/find/search?name=${searchValue}&staffCode=${searchValue}&location=${user.location}&page=${
-        current - 1
-      }`;
-    }
-    const response = await getItems(url);
+  const getData = async (keyWord, types, limit, page, sortField, sortType) => {
+    const response = await searchUsersWithKeywordAndTypesWithPagination({
+      keyWord,
+      types,
+      limit,
+      page,
+      sortField,
+      sortType,
+    });
     if (response.status === 200) {
       const userResponse = location.state?.userResponse;
       if (userResponse && userResponse.location && userResponse.location === user.location && isDisabled === false) {
@@ -171,7 +133,7 @@ const ListUser = () => {
   };
 
   const ApiUserDetails = async (staffCode) => {
-    const response = await getItems(`/api/find/get/${staffCode}`);
+    const response = await getUserDetails(staffCode);
     if (response.status === 200) {
       setUserDetail(response.data);
     }
@@ -268,30 +230,6 @@ const ListUser = () => {
         </div>
       ),
     },
-    {
-      title: title(''),
-      dataIndex: 'firstName',
-      key: 'firstname',
-      hidden: true,
-    },
-    {
-      title: title(''),
-      dataIndex: 'lastName',
-      key: 'lastname',
-      hidden: true,
-    },
-    {
-      title: title(''),
-      dataIndex: 'gender',
-      key: 'gender',
-      hidden: true,
-    },
-    {
-      title: title(''),
-      dataIndex: 'dateOfBirth',
-      key: 'datoOfbirth',
-      hidden: true,
-    },
   ].filter((item) => !item.hidden);
 
   const onClickToCheck = async (staffCode) => {
@@ -332,22 +270,7 @@ const ListUser = () => {
 
   const onSearch = async (value) => {
     setCurrent(1);
-    let url = '';
-
-    setIsSearch(true);
     setSearchValue(value);
-    if (value === '') {
-      setIsSearch(false);
-    }
-    if (type.some((data) => data === 'ALL') || type.length === 2 || type.length === 0) {
-      url = `/api/find/search?name=${value}&staffCode=${value}&location=${user.location}&page=0`;
-    } else {
-      url = `/api/find/search?name=${value}&staffCode=${value}&type=${type}&location=${user.location}&page=0`;
-    }
-    const response = await getItems(url);
-    if (response.status === 200) {
-      setUserList(response.data);
-    }
   };
 
   return (

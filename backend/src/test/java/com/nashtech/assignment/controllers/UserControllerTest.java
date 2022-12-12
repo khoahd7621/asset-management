@@ -15,6 +15,7 @@ import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.services.create.CreateUserService;
 import com.nashtech.assignment.services.delete.DeleteUserService;
 import com.nashtech.assignment.services.edit.EditUserService;
+import com.nashtech.assignment.services.get.GetUserService;
 import com.nashtech.assignment.services.search.SearchUserService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,6 +62,8 @@ public class UserControllerTest {
     private CreateUserService createUserService;
     @MockBean
     private SearchUserService searchUserService;
+    @MockBean
+    private GetUserService getUserService;
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @MockBean
@@ -412,6 +415,22 @@ public class UserControllerTest {
                         "\"joinedDate\":\"2001-01-01T00:00:00.000+00:00\",\"dateOfBirth\":\"2001-01-01T00:00:00.000+00:00\"," +
                         "\"type\":\"ADMIN\",\"location\":\"location\",\"fullName\":\"fullName\"}]," +
                         "\"totalPage\":1,\"totalRow\":1}"));
+    }
+
+    @Test
+    void viewUserDetails_ShouldReturnUserResponse() throws Exception {
+        when(getUserService.viewUserDetails("test")).thenReturn(userResponse);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/api/user/get/{staffCode}", "test");
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+        assertThat(result.getResponse().getContentAsString(), is(
+                "{\"id\":0,\"username\":\"username\",\"staffCode\":\"staffCode\","+
+                "\"firstName\":\"firstName\",\"lastName\":\"lastName\",\"gender\":\"MALE\","+
+                "\"joinedDate\":\"2001-01-01T00:00:00.000+00:00\",\"dateOfBirth\":\"2001-01-01T00:00:00.000+00:00\","+
+                "\"type\":\"ADMIN\",\"location\":\"location\",\"fullName\":\"fullName\"}"
+        ));
     }
 
 }
