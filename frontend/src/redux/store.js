@@ -2,11 +2,21 @@ import { configureStore } from '@reduxjs/toolkit';
 import storage from 'redux-persist/lib/storage';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import rootReducer from './reducer/rootReducer';
+import { encryptTransform } from 'redux-persist-transform-encrypt';
 
 const persistConfig = {
   key: 'root',
   version: 1,
   storage,
+  transforms: [
+    encryptTransform({
+      secretKey: 'SUPER_SUPER_SECRET_KEY',
+      onError: function (error) {
+        // Handle the error.
+        console.log('Error: ', error);
+      },
+    }),
+  ],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

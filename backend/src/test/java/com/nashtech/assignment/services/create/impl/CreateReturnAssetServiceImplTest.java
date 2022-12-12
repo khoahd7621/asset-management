@@ -1,17 +1,5 @@
 package com.nashtech.assignment.services.create.impl;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
 import com.nashtech.assignment.data.constants.EAssignStatus;
 import com.nashtech.assignment.data.constants.EUserType;
 import com.nashtech.assignment.data.entities.AssignAsset;
@@ -25,6 +13,17 @@ import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.mappers.ReturnAssetMapper;
 import com.nashtech.assignment.services.auth.SecurityContextService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
+import java.util.Optional;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CreateReturnAssetServiceImplTest {
 
@@ -44,8 +43,11 @@ public class CreateReturnAssetServiceImplTest {
         returnAssetRepository = mock(ReturnAssetRepository.class);
         assignAssetRepository = mock(AssignAssetRepository.class);
         returnAssetMapper = mock(ReturnAssetMapper.class);
-        createReturnAssetServiceImp = new CreateReturnAssetServiceImpl(returnAssetRepository, assignAssetRepository,
-                returnAssetMapper, securityContextService);
+        createReturnAssetServiceImp = CreateReturnAssetServiceImpl.builder()
+                .returnAssetRepository(returnAssetRepository)
+                .assignAssetRepository(assignAssetRepository)
+                .returnAssetMapper(returnAssetMapper)
+                .securityContextService(securityContextService).build();
     }
 
     @Test

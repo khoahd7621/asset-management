@@ -13,6 +13,8 @@
     width: 136px !important;
   }
 
+  
+
   .navbar-header__left {
     display: flex;
     align-items: end;
@@ -55,6 +57,7 @@
     width: 70px;
     height: 70px;
   }
+  
 }
 
 .username-dropdown {
@@ -98,6 +101,12 @@
     background-color: #d24a5a;
     border: 1px solid #d24a5a;
     color: white;
+  }
+
+  &.ant-btn-primary:focus{
+    background-color: #cf2338 !important;
+    color: white ;
+    border-color: #cf2338 !important;  
   }
 }
 

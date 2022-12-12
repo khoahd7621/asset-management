@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -45,7 +46,9 @@ public class SecurityConfig {
         httpSecurity.csrf().disable().cors();
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         httpSecurity.authorizeHttpRequests()
-                .antMatchers("/api/user/change-password/**", "/api/assignment/user/**", "/api/return-asset/**")
+                .antMatchers("/api/user/change-password/**", "/api/assignment/user/**")
+                .hasAnyAuthority(EUserType.ADMIN.toString(), EUserType.STAFF.toString())
+                .antMatchers(HttpMethod.POST, "/api/return-asset")
                 .hasAnyAuthority(EUserType.ADMIN.toString(), EUserType.STAFF.toString())
                 .anyRequest().hasAuthority(EUserType.ADMIN.toString());
         httpSecurity.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
