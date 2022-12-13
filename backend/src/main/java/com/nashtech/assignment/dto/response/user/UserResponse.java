@@ -1,13 +1,12 @@
 package com.nashtech.assignment.dto.response.user;
 
-import java.util.Date;
-
 import com.nashtech.assignment.data.constants.EGender;
 import com.nashtech.assignment.data.constants.EUserType;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
 
 @Builder
 @Getter
@@ -24,4 +23,5 @@ public class UserResponse {
     private EUserType type;
     private String location;
     private String fullName;
+    private boolean isFirstLogin;
 }

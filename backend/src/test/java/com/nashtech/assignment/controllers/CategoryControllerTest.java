@@ -8,8 +8,7 @@ import com.nashtech.assignment.dto.request.category.CreateNewCategoryRequest;
 import com.nashtech.assignment.dto.response.category.CategoryResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.services.auth.SecurityContextService;
-import com.nashtech.assignment.services.create.CreateCategoryService;
-import com.nashtech.assignment.services.get.GetCategoryService;
+import com.nashtech.assignment.services.category.CategoryService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,9 +42,7 @@ class CategoryControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
     @MockBean
-    private GetCategoryService getCategoryService;
-    @MockBean
-    private CreateCategoryService createCategoryService;
+    private CategoryService categoryService;
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @MockBean
@@ -68,7 +65,7 @@ class CategoryControllerTest {
         List<CategoryResponse> response = new ArrayList<>();
         response.add(categoryResponse);
 
-        when(getCategoryService.getAllCategories()).thenReturn(response);
+        when(categoryService.getAllCategories()).thenReturn(response);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/category");
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -94,7 +91,7 @@ class CategoryControllerTest {
                 .prefixAssetCode("CN")
                 .build();
 
-        when(createCategoryService.createNewCategory(categoryCaptor.capture())).thenReturn(response);
+        when(categoryService.createNewCategory(categoryCaptor.capture())).thenReturn(response);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/category")
                 .content(objectMapper.writeValueAsString(request))
@@ -112,7 +109,7 @@ class CategoryControllerTest {
                 .prefixAssetCode("CN")
                 .build();
 
-        when(createCategoryService.createNewCategory(request)).thenThrow(badRequestException);
+        when(categoryService.createNewCategory(request)).thenThrow(badRequestException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/category");
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();

@@ -4,19 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nashtech.assignment.AssignmentApplication;
 import com.nashtech.assignment.config.CORSConfig;
 import com.nashtech.assignment.config.SecurityConfig;
+import com.nashtech.assignment.data.constants.Constants;
 import com.nashtech.assignment.data.constants.EGender;
 import com.nashtech.assignment.data.constants.EUserType;
 import com.nashtech.assignment.dto.request.user.*;
 import com.nashtech.assignment.dto.response.PaginationResponse;
 import com.nashtech.assignment.dto.response.user.UserResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
+import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.services.auth.SecurityContextService;
-import com.nashtech.assignment.services.create.CreateUserService;
-import com.nashtech.assignment.services.delete.DeleteUserService;
-import com.nashtech.assignment.services.edit.EditUserService;
-import com.nashtech.assignment.services.get.GetUserService;
 import com.nashtech.assignment.services.search.SearchUserService;
+import com.nashtech.assignment.services.user.UserService;
+import com.nashtech.assignment.services.validation.ValidationUserService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,22 +48,18 @@ import static org.mockito.Mockito.*;
 @WebMvcTest(value = UserController.class)
 @ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class, CORSConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
-public class UserControllerTest {
+class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
     @MockBean
-    private EditUserService editUserService;
-    @MockBean
-    private DeleteUserService deleteUserService;
-    @MockBean
-    private CreateUserService createUserService;
-    @MockBean
     private SearchUserService searchUserService;
     @MockBean
-    private GetUserService getUserService;
+    private UserService userService;
+    @MockBean
+    private ValidationUserService validationUserService;
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @MockBean
@@ -77,7 +73,7 @@ public class UserControllerTest {
     @BeforeEach
     void setup() throws Exception {
         badRequestException = new BadRequestException("error message");
-        SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat formatterDate = new SimpleDateFormat(Constants.DATE_FORMAT);
         formatterDate.setTimeZone(TimeZone.getTimeZone("GMT"));
         dateOfBirth = formatterDate.parse("21/12/2001");
         joinedDate = formatterDate.parse("17/11/2022");
@@ -118,7 +114,7 @@ public class UserControllerTest {
                 .location("location")
                 .build();
 
-        when(createUserService.createNewUser(createNewUserRequestCaptor.capture())).thenReturn(response);
+        when(userService.createNewUser(createNewUserRequestCaptor.capture())).thenReturn(response);
 
         RequestBuilder request = MockMvcRequestBuilders.post("/api/user")
                 .content(objectMapper.writeValueAsString(createNewUserRequest))
@@ -132,7 +128,7 @@ public class UserControllerTest {
                 "{\"id\":0,\"username\":null,\"staffCode\":null,\"firstName\":\"hau\",\"lastName\":\"doan\"," +
                         "\"gender\":\"MALE\",\"joinedDate\":\"2022-11-17T00:00:00.000+00:00\"," +
                         "\"dateOfBirth\":\"2001-12-21T00:00:00.000+00:00\",\"type\":\"ADMIN\"," +
-                        "\"location\":\"location\",\"fullName\":null}"
+                        "\"location\":\"location\",\"fullName\":null,\"firstLogin\":false}"
         ));
     }
 
@@ -158,7 +154,7 @@ public class UserControllerTest {
                 .type(EUserType.STAFF)
                 .build();
 
-        when(editUserService.editUserInformation(userRequestCaptor.capture())).thenReturn(userResponse);
+        when(userService.editUserInformation(userRequestCaptor.capture())).thenReturn(userResponse);
 
         RequestBuilder request = MockMvcRequestBuilders.put("/api/user/edit")
                 .content(objectMapper.writeValueAsString(userRequest))
@@ -171,7 +167,7 @@ public class UserControllerTest {
                 "{\"id\":0,\"username\":null,\"staffCode\":\"test\",\"firstName\":\"Doan\",\"lastName\":\"Ngoc Dam\"," +
                         "\"gender\":\"FEMALE\",\"joinedDate\":\"2022-11-17T00:00:00.000+00:00\"," +
                         "\"dateOfBirth\":\"2001-12-21T00:00:00.000+00:00\",\"type\":\"STAFF\",\"location\":\"HCM\"," +
-                        "\"fullName\":\"Doan Ngoc Dam\"}"
+                        "\"fullName\":\"Doan Ngoc Dam\",\"firstLogin\":false}"
         ));
 
     }
@@ -189,7 +185,7 @@ public class UserControllerTest {
         ArgumentCaptor<EditUserRequest> userRequestCaptor = ArgumentCaptor.forClass(EditUserRequest.class);
         NotFoundException notFoundException = new NotFoundException("Message");
 
-        when(editUserService.editUserInformation(userRequestCaptor.capture())).thenThrow(notFoundException);
+        when(userService.editUserInformation(userRequestCaptor.capture())).thenThrow(notFoundException);
 
         RequestBuilder request = MockMvcRequestBuilders.put("/api/user/edit")
                 .content(objectMapper.writeValueAsString(userRequest))
@@ -213,7 +209,7 @@ public class UserControllerTest {
         ArgumentCaptor<EditUserRequest> userRequestCaptor = ArgumentCaptor.forClass(EditUserRequest.class);
         BadRequestException badRequestException = new BadRequestException("Message");
 
-        when(editUserService.editUserInformation(userRequestCaptor.capture())).thenThrow(badRequestException);
+        when(userService.editUserInformation(userRequestCaptor.capture())).thenThrow(badRequestException);
 
         RequestBuilder request = MockMvcRequestBuilders.put("/api/user/edit")
                 .content(objectMapper.writeValueAsString(userRequest))
@@ -229,7 +225,7 @@ public class UserControllerTest {
 
     @Test
     void deleteUser_WhenSuccessfully_ShouldReturnStatusCode204() throws Exception {
-        doNothing().when(deleteUserService).deleteUser("test");
+        doNothing().when(userService).deleteUser("test");
 
         RequestBuilder request = MockMvcRequestBuilders.delete("/api/user")
                 .param("staffCode", "test");
@@ -240,7 +236,7 @@ public class UserControllerTest {
 
     @Test
     void deleteUser_WhenUserNotFound_ShouldThrowNotFoundException() throws Exception {
-        doThrow(NotFoundException.class).when(deleteUserService).deleteUser("test");
+        doThrow(NotFoundException.class).when(userService).deleteUser("test");
 
         RequestBuilder request = MockMvcRequestBuilders.delete("/api/user")
                 .param("staffCode", "test");
@@ -251,7 +247,7 @@ public class UserControllerTest {
 
     @Test
     void deleteUser_WhenUserHaveValidAssign_ShouldThrowBadRequestException() throws Exception {
-        doThrow(BadRequestException.class).when(deleteUserService).deleteUser("test");
+        doThrow(BadRequestException.class).when(userService).deleteUser("test");
 
         RequestBuilder request = MockMvcRequestBuilders.delete("/api/user")
                 .param("staffCode", "test");
@@ -262,7 +258,7 @@ public class UserControllerTest {
 
     @Test
     void checkValidUserForDelete_ShouldReturnTrue_WhenDataValid() throws Exception {
-        when(deleteUserService.checkValidUser("test")).thenReturn(true);
+        when(validationUserService.checkValidUserForDelete("test")).thenReturn(true);
 
         RequestBuilder request = MockMvcRequestBuilders.get("/api/user/check-user")
                 .param("staffCode", "test");
@@ -274,7 +270,7 @@ public class UserControllerTest {
 
     @Test
     void checkValidUserForDelete_WhenUserHaveValidAssign_ShouldThrowBadRequestException() throws Exception {
-        doThrow(BadRequestException.class).when(deleteUserService).checkValidUser("test");
+        doThrow(BadRequestException.class).when(validationUserService).checkValidUserForDelete("test");
 
         RequestBuilder request = MockMvcRequestBuilders.get("/api/user/check-user")
                 .param("staffCode", "test");
@@ -285,7 +281,7 @@ public class UserControllerTest {
 
     @Test
     void checkValidUser_WhenUserNotFound_ShouldThrowNotFoundException() throws Exception {
-        doThrow(NotFoundException.class).when(deleteUserService).checkValidUser("test");
+        doThrow(NotFoundException.class).when(validationUserService).checkValidUserForDelete("test");
 
         RequestBuilder request = MockMvcRequestBuilders.get("/api/user/check-user")
                 .param("staffCode", "test");
@@ -302,7 +298,7 @@ public class UserControllerTest {
         ArgumentCaptor<ChangePasswordRequest> changePasswordRequestCaptor = ArgumentCaptor
                 .forClass(ChangePasswordRequest.class);
 
-        when(editUserService.changePassword(changePasswordRequestCaptor.capture())).thenThrow(badRequestException);
+        when(userService.changePassword(changePasswordRequestCaptor.capture())).thenThrow(badRequestException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password")
                 .content(objectMapper.writeValueAsString(changePasswordRequest))
@@ -322,7 +318,7 @@ public class UserControllerTest {
                 .forClass(ChangePasswordRequest.class);
         UserResponse userResponse = UserResponse.builder().fullName("Test").build();
 
-        when(editUserService.changePassword(changePasswordRequestCaptor.capture()))
+        when(userService.changePassword(changePasswordRequestCaptor.capture()))
                 .thenReturn(userResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password")
@@ -334,7 +330,7 @@ public class UserControllerTest {
         assertThat(actual.getContentAsString(), is(
                 "{\"id\":0,\"username\":null,\"staffCode\":null,\"firstName\":null,\"lastName\":null," +
                         "\"gender\":null,\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":null," +
-                        "\"fullName\":\"Test\"}"
+                        "\"fullName\":\"Test\",\"firstLogin\":false}"
         ));
     }
 
@@ -345,7 +341,7 @@ public class UserControllerTest {
         ArgumentCaptor<ChangePasswordFirstRequest> changeFirstCaptor = ArgumentCaptor
                 .forClass(ChangePasswordFirstRequest.class);
 
-        when(editUserService.changePasswordFirst(changeFirstCaptor.capture())).thenThrow(badRequestException);
+        when(userService.changePasswordFirst(changeFirstCaptor.capture())).thenThrow(badRequestException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password/first")
                 .content(objectMapper.writeValueAsString(changeFirstRequest))
@@ -364,7 +360,7 @@ public class UserControllerTest {
                 .forClass(ChangePasswordFirstRequest.class);
         UserResponse userResponse = UserResponse.builder().fullName("Test").build();
 
-        when(editUserService.changePasswordFirst(changeFirstCaptor.capture())).thenReturn(userResponse);
+        when(userService.changePasswordFirst(changeFirstCaptor.capture())).thenReturn(userResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/user/change-password/first")
                 .content(objectMapper.writeValueAsString(changeFirstRequest))
@@ -373,7 +369,7 @@ public class UserControllerTest {
 
         assertThat(actual.getContentAsString(), is(
                 "{\"id\":0,\"username\":null,\"staffCode\":null,\"firstName\":null,\"lastName\":null,\"gender\":null," +
-                        "\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":null,\"fullName\":\"Test\"}"
+                        "\"joinedDate\":null,\"dateOfBirth\":null,\"type\":null,\"location\":null,\"fullName\":\"Test\",\"firstLogin\":false}"
         ));
     }
 
@@ -413,23 +409,52 @@ public class UserControllerTest {
                 "{\"data\":[{\"id\":0,\"username\":\"username\",\"staffCode\":\"staffCode\"," +
                         "\"firstName\":\"firstName\",\"lastName\":\"lastName\",\"gender\":\"MALE\"," +
                         "\"joinedDate\":\"2001-01-01T00:00:00.000+00:00\",\"dateOfBirth\":\"2001-01-01T00:00:00.000+00:00\"," +
-                        "\"type\":\"ADMIN\",\"location\":\"location\",\"fullName\":\"fullName\"}]," +
+                        "\"type\":\"ADMIN\",\"location\":\"location\",\"fullName\":\"fullName\",\"firstLogin\":false}]," +
                         "\"totalPage\":1,\"totalRow\":1}"));
     }
 
     @Test
     void viewUserDetails_ShouldReturnUserResponse() throws Exception {
-        when(getUserService.viewUserDetails("test")).thenReturn(userResponse);
+        when(userService.viewUserDetails("test")).thenReturn(userResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/user/get/{staffCode}", "test");
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
         assertThat(result.getResponse().getContentAsString(), is(
-                "{\"id\":0,\"username\":\"username\",\"staffCode\":\"staffCode\","+
-                "\"firstName\":\"firstName\",\"lastName\":\"lastName\",\"gender\":\"MALE\","+
-                "\"joinedDate\":\"2001-01-01T00:00:00.000+00:00\",\"dateOfBirth\":\"2001-01-01T00:00:00.000+00:00\","+
-                "\"type\":\"ADMIN\",\"location\":\"location\",\"fullName\":\"fullName\"}"
+                "{\"id\":0,\"username\":\"username\",\"staffCode\":\"staffCode\"," +
+                        "\"firstName\":\"firstName\",\"lastName\":\"lastName\",\"gender\":\"MALE\"," +
+                        "\"joinedDate\":\"2001-01-01T00:00:00.000+00:00\",\"dateOfBirth\":\"2001-01-01T00:00:00.000+00:00\"," +
+                        "\"type\":\"ADMIN\",\"location\":\"location\",\"fullName\":\"fullName\",\"firstLogin\":false}"
+        ));
+    }
+
+    @Test
+    void getCurrentUserLoggedInInformation_WhenUserNameNotMatch_ThrowForbiddenException() throws Exception {
+        doThrow(ForbiddenException.class).when(userService).getCurrentUserLoggedInInformation("username");
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/api/user/{username}/current", "username");
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+        assertThat(result.getResponse().getStatus(), is(HttpStatus.FORBIDDEN.value()));
+        assertThat(result.getResponse().getContentAsString(), is("{\"message\":null}"));
+    }
+
+    @Test
+    void getCurrentUserLoggedInInformation_WhenDataValid_ShouldReturnUserResponse() throws Exception {
+        when(userService.getCurrentUserLoggedInInformation("username")).thenReturn(userResponse);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/api/user/{username}/current", "username");
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+        assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
+        assertThat(result.getResponse().getContentAsString(), is(
+                "{\"id\":0,\"username\":\"username\",\"staffCode\":\"staffCode\"," +
+                        "\"firstName\":\"firstName\",\"lastName\":\"lastName\",\"gender\":\"MALE\"," +
+                        "\"joinedDate\":\"2001-01-01T00:00:00.000+00:00\",\"dateOfBirth\":\"2001-01-01T00:00:00.000+00:00\"," +
+                        "\"type\":\"ADMIN\",\"location\":\"location\",\"fullName\":\"fullName\",\"firstLogin\":false}"
         ));
     }
 

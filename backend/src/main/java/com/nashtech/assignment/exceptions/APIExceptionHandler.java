@@ -24,7 +24,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
 public class APIExceptionHandler {
-    
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ExceptionResponse> handleBadRequestException(BadRequestException ex) {
         ExceptionResponse errors = ExceptionResponse.builder().message(ex.getMessage()).build();
@@ -35,7 +35,7 @@ public class APIExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException ex) {
         ExceptionResponse errors = ExceptionResponse.builder().build();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
+        ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.setMessage(fieldName + ":" + errorMessage);

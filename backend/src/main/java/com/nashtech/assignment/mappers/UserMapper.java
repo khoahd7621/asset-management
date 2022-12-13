@@ -22,6 +22,7 @@ public class UserMapper {
                 .dateOfBirth(user.getDateOfBirth())
                 .staffCode(user.getStaffCode())
                 .location(user.getLocation())
+                .isFirstLogin(user.isFirstLogin())
                 .type(user.getType()).build();
     }
 

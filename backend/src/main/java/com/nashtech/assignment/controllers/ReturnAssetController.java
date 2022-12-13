@@ -6,9 +6,7 @@ import com.nashtech.assignment.dto.response.returned.ReturnAssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.exceptions.NotFoundException;
-import com.nashtech.assignment.services.create.CreateReturnAssetService;
-import com.nashtech.assignment.services.delete.DeleteReturnAssetService;
-import com.nashtech.assignment.services.edit.EditReturnAssetService;
+import com.nashtech.assignment.services.returned.ReturnedService;
 import com.nashtech.assignment.services.search.SearchReturnAssetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,13 +26,9 @@ import java.util.List;
 public class ReturnAssetController {
 
     @Autowired
-    private CreateReturnAssetService createReturnAssetService;
-    @Autowired
     private SearchReturnAssetService searchReturnAssetService;
     @Autowired
-    private DeleteReturnAssetService deleteReturnAssetService;
-    @Autowired
-    private EditReturnAssetService editReturnAssetService;
+    private ReturnedService returnedService;
 
     @Operation(summary = "Create request for returning asset")
     @ApiResponses(value = {
@@ -49,8 +43,7 @@ public class ReturnAssetController {
     })
     @PostMapping
     public ResponseEntity<ReturnAssetResponse> createReturnAsset(@RequestParam(value = "id") long id) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(createReturnAssetService.createReturnAsset(id));
+        return ResponseEntity.status(HttpStatus.OK).body(returnedService.createReturnAsset(id));
     }
 
     @Operation(summary = "Search return asset by key-word, status, date, page")
@@ -78,7 +71,7 @@ public class ReturnAssetController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))})})
     @DeleteMapping()
     public ResponseEntity<Void> cancelReturnAsset(@RequestParam() long id) {
-        deleteReturnAssetService.deleteReturnAsset(id);
+        returnedService.deleteReturnAsset(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -92,7 +85,7 @@ public class ReturnAssetController {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = NotFoundException.class))})})
     @PatchMapping
     public ResponseEntity<Void> completeReturnRequest(@RequestParam() long id) {
-        editReturnAssetService.completeReturnRequest(id);
+        returnedService.completeReturnRequest(id);
         return ResponseEntity.noContent().build();
     }
 }

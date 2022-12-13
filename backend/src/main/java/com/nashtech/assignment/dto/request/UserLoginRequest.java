@@ -1,19 +1,20 @@
 package com.nashtech.assignment.dto.request;
 
+import com.nashtech.assignment.data.constants.Constants;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
-import com.nashtech.assignment.data.constants.Constants;
-
-import lombok.*;
 
 @Getter
 @Setter
 @Builder
 public class UserLoginRequest {
     @NotBlank(message = "Username is required")
-    @Pattern(regexp = Constants.USERNAME_REGEX, message = "Invalid username")
+    @Pattern(regexp = Constants.ONLY_ALPHABET_AND_NUMBER_REGEX, message = "Invalid username")
     private String username;
 
     @NotBlank(message = "Password is required")

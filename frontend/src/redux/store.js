@@ -1,8 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
+
+import { persistStore, persistReducer, REHYDRATE, PERSIST } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
-import rootReducer from './reducer/rootReducer';
+
 import { encryptTransform } from 'redux-persist-transform-encrypt';
+import { createStateSyncMiddleware } from 'redux-state-sync';
+
+import rootReducer from './reducer/rootReducer';
 
 const persistConfig = {
   key: 'root',
@@ -12,7 +16,6 @@ const persistConfig = {
     encryptTransform({
       secretKey: 'SUPER_SUPER_SECRET_KEY',
       onError: function (error) {
-        // Handle the error.
         console.log('Error: ', error);
       },
     }),
@@ -26,11 +29,14 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        ignoredActions: [REHYDRATE, PERSIST],
       },
-    }),
+    }).concat(
+      createStateSyncMiddleware({
+        blacklist: [REHYDRATE, PERSIST],
+      }),
+    ),
 });
-
 const persistor = persistStore(store);
 
 export { store, persistor };

@@ -10,9 +10,7 @@ import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.exceptions.NotFoundException;
 import com.nashtech.assignment.services.auth.SecurityContextService;
-import com.nashtech.assignment.services.create.CreateReturnAssetService;
-import com.nashtech.assignment.services.delete.DeleteReturnAssetService;
-import com.nashtech.assignment.services.edit.EditReturnAssetService;
+import com.nashtech.assignment.services.returned.ReturnedService;
 import com.nashtech.assignment.services.search.SearchReturnAssetService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,18 +38,14 @@ import static org.mockito.Mockito.*;
 @WebMvcTest(value = ReturnAssetController.class)
 @ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class, CORSConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
-public class ReturnAssetControllerTest {
+class ReturnAssetControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private CreateReturnAssetService createReturnAssetService;
-    @MockBean
     private SearchReturnAssetService searchReturnAssetService;
     @MockBean
-    private DeleteReturnAssetService deleteReturnAssetService;
-    @MockBean
-    private EditReturnAssetService editReturnAssetService;
+    private ReturnedService returnedService;
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @MockBean
@@ -74,7 +68,7 @@ public class ReturnAssetControllerTest {
 
     @Test
     void createReturnAsset_WhenAssignNotFound_ShouldReturnNotFoundException() throws Exception {
-        when(createReturnAssetService.createReturnAsset(1L)).thenThrow(notFoundException);
+        when(returnedService.createReturnAsset(1L)).thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/return-asset")
                 .param("id", String.valueOf(1L));
@@ -86,7 +80,7 @@ public class ReturnAssetControllerTest {
 
     @Test
     void createReturnAsset_WhenAssignInvalid_ShouldReturnBadRequestException() throws Exception {
-        when(createReturnAssetService.createReturnAsset(1L)).thenThrow(badRequestException);
+        when(returnedService.createReturnAsset(1L)).thenThrow(badRequestException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/return-asset")
                 .param("id", String.valueOf(1L));
@@ -98,7 +92,7 @@ public class ReturnAssetControllerTest {
 
     @Test
     void createReturnAsset_WhenUserNotMatch_ShouldReturnForbiddenException() throws Exception {
-        when(createReturnAssetService.createReturnAsset(1L)).thenThrow(forbiddenException);
+        when(returnedService.createReturnAsset(1L)).thenThrow(forbiddenException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/return-asset")
                 .param("id", String.valueOf(1L));
@@ -114,7 +108,7 @@ public class ReturnAssetControllerTest {
                 .status(EReturnStatus.WAITING_FOR_RETURNING)
                 .isDeleted(false)
                 .build();
-        when(createReturnAssetService.createReturnAsset(1L)).thenReturn(expected);
+        when(returnedService.createReturnAsset(1L)).thenReturn(expected);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/return-asset")
                 .param("id", String.valueOf(1L));
@@ -179,7 +173,7 @@ public class ReturnAssetControllerTest {
 
     @Test
     void cancelReturnAsset_WhenDataValid_ShouldReturn204() throws Exception {
-        doNothing().when(deleteReturnAssetService).deleteReturnAsset(1L);
+        doNothing().when(returnedService).deleteReturnAsset(1L);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/return-asset")
@@ -191,7 +185,7 @@ public class ReturnAssetControllerTest {
 
     @Test
     void cancelReturnAsset_WhenReturnAssetNotExist_ShouldReturn404() throws Exception {
-        doThrow(NotFoundException.class).when(deleteReturnAssetService).deleteReturnAsset(1L);
+        doThrow(NotFoundException.class).when(returnedService).deleteReturnAsset(1L);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/return-asset")
@@ -203,7 +197,7 @@ public class ReturnAssetControllerTest {
 
     @Test
     void completeReturnRequest_WhenDataValid_ShouldReturn204() throws Exception {
-        doNothing().when(editReturnAssetService).completeReturnRequest(1L);
+        doNothing().when(returnedService).completeReturnRequest(1L);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.patch("/api/return-asset")
                 .param("id", "1");
@@ -214,7 +208,7 @@ public class ReturnAssetControllerTest {
 
     @Test
     void completeReturnRequest_WhenIdNotExist_ShouldThrow404() throws Exception {
-        doThrow(NotFoundException.class).when(editReturnAssetService).completeReturnRequest(1L);
+        doThrow(NotFoundException.class).when(returnedService).completeReturnRequest(1L);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.patch("/api/return-asset")
                 .param("id", "1");
@@ -225,7 +219,7 @@ public class ReturnAssetControllerTest {
 
     @Test
     void completeReturnRequest_WhenReturnAssetNotValid_ShouldThrow400() throws Exception {
-        doThrow(BadRequestException.class).when(editReturnAssetService).completeReturnRequest(1L);
+        doThrow(BadRequestException.class).when(returnedService).completeReturnRequest(1L);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.patch("/api/return-asset")
                 .param("id", "1");
@@ -236,7 +230,7 @@ public class ReturnAssetControllerTest {
 
     @Test
     void cancelReturnAsset_WhenReturnAssetNotValid_ShouldReturn400() throws Exception {
-        doThrow(BadRequestException.class).when(deleteReturnAssetService).deleteReturnAsset(1L);
+        doThrow(BadRequestException.class).when(returnedService).deleteReturnAsset(1L);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/return-asset")
                 .param("id", "1");

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nashtech.assignment.AssignmentApplication;
 import com.nashtech.assignment.config.CORSConfig;
 import com.nashtech.assignment.config.SecurityConfig;
+import com.nashtech.assignment.data.constants.Constants;
 import com.nashtech.assignment.data.constants.EAssetStatus;
 import com.nashtech.assignment.dto.request.asset.CreateNewAssetRequest;
 import com.nashtech.assignment.dto.request.asset.EditAssetInformationRequest;
@@ -15,11 +16,8 @@ import com.nashtech.assignment.dto.response.asset.AssetResponse;
 import com.nashtech.assignment.dto.response.category.CategoryResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
+import com.nashtech.assignment.services.asset.AssetService;
 import com.nashtech.assignment.services.auth.SecurityContextService;
-import com.nashtech.assignment.services.create.CreateAssetService;
-import com.nashtech.assignment.services.delete.DeleteAssetService;
-import com.nashtech.assignment.services.edit.EditAssetService;
-import com.nashtech.assignment.services.get.GetAssetService;
 import com.nashtech.assignment.services.search.SearchAssetService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,13 +58,7 @@ class AssetControllerTest {
     @MockBean
     private SearchAssetService searchAssetService;
     @MockBean
-    private EditAssetService editAssetService;
-    @MockBean
-    private DeleteAssetService deleteAssetService;
-    @MockBean
-    private GetAssetService getAssetService;
-    @MockBean
-    private CreateAssetService createAssetService;
+    private AssetService assetService;
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @MockBean
@@ -79,7 +71,7 @@ class AssetControllerTest {
 
     @BeforeEach
     void setup() throws ParseException {
-        SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat formatterDate = new SimpleDateFormat(Constants.DATE_FORMAT);
         formatterDate.setTimeZone(TimeZone.getTimeZone("GMT"));
         date = formatterDate.parse("01/01/2001");
         assetResponse = AssetResponse.builder()
@@ -112,7 +104,7 @@ class AssetControllerTest {
                 .asset(assetResponse)
                 .histories(assetHistories).build();
 
-        when(getAssetService.getAssetAndItsHistoriesByAssetId(1L)).thenReturn(expected);
+        when(assetService.getAssetAndItsHistoriesByAssetId(1L)).thenReturn(expected);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset/{assetId}", 1L);
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -129,7 +121,7 @@ class AssetControllerTest {
 
     @Test
     void getAssetAndItsHistoriesByAssetId_WhenAssetIdNotExist_ShouldThrowNotFoundException() throws Exception {
-        when(getAssetService.getAssetAndItsHistoriesByAssetId(1L)).thenThrow(notFoundException);
+        when(assetService.getAssetAndItsHistoriesByAssetId(1L)).thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset/{assetId}", 1L);
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -185,7 +177,7 @@ class AssetControllerTest {
     }
 
     @Test
-    void editAssetInformation_WhenDataValid_ShouldReturnReponse() throws Exception {
+    void editAssetInformation_WhenDataValid_ShouldReturnResponse() throws Exception {
         EditAssetInformationRequest editAssetInformationRequest = EditAssetInformationRequest.builder()
                 .assetName("assetName")
                 .specification("assetSpecification")
@@ -205,7 +197,7 @@ class AssetControllerTest {
                 .installedDate(date)
                 .build();
 
-        when(editAssetService.editAssetInformation(idCaptor.capture(), editAssetInformationRequestCaptor.capture()))
+        when(assetService.editAssetInformation(idCaptor.capture(), editAssetInformationRequestCaptor.capture()))
                 .thenReturn(editAssetInformationResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/asset/{assetId}", 1L)
@@ -233,7 +225,7 @@ class AssetControllerTest {
 
         ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
 
-        when(editAssetService.editAssetInformation(idCaptor.capture(), editAssetInformationRequestCaptor.capture()))
+        when(assetService.editAssetInformation(idCaptor.capture(), editAssetInformationRequestCaptor.capture()))
                 .thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/asset/{assetId}", 1L)
@@ -260,11 +252,38 @@ class AssetControllerTest {
 
         ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
 
-        when(editAssetService.editAssetInformation(idCaptor.capture(), editAssetInformationRequestCaptor.capture()))
+        when(assetService.editAssetInformation(idCaptor.capture(), editAssetInformationRequestCaptor.capture()))
                 .thenThrow(badRequestException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/asset/{assetId}", 1L)
                 .content(objectMapper.writeValueAsString(editAssetInformationRequest))
+                .contentType(MediaType.APPLICATION_JSON);
+
+        MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
+
+        assertThat(actual.getStatus(), is(HttpStatus.BAD_REQUEST.value()));
+        assertThat(actual.getContentAsString(), is("{\"message\":\"error message\"}"));
+    }
+
+    @Test
+    void createAssetResponse_WhenDataInvalid_ShouldReturnException() throws Exception {
+        CreateNewAssetRequest request = CreateNewAssetRequest
+                .builder()
+                .assetName("assetName")
+                .categoryName("categoryName")
+                .specification("specification")
+                .assetStatus(EAssetStatus.AVAILABLE)
+                .installedDate("01/01/2001")
+                .build();
+
+        ArgumentCaptor<CreateNewAssetRequest> createNewAssetRequestCaptor = ArgumentCaptor
+                .forClass(CreateNewAssetRequest.class);
+
+        when(assetService.createAssetResponse(createNewAssetRequestCaptor.capture()))
+                .thenThrow(badRequestException);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/asset")
+                .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON);
 
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -296,7 +315,7 @@ class AssetControllerTest {
                 .location("location")
                 .build();
 
-        when(createAssetService.createAssetResponse(assetCaptor.capture())).thenReturn(response);
+        when(assetService.createAssetResponse(assetCaptor.capture())).thenReturn(response);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/asset")
                 .content(objectMapper.writeValueAsString(request))
@@ -313,7 +332,7 @@ class AssetControllerTest {
     void checkAssetIsValidForDeleteOrNot_WhenAssetIdExistAndValidForDelete_ShouldReturnNoContent() throws Exception {
         long assetId = 1L;
 
-        doNothing().when(getAssetService).checkAssetIsValidForDeleteOrNot(assetId);
+        doNothing().when(assetService).checkAssetIsValidForDeleteOrNot(assetId);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset/check-asset/{assetId}", assetId);
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -325,7 +344,7 @@ class AssetControllerTest {
     void checkAssetIsValidForDeleteOrNot_WhenAssetIdNotExist_ShouldThrowNotFoundException() throws Exception {
         long assetId = 1L;
 
-        doThrow(notFoundException).when(getAssetService).checkAssetIsValidForDeleteOrNot(assetId);
+        doThrow(notFoundException).when(assetService).checkAssetIsValidForDeleteOrNot(assetId);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset/check-asset/{assetId}", assetId);
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -338,7 +357,7 @@ class AssetControllerTest {
     void checkAssetIsValidForDeleteOrNot_WhenAssetIdExistButNotValidForDelete_ShouldThrowBadRequestException() throws Exception {
         long assetId = 1L;
 
-        doThrow(badRequestException).when(getAssetService).checkAssetIsValidForDeleteOrNot(assetId);
+        doThrow(badRequestException).when(assetService).checkAssetIsValidForDeleteOrNot(assetId);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/asset/check-asset/{assetId}", assetId);
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -351,7 +370,7 @@ class AssetControllerTest {
     void deleteAssetByAssetId_WhenAssetIdExistAndValidForDelete_ShouldReturnNoContent() throws Exception {
         long assetId = 1L;
 
-        doNothing().when(deleteAssetService).deleteAssetByAssetId(assetId);
+        doNothing().when(assetService).deleteAssetByAssetId(assetId);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/asset/{assetId}", assetId);
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -363,7 +382,7 @@ class AssetControllerTest {
     void deleteAssetByAssetId_WhenAssetIdNotExist_ShouldThrowNotFoundException() throws Exception {
         long assetId = 1L;
 
-        doThrow(notFoundException).when(deleteAssetService).deleteAssetByAssetId(assetId);
+        doThrow(notFoundException).when(assetService).deleteAssetByAssetId(assetId);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/asset/{assetId}", assetId);
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();
@@ -376,7 +395,7 @@ class AssetControllerTest {
     void deleteAssetByAssetId_WhenAssetIdExistButNotValidForDelete_ShouldThrowBadRequestException() throws Exception {
         long assetId = 1L;
 
-        doThrow(badRequestException).when(deleteAssetService).deleteAssetByAssetId(assetId);
+        doThrow(badRequestException).when(assetService).deleteAssetByAssetId(assetId);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/asset/{assetId}", assetId);
         MockHttpServletResponse actual = mockMvc.perform(requestBuilder).andReturn().getResponse();

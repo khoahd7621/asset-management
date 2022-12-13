@@ -2,7 +2,7 @@ package com.nashtech.assignment.controllers;
 
 import com.nashtech.assignment.dto.response.report.AssetReportResponse;
 import com.nashtech.assignment.dto.response.report.AssetReportResponseInterface;
-import com.nashtech.assignment.services.get.GetAssetReportService;
+import com.nashtech.assignment.services.asset.AssetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +22,7 @@ import java.util.List;
 public class ReportController {
 
     @Autowired
-    private GetAssetReportService getAssetReportService;
+    private AssetService assetService;
 
     @Operation(summary = "Get report of asset")
     @ApiResponses(value = {
@@ -32,7 +32,6 @@ public class ReportController {
     })
     @GetMapping()
     public ResponseEntity<List<AssetReportResponse>> getReport() {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                getAssetReportService.getAssetReport());
+        return ResponseEntity.status(HttpStatus.OK).body(assetService.getAssetReport());
     }
 }

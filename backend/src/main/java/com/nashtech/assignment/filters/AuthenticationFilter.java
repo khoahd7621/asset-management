@@ -1,8 +1,11 @@
 package com.nashtech.assignment.filters;
 
+import com.nashtech.assignment.exceptions.BadRequestException;
+import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.services.auth.SecurityContextService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -42,17 +45,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                     String username = jwtTokenUtil.getUsernameFromClaims(listClaims.getBody());
                     securityContextService.setSecurityContext(username);
                     filterChain.doFilter(request, response);
-                } catch (SignatureException se) {
-                    throw new SignatureException("Invalid JWT signature.", se);
-                } catch (IllegalArgumentException iae) {
-                    throw new IllegalArgumentException("Unable to get JWT.", iae);
-                } catch (ExpiredJwtException eje) {
-                    throw new ExpiredJwtException(null, null, "Token has expired.", eje);
-                } catch (MalformedJwtException mje) {
-                    throw new MalformedJwtException("JWT was not correctly constructed.", mje);
+                } catch (Exception ex) {
+                    throw new BadRequestException(ex.getMessage(), ex);
                 }
             } else {
-                throw new RuntimeException("JWT Access Token does not start with 'Bearer '.");
+                throw new ForbiddenException("JWT Access Token does not start with 'Bearer '.");
             }
         }
     }

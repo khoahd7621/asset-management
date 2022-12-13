@@ -1,15 +1,10 @@
 package com.nashtech.assignment.dto.request.user;
 
+import com.nashtech.assignment.data.constants.Constants;
+import lombok.*;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-
-import com.nashtech.assignment.data.constants.Constants;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Setter

@@ -24,7 +24,7 @@ import javax.validation.Valid;
 public class AuthController {
 
     @Autowired
-    LoginService loginService;
+    private LoginService loginService;
 
     @Operation(summary = "Login")
     @ApiResponses(value = {

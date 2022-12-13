@@ -4,8 +4,8 @@ import com.nashtech.assignment.AssignmentApplication;
 import com.nashtech.assignment.config.CORSConfig;
 import com.nashtech.assignment.config.SecurityConfig;
 import com.nashtech.assignment.dto.response.report.AssetReportResponse;
+import com.nashtech.assignment.services.asset.AssetService;
 import com.nashtech.assignment.services.auth.SecurityContextService;
-import com.nashtech.assignment.services.get.GetAssetReportService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,12 +29,12 @@ import static org.mockito.Mockito.when;
 @WebMvcTest(value = ReportController.class)
 @ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class, CORSConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
-public class ReportControllerTest {
+class ReportControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private GetAssetReportService getAssetReportService;
+    private AssetService assetService;
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @MockBean
@@ -60,10 +60,9 @@ public class ReportControllerTest {
         List<AssetReportResponse> expected = new ArrayList<>();
         expected.add(assetReportResponse);
 
-        when(getAssetReportService.getAssetReport()).thenReturn(expected);
+        when(assetService.getAssetReport()).thenReturn(expected);
 
-        RequestBuilder request = MockMvcRequestBuilders
-                .get("/api/report");
+        RequestBuilder request = MockMvcRequestBuilders.get("/api/report");
         MvcResult result = mockMvc.perform(request).andReturn();
 
         assertThat(result.getResponse().getContentAsString(), is(

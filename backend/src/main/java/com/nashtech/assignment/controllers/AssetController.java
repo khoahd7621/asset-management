@@ -9,10 +9,7 @@ import com.nashtech.assignment.dto.response.asset.AssetAndHistoriesResponse;
 import com.nashtech.assignment.dto.response.asset.AssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.NotFoundException;
-import com.nashtech.assignment.services.create.CreateAssetService;
-import com.nashtech.assignment.services.delete.DeleteAssetService;
-import com.nashtech.assignment.services.edit.EditAssetService;
-import com.nashtech.assignment.services.get.GetAssetService;
+import com.nashtech.assignment.services.asset.AssetService;
 import com.nashtech.assignment.services.search.SearchAssetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,13 +32,7 @@ public class AssetController {
     @Autowired
     private SearchAssetService searchAssetService;
     @Autowired
-    private EditAssetService editAssetService;
-    @Autowired
-    private DeleteAssetService deleteAssetService;
-    @Autowired
-    private GetAssetService getAssetService;
-    @Autowired
-    private CreateAssetService createAssetService;
+    private AssetService assetService;
 
     @Operation(summary = "Get asset detail and its histories by assetId")
     @ApiResponses(value = {
@@ -52,7 +43,7 @@ public class AssetController {
     })
     @GetMapping("/{assetId}")
     public ResponseEntity<AssetAndHistoriesResponse> getAssetAndItsHistoriesByAssetId(@PathVariable Long assetId) {
-        return ResponseEntity.status(HttpStatus.OK).body(getAssetService.getAssetAndItsHistoriesByAssetId(assetId));
+        return ResponseEntity.status(HttpStatus.OK).body(assetService.getAssetAndItsHistoriesByAssetId(assetId));
     }
 
     @Operation(summary = "Search all assets by assetCode or assetName (optional) in list status (optional) and in list categories (optional) same location with current user with pagination")
@@ -93,21 +84,21 @@ public class AssetController {
             @Valid @RequestBody EditAssetInformationRequest editAssetInformationRequest, @PathVariable Long assetId)
             throws ParseException {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(editAssetService.editAssetInformation(assetId, editAssetInformationRequest));
+                .body(assetService.editAssetInformation(assetId, editAssetInformationRequest));
     }
 
     @Operation(summary = "Create new asset")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Create new asset success.", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = AssetResponse.class))}),
-            @ApiResponse(responseCode = "404", description = "Asset name, category name, specification and installed date cannot be blank.", content = {
+            @ApiResponse(responseCode = "400", description = "Asset name, category name, specification and installed date cannot be blank.", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class))})
     })
     @PostMapping
     public ResponseEntity<AssetResponse> createAssetResponse(
             @Valid @RequestBody CreateNewAssetRequest createNewAssetRequest) throws ParseException {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(createAssetService.createAssetResponse(createNewAssetRequest));
+                .body(assetService.createAssetResponse(createNewAssetRequest));
     }
 
     @Operation(summary = "Check asset is valid for delete or not by assetId")
@@ -121,8 +112,8 @@ public class AssetController {
     })
     @GetMapping("/check-asset/{assetId}")
     public ResponseEntity<Void> checkAssetIsValidForDeleteOrNot(@PathVariable Long assetId) {
-        getAssetService.checkAssetIsValidForDeleteOrNot(assetId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        assetService.checkAssetIsValidForDeleteOrNot(assetId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Delete asset by assetId")
@@ -136,7 +127,7 @@ public class AssetController {
     })
     @DeleteMapping("/{assetId}")
     public ResponseEntity<Void> deleteAssetByAssetId(@PathVariable Long assetId) {
-        deleteAssetService.deleteAssetByAssetId(assetId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        assetService.deleteAssetByAssetId(assetId);
+        return ResponseEntity.noContent().build();
     }
 }

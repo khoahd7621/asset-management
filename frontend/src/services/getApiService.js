@@ -31,3 +31,7 @@ export const getAssignAssetDetails = (asignAssetId) => {
 export const getReportDetails = () => {
   return axios.get('/api/report');
 };
+
+export const getCurrentUserLoggedInByUsername = (username) => {
+  return axios.get(`/api/user/${username}/current`);
+};
