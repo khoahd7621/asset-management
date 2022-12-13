@@ -11,7 +11,7 @@ import java.util.Date;
 @Builder
 public class CompareDateUtil {
 
-    private final ZoneId ZONE_ID = ZoneId.systemDefault();
+    private static final ZoneId ZONE_ID = ZoneId.systemDefault();
 
     public boolean isEquals(Date dateNeedToCompare, Date dateUsedToCompare) {
         LocalDate localDateNeedToCompare = LocalDate.ofInstant(dateNeedToCompare.toInstant(), ZONE_ID);

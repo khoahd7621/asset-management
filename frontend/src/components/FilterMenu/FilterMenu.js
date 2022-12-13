@@ -42,7 +42,16 @@ const FilterMenu = ({
   }, [selectedItems]);
 
   const handleOnChange = (selection) => {
-    if (selection.length) {
+    if (selection.length && options.length - 1 === selection.length) {
+      if (selectedItems.some((item) => item === 'All') && selection.some((item) => item === 'All')) {
+        const arrSelections = selection.filter((item) => item !== 'All');
+        setSelectedItems([...arrSelections]);
+        onChange(arrSelections, checkboxType);
+      } else {
+        setSelectedItems(['All']);
+        onChange(['All'], checkboxType);
+      }
+    } else if (selection.length) {
       if (selectedItems.some((item) => item !== 'All') && selection.some((item) => item === 'All')) {
         setSelectedItems(['All']);
         onChange(['All'], checkboxType);

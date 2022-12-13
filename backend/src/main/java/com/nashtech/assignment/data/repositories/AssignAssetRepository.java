@@ -35,15 +35,13 @@ public interface AssignAssetRepository extends JpaRepository<AssignAsset, Long> 
             @Param("location") String location,
             Pageable pageable);
 
-    Optional<AssignAsset> findByIdAndIsDeletedFalse(long id);
-
     @Query(value = "select a FROM AssignAsset as a" +
             " where a.userAssignedTo.id = :userId" +
             " and a.isDeleted = :isDeleted" +
             " and a.status != :status" +
             " and (to_char(cast(a.assignedDate as date),'dd/mm/yyyy') < :date" +
             " or to_char(cast(a.assignedDate as date),'dd/mm/yyyy') = :date)")
-    public List<AssignAsset> findAllAssignAssetByUser(
+    List<AssignAsset> findAllAssignAssetByUser(
             @Param("userId") Long userId,
             @Param("isDeleted") Boolean isDeleted,
             @Param("status") EAssignStatus status,
@@ -51,4 +49,6 @@ public interface AssignAssetRepository extends JpaRepository<AssignAsset, Long> 
 
     @Query(value = "SELECT a FROM AssignAsset as a WHERE a.id = :id AND a.userAssignedTo.id = :userId")
     Optional<AssignAsset> findByIdAndUser(@Param("id") Long id, @Param("userId") Long userId);
+
+    Optional<AssignAsset> findByIdAndIsDeletedFalse(Long id);
 }

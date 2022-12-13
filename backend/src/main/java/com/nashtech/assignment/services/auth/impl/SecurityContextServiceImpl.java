@@ -3,6 +3,7 @@ package com.nashtech.assignment.services.auth.impl;
 import com.nashtech.assignment.config.CustomUserDetails;
 import com.nashtech.assignment.data.entities.User;
 import com.nashtech.assignment.data.repositories.UserRepository;
+import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.services.auth.SecurityContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,7 +26,7 @@ public class SecurityContextServiceImpl implements SecurityContextService {
     public void setSecurityContext(String username) {
         Optional<User> userOptional = userRepository.findByUsernameAndIsDeletedFalse(username);
         if (userOptional.isEmpty()) {
-            throw new RuntimeException("Invalid username in JWT.");
+            throw new ForbiddenException("Invalid username in JWT.");
         }
         UserDetails userDetails = new CustomUserDetails(userOptional.get());
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =

@@ -1,6 +1,7 @@
 package com.nashtech.assignment.dto.request.assignment;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.nashtech.assignment.data.constants.Constants;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,8 +19,8 @@ public class EditAssignmentRequest {
     @Min(1)
     private Long userId;
     @NotBlank(message = "Assigned date is required")
-    @JsonFormat(pattern = "dd/MM/yyyy")
+    @JsonFormat(pattern = Constants.DATE_FORMAT)
     private String assignedDate;
-    @Size(max = 500)
+    @Size(max = Constants.MAX_LENGTH_TEXTAREA)
     private String note;
 }

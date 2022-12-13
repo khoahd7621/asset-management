@@ -1,12 +1,11 @@
 package com.nashtech.assignment.dto.response.returned;
 
-import java.util.Date;
-
 import com.nashtech.assignment.data.constants.EReturnStatus;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
 
 @Builder
 @Getter

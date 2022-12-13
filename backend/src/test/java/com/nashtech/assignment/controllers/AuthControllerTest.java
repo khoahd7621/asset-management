@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 @WebMvcTest(value = AuthController.class)
 @ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class, CORSConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
-public class AuthControllerTest {
+class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

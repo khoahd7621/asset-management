@@ -4,7 +4,6 @@ import com.nashtech.assignment.data.constants.EReturnStatus;
 import com.nashtech.assignment.data.entities.Asset;
 import com.nashtech.assignment.data.entities.AssignAsset;
 import com.nashtech.assignment.data.entities.ReturnAsset;
-import com.nashtech.assignment.data.repositories.CategoryRepository;
 import com.nashtech.assignment.dto.request.asset.CreateNewAssetRequest;
 import com.nashtech.assignment.dto.response.asset.AssetAndHistoriesResponse;
 import com.nashtech.assignment.dto.response.asset.AssetHistory;
@@ -17,8 +16,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class AssetMapper {
-    @Autowired
-    private CategoryRepository categoryRepository;
     @Autowired
     private CategoryMapper categoryMapper;
 
@@ -61,7 +58,6 @@ public class AssetMapper {
     public Asset toAsset(CreateNewAssetRequest createNewAssetRequest) {
         return Asset.builder()
                 .name(createNewAssetRequest.getAssetName())
-                .category(categoryRepository.findByName(createNewAssetRequest.getCategoryName()).get())
                 .specification(createNewAssetRequest.getSpecification())
                 .status(createNewAssetRequest.getAssetStatus())
                 .isDeleted(false)

@@ -42,6 +42,8 @@ public class User {
     private EUserType type;
     @Column(name = "location")
     private String location;
+    @Column(name = "is_first_login")
+    private boolean isFirstLogin;
     @Column(name = "is_deleted")
     private boolean isDeleted;
 

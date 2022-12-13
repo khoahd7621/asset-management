@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nashtech.assignment.AssignmentApplication;
 import com.nashtech.assignment.config.CORSConfig;
 import com.nashtech.assignment.config.SecurityConfig;
+import com.nashtech.assignment.data.constants.Constants;
 import com.nashtech.assignment.data.constants.EAssignStatus;
 import com.nashtech.assignment.dto.request.assignment.CreateNewAssignmentRequest;
 import com.nashtech.assignment.dto.request.assignment.EditAssignmentRequest;
@@ -12,11 +13,8 @@ import com.nashtech.assignment.dto.response.assignment.AssignAssetResponse;
 import com.nashtech.assignment.exceptions.BadRequestException;
 import com.nashtech.assignment.exceptions.ForbiddenException;
 import com.nashtech.assignment.exceptions.NotFoundException;
+import com.nashtech.assignment.services.assignment.AssignmentService;
 import com.nashtech.assignment.services.auth.SecurityContextService;
-import com.nashtech.assignment.services.create.CreateAssignmentService;
-import com.nashtech.assignment.services.delete.DeleteAssignAssetService;
-import com.nashtech.assignment.services.edit.EditAssignAssetService;
-import com.nashtech.assignment.services.get.GetAssignAssetService;
 import com.nashtech.assignment.services.search.SearchAssignAssetService;
 import com.nashtech.assignment.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +45,7 @@ import static org.mockito.Mockito.*;
 @WebMvcTest(value = AssignAssetController.class)
 @ContextConfiguration(classes = {AssignmentApplication.class, SecurityConfig.class, CORSConfig.class})
 @AutoConfigureMockMvc(addFilters = false)
-public class AssignAssetControllerTest {
+class AssignAssetControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -56,13 +54,7 @@ public class AssignAssetControllerTest {
     @MockBean
     private SearchAssignAssetService searchAssignAssetService;
     @MockBean
-    private GetAssignAssetService getAssignAssetService;
-    @MockBean
-    private CreateAssignmentService createAssignmentService;
-    @MockBean
-    private DeleteAssignAssetService deleteAssignAssetService;
-    @MockBean
-    private EditAssignAssetService editAssignAssetService;
+    private AssignmentService assignmentService;
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
     @MockBean
@@ -80,7 +72,7 @@ public class AssignAssetControllerTest {
         assetResponse = AssignAssetResponse.builder().assetCode("LP0101")
                 .assetName("Laptop Lenovo 1009").category("Laptop")
                 .note("note").build();
-        dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        dateFormat = new SimpleDateFormat(Constants.DATE_FORMAT);
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         date = dateFormat.parse("01/01/2001");
         badRequestException = new BadRequestException("Error message");
@@ -144,7 +136,7 @@ public class AssignAssetControllerTest {
     void getAssignmentDetails_WhenDataValid_ShouldReturnAssignAssetResponse() throws Exception {
         AssignAssetResponse expected = AssignAssetResponse.builder()
                 .assetCode("test").assetId(1L).build();
-        when(getAssignAssetService.getAssignAssetDetails(1L)).thenReturn(expected);
+        when(assignmentService.getAssignAssetDetails(1L)).thenReturn(expected);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/assignment/details").param("id", "1");
@@ -161,7 +153,7 @@ public class AssignAssetControllerTest {
     @Test
     void getAssignmentDetails_WhenAssignNotFound_ShouldThrowNotFoundException() throws Exception {
         NotFoundException exception = new NotFoundException("Mess");
-        when(getAssignAssetService.getAssignAssetDetails(1L)).thenThrow(exception);
+        when(assignmentService.getAssignAssetDetails(1L)).thenThrow(exception);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/assignment/details").param("id", "1");
@@ -192,7 +184,7 @@ public class AssignAssetControllerTest {
                 .specification("specification")
                 .status(EAssignStatus.WAITING_FOR_ACCEPTANCE).build();
 
-        when(createAssignmentService.createNewAssignment(requestDataCaptor.capture()))
+        when(assignmentService.createNewAssignment(requestDataCaptor.capture()))
                 .thenReturn(assetResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/assignment")
@@ -219,7 +211,7 @@ public class AssignAssetControllerTest {
         ArgumentCaptor<CreateNewAssignmentRequest> requestDataCaptor = ArgumentCaptor
                 .forClass(CreateNewAssignmentRequest.class);
 
-        when(createAssignmentService.createNewAssignment(requestDataCaptor.capture()))
+        when(assignmentService.createNewAssignment(requestDataCaptor.capture()))
                 .thenThrow(badRequestException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/assignment")
@@ -241,7 +233,7 @@ public class AssignAssetControllerTest {
         ArgumentCaptor<CreateNewAssignmentRequest> requestDataCaptor = ArgumentCaptor
                 .forClass(CreateNewAssignmentRequest.class);
 
-        when(createAssignmentService.createNewAssignment(requestDataCaptor.capture()))
+        when(assignmentService.createNewAssignment(requestDataCaptor.capture()))
                 .thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/assignment")
@@ -279,7 +271,7 @@ public class AssignAssetControllerTest {
                 .specification("specification")
                 .status(EAssignStatus.WAITING_FOR_ACCEPTANCE).build();
 
-        when(editAssignAssetService.editAssignment(assignmentIdCaptor.capture(), requestDataCaptor.capture()))
+        when(assignmentService.editAssignment(assignmentIdCaptor.capture(), requestDataCaptor.capture()))
                 .thenReturn(response);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -309,7 +301,7 @@ public class AssignAssetControllerTest {
         ArgumentCaptor<EditAssignmentRequest> requestDataCaptor = ArgumentCaptor
                 .forClass(EditAssignmentRequest.class);
 
-        when(editAssignAssetService.editAssignment(assignmentIdCaptor.capture(), requestDataCaptor.capture()))
+        when(assignmentService.editAssignment(assignmentIdCaptor.capture(), requestDataCaptor.capture()))
                 .thenThrow(badRequestException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -334,7 +326,7 @@ public class AssignAssetControllerTest {
         ArgumentCaptor<EditAssignmentRequest> requestDataCaptor = ArgumentCaptor
                 .forClass(EditAssignmentRequest.class);
 
-        when(editAssignAssetService.editAssignment(assignmentIdCaptor.capture(), requestDataCaptor.capture()))
+        when(assignmentService.editAssignment(assignmentIdCaptor.capture(), requestDataCaptor.capture()))
                 .thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -349,7 +341,7 @@ public class AssignAssetControllerTest {
 
     @Test
     void findAllAssignAssetByUser_ReturnException() throws Exception {
-        when(getAssignAssetService.getAssignAssetOfUser()).thenThrow(notFoundException);
+        when(assignmentService.getAssignAssetOfUser()).thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user");
 
@@ -364,7 +356,7 @@ public class AssignAssetControllerTest {
         List<AssignAssetResponse> assignAssets = new ArrayList<>();
         assignAssets.add(assetResponse);
 
-        when(getAssignAssetService.getAssignAssetOfUser()).thenReturn(assignAssets);
+        when(assignmentService.getAssignAssetOfUser()).thenReturn(assignAssets);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user");
 
@@ -379,7 +371,7 @@ public class AssignAssetControllerTest {
 
     @Test
     void viewDetailAssignAsset_ReturnException() throws Exception {
-        when(getAssignAssetService.getDetailAssignAssetOfUser(1L)).thenThrow(notFoundException);
+        when(assignmentService.getDetailAssignAssetOfUser(1L)).thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user/{assignAssetId}", 1L);
 
@@ -391,7 +383,7 @@ public class AssignAssetControllerTest {
 
     @Test
     void viewDetailAssignAsset_ReturnData() throws Exception {
-        when(getAssignAssetService.getDetailAssignAssetOfUser(1L)).thenReturn(assetResponse);
+        when(assignmentService.getDetailAssignAssetOfUser(1L)).thenReturn(assetResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/assignment/user/{assignAssetId}", 1L);
 
@@ -408,7 +400,7 @@ public class AssignAssetControllerTest {
     void acceptAssignAsset_WhenReturnData() throws Exception {
         AssignAssetResponse assignAssetResponse = AssignAssetResponse.builder().status(EAssignStatus.ACCEPTED)
                 .build();
-        when(editAssignAssetService.acceptAssignAsset(1L)).thenReturn(assignAssetResponse);
+        when(assignmentService.acceptAssignAsset(1L)).thenReturn(assignAssetResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/assignment/user/accept/{idAssignAsset}", 1L);
@@ -424,7 +416,7 @@ public class AssignAssetControllerTest {
 
     @Test
     void acceptAssignAsset_WhenReturnNotFoundException() throws Exception {
-        when(editAssignAssetService.acceptAssignAsset(1L)).thenThrow(notFoundException);
+        when(assignmentService.acceptAssignAsset(1L)).thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/accept/{idAssignAsset}", 1L);
 
@@ -436,7 +428,7 @@ public class AssignAssetControllerTest {
 
     @Test
     void acceptAssignAsset_WhenReturnBadRequestException() throws Exception {
-        when(editAssignAssetService.acceptAssignAsset(1L)).thenThrow(badRequestException);
+        when(assignmentService.acceptAssignAsset(1L)).thenThrow(badRequestException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/accept/{idAssignAsset}", 1L);
 
@@ -448,7 +440,7 @@ public class AssignAssetControllerTest {
 
     @Test
     void acceptAssignAsset_WhenReturnForbiddenException() throws Exception {
-        when(editAssignAssetService.acceptAssignAsset(1L)).thenThrow(forbiddenException);
+        when(assignmentService.acceptAssignAsset(1L)).thenThrow(forbiddenException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/accept/{idAssignAsset}", 1L);
 
@@ -460,7 +452,7 @@ public class AssignAssetControllerTest {
 
     @Test
     void declineAssignAsset_WhenReturnNotFoundException() throws Exception {
-        when(editAssignAssetService.declineAssignAsset(1L)).thenThrow(notFoundException);
+        when(assignmentService.declineAssignAsset(1L)).thenThrow(notFoundException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/decline/{idAssignAsset}", 1L);
 
@@ -472,7 +464,7 @@ public class AssignAssetControllerTest {
 
     @Test
     void declineAssignAsset_WhenReturnBadRequestException() throws Exception {
-        when(editAssignAssetService.declineAssignAsset(1L)).thenThrow(badRequestException);
+        when(assignmentService.declineAssignAsset(1L)).thenThrow(badRequestException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/decline/{idAssignAsset}", 1L);
 
@@ -484,7 +476,7 @@ public class AssignAssetControllerTest {
 
     @Test
     void declineAssignAsset_WhenReturnForbiddenException() throws Exception {
-        when(editAssignAssetService.declineAssignAsset(1L)).thenThrow(forbiddenException);
+        when(assignmentService.declineAssignAsset(1L)).thenThrow(forbiddenException);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/assignment/user/decline/{idAssignAsset}", 1L);
 
@@ -499,7 +491,7 @@ public class AssignAssetControllerTest {
         AssignAssetResponse assignAssetResponse = AssignAssetResponse.builder().status(EAssignStatus.DECLINED)
                 .build();
 
-        when(editAssignAssetService.declineAssignAsset(1L)).thenReturn(assignAssetResponse);
+        when(assignmentService.declineAssignAsset(1L)).thenReturn(assignAssetResponse);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put("/api/assignment/user/decline/{idAssignAsset}", 1L);
@@ -515,7 +507,7 @@ public class AssignAssetControllerTest {
 
     @Test
     void deleteAssignAsset_WhenDataValid_ShouldReturnStatus204() throws Exception {
-        doNothing().when(deleteAssignAssetService).deleteAssignAsset(1L);
+        doNothing().when(assignmentService).deleteAssignAsset(1L);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .delete("/api/assignment")
@@ -528,12 +520,10 @@ public class AssignAssetControllerTest {
 
     @Test
     void deleteAssignAsset_WhenAssigmentNotExist_ShouldThrowNotFoundException() throws Exception {
-        doThrow(NotFoundException.class).when(deleteAssignAssetService).deleteAssignAsset(1L);
+        doThrow(NotFoundException.class).when(assignmentService).deleteAssignAsset(1L);
 
-        RequestBuilder request = MockMvcRequestBuilders
-                .delete("/api/assignment")
+        RequestBuilder request = MockMvcRequestBuilders.delete("/api/assignment")
                 .param("assignmentId", String.valueOf(1L));
-
         MvcResult result = mockMvc.perform(request).andReturn();
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.NOT_FOUND.value()));
@@ -541,12 +531,10 @@ public class AssignAssetControllerTest {
 
     @Test
     void deleteAssignAsset_WhenAssigmentValidForDelete_ShouldThrowBadRequestException() throws Exception {
-        doThrow(BadRequestException.class).when(deleteAssignAssetService).deleteAssignAsset(1L);
+        doThrow(BadRequestException.class).when(assignmentService).deleteAssignAsset(1L);
 
-        RequestBuilder request = MockMvcRequestBuilders
-                .delete("/api/assignment")
+        RequestBuilder request = MockMvcRequestBuilders.delete("/api/assignment")
                 .param("assignmentId", String.valueOf(1L));
-
         MvcResult result = mockMvc.perform(request).andReturn();
 
         assertThat(result.getResponse().getStatus(), is(HttpStatus.BAD_REQUEST.value()));

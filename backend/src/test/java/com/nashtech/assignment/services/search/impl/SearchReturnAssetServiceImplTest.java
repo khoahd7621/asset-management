@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SearchReturnAssetServiceImplTest {
+class SearchReturnAssetServiceImplTest {
     private SearchReturnAssetServiceImpl searchReturnAssetServiceImpl;
     private ReturnAssetRepository returnAssetRepository;
     private ReturnAssetMapper returnAssetMapper;

@@ -1,5 +1,6 @@
 package com.nashtech.assignment.services.search.impl;
 
+import com.nashtech.assignment.data.constants.Constants;
 import com.nashtech.assignment.data.constants.EAssignStatus;
 import com.nashtech.assignment.data.entities.AssignAsset;
 import com.nashtech.assignment.data.entities.User;
@@ -38,7 +39,7 @@ public class SearchAssignAssetServiceImpl implements SearchAssignAssetService {
         User user = securityContextService.getCurrentUser();
         date = date == null ? "" : date;
         if (!date.equals("")) {
-            SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat formatterDate = new SimpleDateFormat(Constants.DATE_FORMAT);
             formatterDate.setLenient(false);
             formatterDate.parse(date);
         }

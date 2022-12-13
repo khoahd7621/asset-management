@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Admin from './layouts/Admin';
 import Login from './layouts/Login';
@@ -25,8 +27,18 @@ import AdminPrivateRoute from './routes/AdminPrivateRoute';
 import StaffPrivateRoute from './routes/StaffPrivateRoute';
 import CheckFirstLoginRoute from './routes/CheckFirstLoginRoute';
 import LoginProtectRoute from './routes/LoginProtectRoute';
+import { fetchUserLoggedIn } from './redux/slice/userSlice';
 
 const App = () => {
+  const dispatch = useDispatch();
+  const { isAuthenticated, isFirstLogin, user } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (isAuthenticated && isFirstLogin) {
+      dispatch(fetchUserLoggedIn(user.username));
+    }
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>

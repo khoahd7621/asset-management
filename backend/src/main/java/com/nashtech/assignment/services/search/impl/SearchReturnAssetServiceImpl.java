@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.nashtech.assignment.data.constants.Constants;
 import com.nashtech.assignment.data.constants.EReturnStatus;
 import com.nashtech.assignment.data.entities.ReturnAsset;
 import com.nashtech.assignment.data.entities.User;
@@ -39,7 +40,7 @@ public class SearchReturnAssetServiceImpl implements SearchReturnAssetService {
                 User user = securityContextService.getCurrentUser();
                 date = date == null ? "" : date;
                 if (!date.equals("")) {
-                        SimpleDateFormat formatterDate = new SimpleDateFormat("dd/MM/yyyy");
+                        SimpleDateFormat formatterDate = new SimpleDateFormat(Constants.DATE_FORMAT);
                         formatterDate.setLenient(false);
                         formatterDate.parse(date);
                 }
