@@ -8,6 +8,7 @@ import { FilterMenu, TableAsset } from '../../../components';
 import { adminRoute } from '../../../routes/routes';
 import { searchAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination } from '../../../services/findApiService';
 import { getAllCategories } from '../../../services/getApiService';
+import convertEnum from '../../../utils/convertEnumUtil';
 
 const ManageAsset = () => {
   const location = useLocation();
@@ -67,7 +68,7 @@ const ManageAsset = () => {
               assetCode: item.assetCode,
               assetName: item.assetName.replaceAll(' ', '\u00a0'),
               category: item.category.name,
-              state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
+              state: convertEnum.toShow(item.status),
             };
           }),
         );
@@ -82,7 +83,7 @@ const ManageAsset = () => {
                   assetCode: item.assetCode,
                   assetName: item.assetName.replaceAll(' ', '\u00a0'),
                   category: item.category.name,
-                  state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
+                  state: convertEnum.toShow(item.status),
                 };
               }),
         );
@@ -114,14 +115,12 @@ const ManageAsset = () => {
                 assetCode: item.assetCode,
                 assetName: item.assetName.replaceAll(' ', '\u00a0'),
                 category: item.category.name,
-                state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
+                state: convertEnum.toShow(item.status),
               };
             }),
       );
     }
   };
-
-  const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
   const convertListStatus = (listStatus) => {
     if (listStatus.length === 1 && listStatus[0] === 'All') {

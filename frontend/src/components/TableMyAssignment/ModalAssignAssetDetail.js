@@ -1,23 +1,12 @@
 import { Col, Row } from 'antd';
+import convertDate from '../../utils/convertDateUtil';
+import convertEnum from '../../utils/convertEnumUtil';
 
 import CustomModal from '../Modal/Modal';
 
 import './TableMyAssignment.scss';
 
 const ModalAssignAssetDetail = ({ open, onCancel, data }) => {
-  const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
-
-  const convertStrDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return (
-      (date.getDate() > 9 ? date.getDate() : '0' + date.getDate()) +
-      '/' +
-      (date.getMonth() > 8 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)) +
-      '/' +
-      date.getFullYear()
-    );
-  };
-
   return (
     <CustomModal
       className="modal-asign-asset-detail"
@@ -71,7 +60,7 @@ const ModalAssignAssetDetail = ({ open, onCancel, data }) => {
           <div className="title">Assign Date</div>
         </Col>
         <Col span={16} sm={19} md={16}>
-          <div className="content">{data.assignedDate ? convertStrDate(data.assignedDate) : ''}</div>
+          <div className="content">{data.assignedDate ? convertDate.convertStrDate(data.assignedDate) : ''}</div>
         </Col>
       </Row>
       <Row>
@@ -80,7 +69,9 @@ const ModalAssignAssetDetail = ({ open, onCancel, data }) => {
         </Col>
         <Col span={16} sm={19} md={16}>
           <div className="content">
-            {data.status ? capitalizeFirstLetter(data.status.toLowerCase().replaceAll('_', ' ')) : ''}
+            {data.status === 'ACCEPTED' && data.returnAsset !== null
+              ? 'Waiting for returning'
+              : convertEnum.toShow(data.status)}
           </div>
         </Col>
       </Row>

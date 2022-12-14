@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Modal, Table } from 'antd';
-import { CaretDownOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 
 import './TableMyAssignment.scss';
 
@@ -10,6 +10,8 @@ import { putAcceptAssignAsset, putDeclineAssignAsset } from '../../services/edit
 import FirstPasswordModal from '../FirstPasswordModal/FirstPasswordModal';
 import { postCreateNewRequestReturn } from '../../services/createApiService';
 import { CheckIcon, DeclineIcon, RefreshIcon } from '../../assets/CustomIcon';
+import convertDate from '../../utils/convertDateUtil';
+import convertEnum from '../../utils/convertEnumUtil';
 
 const TableMyAssignment = () => {
   const [isShowModalAssignAssetDetail, setIsShowModalAssignAssetDetail] = useState(false);
@@ -26,19 +28,6 @@ const TableMyAssignment = () => {
     fetchGetMyAssignAsset();
   }, []);
 
-  const convertStrDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return (
-      (date.getDate() > 9 ? date.getDate() : '0' + date.getDate()) +
-      '/' +
-      (date.getMonth() > 8 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)) +
-      '/' +
-      date.getFullYear()
-    );
-  };
-
-  const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
-
   const fetchGetMyAssignAsset = async () => {
     const response = await getAllMyAssignAsset();
     if (response && response.status === 200) {
@@ -50,8 +39,8 @@ const TableMyAssignment = () => {
             assetCode: item.assetCode,
             assetName: item.assetName.replaceAll(' ', '\u00a0'),
             category: item.category,
-            assignedDate: convertStrDate(item.assignedDate),
-            state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
+            assignedDate: convertDate.convertStrDate(item.assignedDate),
+            state: convertEnum.toShow(item.status),
             request: item.returnAsset,
           };
         }),
@@ -112,13 +101,25 @@ const TableMyAssignment = () => {
     onclickShowDetail();
   };
 
+  const [field, setField] = useState();
+  const [order, setOrder] = useState();
+
+  function onChangeSortOrder(_pagination, _filters, sorter, _extra) {
+    setField(sorter.field);
+    setOrder(sorter.order);
+  }
+
+  const title = (title, dataIndex) => {
+    return (
+      <span>
+        {title} {order === 'ascend' && field === dataIndex ? <CaretUpOutlined /> : <CaretDownOutlined />}
+      </span>
+    );
+  };
+
   const tableColumns = [
     {
-      title: (
-        <span>
-          Asset Code <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Asset Code', 'assetCode'),
       dataIndex: 'assetCode',
       key: 'assetCode',
       ellipsis: true,
@@ -129,15 +130,11 @@ const TableMyAssignment = () => {
           </div>
         );
       },
-      sorter: (a, b) => a.assetCode > b.assetCode,
+      sorter: (a, b) => a.assetCode.localeCompare(b.assetCode),
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          Asset Name <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Asset Name', 'assetName'),
       dataIndex: 'assetName',
       key: 'assetName',
       ellipsis: true,
@@ -148,15 +145,11 @@ const TableMyAssignment = () => {
           </div>
         );
       },
-      sorter: (a, b) => a.assetName > b.assetName,
+      sorter: (a, b) => a.assetName.localeCompare(b.assetName),
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          Category <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Category', 'category'),
       dataIndex: 'category',
       key: 'category',
       ellipsis: true,
@@ -167,15 +160,11 @@ const TableMyAssignment = () => {
           </div>
         );
       },
-      sorter: (a, b) => a.category > b.category,
+      sorter: (a, b) => a.category.localeCompare(b.category),
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          Assigned Date <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Assigned Date', 'assignedDate'),
       key: 'assignedDate',
       dataIndex: 'assignedDate',
       ellipsis: true,
@@ -186,26 +175,24 @@ const TableMyAssignment = () => {
           </div>
         );
       },
-      sorter: (a, b) => a.assignedDate > b.assignedDate,
+      sorter: (a, b) =>
+        convertDate.formatDate(convertDate.convertStrDate(a.assignedDate)) -
+        convertDate.formatDate(convertDate.convertStrDate(b.assignedDate)),
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          State <CaretDownOutlined />
-        </span>
-      ),
+      title: title('State', 'state'),
       key: 'state',
       dataIndex: 'state',
       ellipsis: true,
       render: (text, record) => {
         return (
           <div className="col-btn" onClick={() => handleClickRecord(record.assignAssetId)}>
-            {text}
+            {record.state === 'Accepted' && record.request !== null ? 'Waiting for returning' : text}
           </div>
         );
       },
-      sorter: (a, b) => a.state > b.state,
+      sorter: (a, b) => a.state.localeCompare(b.state),
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
@@ -252,6 +239,7 @@ const TableMyAssignment = () => {
           columns={tableColumns}
           dataSource={data}
           pagination={false}
+          onChange={onChangeSortOrder}
         />
       </div>
       <FirstPasswordModal />

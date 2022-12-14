@@ -162,17 +162,25 @@ const EditAsset = () => {
             <Form.Item name="assetName" label="Name" help={assetNameValidate.help} colon={false}>
               <Input
                 id="edit-asset-input__asset-name"
+                className="edit-asset-input__asset-name"
                 onChange={(event) => handleValidString(event, 'ASSET_NAME')}
                 status={assetNameValidate.status}
                 maxLength={100}
               />
             </Form.Item>
             <Form.Item name="category" label="Category" colon={false}>
-              <Select id="edit-asset-select__type" placeholder={category} allowClear value={'LD'} disabled></Select>
+              <Select
+                id="edit-asset-select__type"
+                placeholder={category}
+                allowClear
+                value={'LD'}
+                disabled
+              ></Select>
             </Form.Item>
             <Form.Item name="specification" label="Specification" help={specificationValidate.help} colon={false}>
               <TextArea
                 id="edit-asset-specification"
+                className='edit-asset-specification'
                 rows={4}
                 placeholder=""
                 maxLength={200}

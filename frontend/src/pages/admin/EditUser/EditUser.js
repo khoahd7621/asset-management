@@ -12,6 +12,8 @@ import { CalendarIcon } from '../../../assets/CustomIcon';
 import { postEditUser } from '../../../services/editApiService';
 import { removeDataUserLogout } from '../../../redux/slice/userSlice';
 import { getUserDetails } from '../../../services/getApiService';
+import convertDate from '../../../utils/convertDateUtil';
+import convertEnum from '../../../utils/convertEnumUtil';
 
 const EditUser = () => {
   const navigate = useNavigate();
@@ -71,15 +73,11 @@ const EditUser = () => {
     setIsDisabled(false);
   }, [dateOfBirthType, genderType, joinedDateType, typeType]);
 
-  const toUpper = function (str) {
-    return str.toUpperCase();
-  };
-
   const handleSubmitEditUser = async (values) => {
     setIsDisabled(true);
     const response = await postEditUser({
       ...values,
-      type: toUpper(values.type),
+      type: convertEnum.toGet(values.type),
       dateOfBirth: values.dateOfBirth.format('DD/MM/YYYY'),
       joinedDate: values.joinedDate.format('DD/MM/YYYY'),
       staffCode: userDetails.staffCode,
@@ -111,24 +109,13 @@ const EditUser = () => {
     setJoinedDateValidate({ ...initialError });
   };
 
-  const convertStrDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return (
-      (date.getDate() > 9 ? date.getDate() : '0' + date.getDate()) +
-      '/' +
-      (date.getMonth() > 8 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)) +
-      '/' +
-      date.getFullYear()
-    );
-  };
-
   useEffect(() => {
     form.setFieldsValue({
       firstname: userDetails?.firstName,
       lastname: userDetails?.lastName,
-      dateOfBirth: moment(userDetails?.dateOfBirth ? convertStrDate(userDetails.dateOfBirth) : '', 'DD/MM/YYYY'),
+      dateOfBirth: moment(userDetails?.dateOfBirth ? convertDate.convertStrDate(userDetails.dateOfBirth) : '', 'DD/MM/YYYY'),
       gender: userDetails?.gender,
-      joinedDate: moment(userDetails?.joinedDate ? convertStrDate(userDetails.joinedDate) : '', 'DD/MM/YYYY'),
+      joinedDate: moment(userDetails?.joinedDate ? convertDate.convertStrDate(userDetails.joinedDate) : '', 'DD/MM/YYYY'),
       type: userDetails?.type,
       location: userDetails?.location,
     });

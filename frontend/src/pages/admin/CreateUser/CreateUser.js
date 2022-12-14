@@ -173,7 +173,7 @@ const CreateUser = () => {
     }
   };
 
-  const handleValidateDateOfBirth = (date, dateString) => {
+  const handleValidateDateOfBirth = (date, _dateString) => {
     if (date) {
       if (date.diff(new Date(), 'years') > -18) {
         setDateOfBirthValidate({
@@ -196,7 +196,7 @@ const CreateUser = () => {
     }
   };
 
-  const handleValidateJoinedDate = (date, dateString) => {
+  const handleValidateJoinedDate = (date, _dateString) => {
     if (date) {
       const dayOfWeek = date.format('dddd');
       if (dayOfWeek === 'Saturday' || dayOfWeek === 'Sunday') {
@@ -243,6 +243,7 @@ const CreateUser = () => {
         <Form.Item name="firstName" label="First Name" help={firstNameValidate.help}>
           <Input
             id="create-user-input__first-name"
+            className='create-user-input__first-name'
             onChange={(event) => handleValidString(event, 'FIRST_NAME')}
             status={firstNameValidate.status}
             maxLength={100}
@@ -251,6 +252,7 @@ const CreateUser = () => {
         <Form.Item name="lastName" label="Last Name" help={lastNameValidate.help}>
           <Input
             id="create-user-input__last-name"
+            className='create-user-input__last-name'
             onChange={(event) => handleValidString(event, 'LAST_NAME')}
             status={lastNameValidate.status}
             maxLength={100}

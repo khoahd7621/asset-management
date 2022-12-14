@@ -240,6 +240,7 @@ const CreateAsset = () => {
         <Form.Item name="assetName" label="Asset Name" help={assetNameValidate.help}>
           <Input
             id="create-asset-input__asset-name"
+            className='create-asset-input__asset-name'
             onChange={(event) => handleValidString(event, 'ASSET_NAME')}
             status={assetNameValidate.status}
             maxLength={100}
@@ -334,6 +335,7 @@ const CreateAsset = () => {
         <Form.Item name="specification" label="Specification" help={specificationValidate.help}>
           <TextArea
             id="create-asset-specification"
+            className='create-asset-specification'
             rows={4}
             placeholder=""
             maxLength={200}
