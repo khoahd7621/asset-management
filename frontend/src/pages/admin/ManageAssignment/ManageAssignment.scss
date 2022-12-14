@@ -3,14 +3,6 @@
   padding: 80px 50px 0 96px;
   height: 100vh;
 
-  .ant-pagination.custom-pagination {
-    margin-right: 6.5rem;
-
-    @media (max-width: 1390px) {
-      margin-right: 0rem;
-    }
-  }
-
   .border-right {
     border-right: 0.1rem solid rgb(168, 163, 163);
     top: -5px;
@@ -113,7 +105,6 @@
 }
 
 .manage-assignment-button {
-  margin-right: 6.5rem;
   height: 36px;
   width: 15rem;
   color: aliceblue;
@@ -121,7 +112,6 @@
   background-color: #e5273d;
 
   @media (max-width: 1390px) {
-    margin-right: 0rem;
     width: 11rem;
   }
 

@@ -6,14 +6,14 @@ import { CloseCircleOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-de
 
 import './ListUser.scss';
 
-import { searchUsersWithKeywordAndTypesWithPagination } from '../../../services/findApiService';
-import { adminRoute } from '../../../routes/routes';
-import { CloseIcon, EditIcon, FilterIcon } from '../../../assets/CustomIcon';
-import { checkValid, disableUser } from '../../../services/disableApiService';
-import { getUserDetails } from '../../../services/getApiService';
-import CustomPagination from '../../Pagination/Pagination';
-import convertDate from '../../../utils/convertDateUtil';
-import convertEnum from '../../../utils/convertEnumUtil';
+import { searchUsersWithKeywordAndTypesWithPagination } from '../../services/findApiService';
+import { adminRoute } from '../../routes/routes';
+import { CloseIcon, EditIcon, FilterIcon } from '../../assets/CustomIcon';
+import { checkValid, disableUser } from '../../services/disableApiService';
+import { getUserDetails } from '../../services/getApiService';
+import CustomPagination from '../Pagination/Pagination';
+import convertDate from '../../utils/convertDateUtil';
+import convertEnum from '../../utils/convertEnumUtil';
 
 const ListUser = () => {
   const user = useSelector((state) => state.user.user);
@@ -133,24 +133,24 @@ const ListUser = () => {
   const title = (title, dataIndex) => {
     return (
       <div id="frame">
-        <div>{title}</div>
-        <div>{order === 'ascend' && field === dataIndex ? <CaretUpOutlined /> : <CaretDownOutlined />}</div>
+        <span>
+          {title} {order === 'ascend' && field === dataIndex ? <CaretUpOutlined /> : <CaretDownOutlined />}
+        </span>
       </div>
     );
   };
 
   const columns = [
     {
-      width: '8em',
       title: title('Staff Code', 'staffCode'),
       dataIndex: 'staffCode',
       key: 'staffcode',
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
+      render: (text, _record) => <div className="col-btn">{text}</div>,
       sorter: (a, b) => a.staffCode.match(/\d+/)[0] - b.staffCode.match(/\d+/)[0],
     },
     {
-      width: '9em',
       title: title('Full Name', 'fullName'),
       dataIndex: 'fullName',
       ellipsis: true,
@@ -159,20 +159,19 @@ const ListUser = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.fullName.localeCompare(b.fullName),
       render: (text, record) => (
-        <a className="user-list" data-id={record.staffCode} onClick={showModal}>
+        <a className="col-btn" data-id={record.staffCode} onClick={showModal}>
           {text}
         </a>
       ),
     },
     {
-      width: '9em',
       title: 'Username',
       dataIndex: 'username',
       ellipsis: true,
       key: 'username',
+      render: (text, _record) => <div className="col-btn">{text}</div>,
     },
     {
-      width: '10em',
       title: title('Joined Date', 'joinedDate'),
       dataIndex: 'joinedDate',
       key: 'joineddate',
@@ -181,39 +180,39 @@ const ListUser = () => {
       sorter: (a, b) =>
         convertDate.formatDate(convertDate.convertStrDate(a.joinedDate)) -
         convertDate.formatDate(convertDate.convertStrDate(b.joinedDate)),
-      render: (text) => convertDate.convertStrDate(text),
+      render: (text, _record) => <div className="col-btn">{convertDate.convertStrDate(text)}</div>,
     },
     {
-      width: '5em',
       title: title('Type', 'type'),
       dataIndex: 'type',
       key: 'type',
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.type.localeCompare(b.type),
-      render: (text) => convertEnum.toShow(text),
+      render: (text, _record) => <div className="col-btn">{convertEnum.toShow(text)}</div>,
       responsive: ['xxl'],
     },
     {
-      width: '4em',
+      width: '5em',
       align: 'center',
       key: 'options',
       dataIndex: 'status',
       title: '',
       render: (_text, record) => (
-        <div id="frame">
-          <div className="edit-icon">
-            <Button data-id={record.staffCode} type="link" icon={<EditIcon />} onClick={onClickToEdit}></Button>
-          </div>
-          <div></div>
-          <div>
-            <Button
-              onClick={record.username === user?.username ? onClickToCurrentUser : onClickToCheck}
-              data-id={record.staffCode}
-              type="link"
-              icon={<CloseCircleOutlined style={{ color: 'red' }} />}
-            ></Button>
-          </div>
+        <div className="action">
+          <Button
+            className="edit-icon"
+            data-id={record.staffCode}
+            type="link"
+            icon={<EditIcon />}
+            onClick={onClickToEdit}
+          ></Button>
+          <Button
+            onClick={record.username === user?.username ? onClickToCurrentUser : onClickToCheck}
+            data-id={record.staffCode}
+            type="link"
+            icon={<CloseCircleOutlined style={{ color: 'red' }} />}
+          ></Button>
         </div>
       ),
     },
