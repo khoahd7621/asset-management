@@ -1,21 +1,33 @@
 import { useEffect, useState } from 'react';
 import { Button, Input, Modal, Table } from 'antd';
-import { CaretDownOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 
 import './Modal.scss';
 
 import { searchUsersWithKeywordAndTypesWithPagination } from '../../services/findApiService';
 import CustomPagination from '../Pagination/Pagination';
+import convertEnum from '../../utils/convertEnumUtil';
 
 const ModalChooseUser = ({ open, onCancel, currentUser, handleSaveChoose }) => {
   const { Search } = Input;
+  const [field, setField] = useState();
+  const [order, setOrder] = useState();
+
+  function onChangeSortOrder(_pagination, _filters, sorter, _extra) {
+    setField(sorter.field);
+    setOrder(sorter.order);
+  }
+
+  const title = (title, dataIndex) => {
+    return (
+      <span>
+        {title} {order === 'ascend' && field === dataIndex ? <CaretUpOutlined /> : <CaretDownOutlined />}
+      </span>
+    );
+  };
   const TableColumns = [
     {
-      title: (
-        <span>
-          Staff Code <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Staff Code', 'staffCode'),
       dataIndex: 'staffCode',
       key: 'staffCode',
       ellipsis: true,
@@ -24,11 +36,7 @@ const ModalChooseUser = ({ open, onCancel, currentUser, handleSaveChoose }) => {
       width: '150px',
     },
     {
-      title: (
-        <span>
-          Full Name <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Full Name', 'fullName'),
       dataIndex: 'fullName',
       key: 'fullName',
       ellipsis: true,
@@ -36,17 +44,16 @@ const ModalChooseUser = ({ open, onCancel, currentUser, handleSaveChoose }) => {
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          Type <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Type', 'type'),
       dataIndex: 'type',
       key: 'type',
       ellipsis: true,
       sorter: (a, b) => a.type.localeCompare(b.type),
       sortDirections: ['ascend', 'descend', 'ascend'],
       width: '130px',
+      render: (text) => {
+        return (convertEnum.toShow(text));
+      },
     },
   ];
   const PAGE_SIZE = 10;
@@ -145,6 +152,7 @@ const ModalChooseUser = ({ open, onCancel, currentUser, handleSaveChoose }) => {
           columns={TableColumns}
           dataSource={dataSource}
           pagination={false}
+          onChange={onChangeSortOrder}
           onRow={(record, _rowIndex) => ({
             onClick: () => {
               setCurrentData({

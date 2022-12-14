@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Table, Modal, Button, Popover, Checkbox, DatePicker, Input, Space, Spin } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CloseCircleOutlined } from '@ant-design/icons';
+import { CloseCircleOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 
 import './ManageAssignment.scss';
 
 import { filterAssignmentList } from '../../../services/findApiService';
-import { CloseIcon, EditIcon, SortIcon, FilterIcon, RefreshIcon } from '../../../assets/CustomIcon';
+import { CloseIcon, EditIcon, FilterIcon, RefreshIcon } from '../../../assets/CustomIcon';
 import CustomPagination from '../../../components/Pagination/Pagination';
 import { getAssignmentDetails } from '../../../services/getApiService';
 import { adminRoute } from '../../../routes/routes';
 import { deleteAssignment } from '../../../services/disableApiService';
 import { postCreateNewRequestReturn } from '../../../services/createApiService';
+import convertDate from '../../../utils/convertDateUtil';
+import convertEnum from '../../../utils/convertEnumUtil';
 
 const ManageAssignment = () => {
   const { Search } = Input;
@@ -50,12 +52,7 @@ const ManageAssignment = () => {
   }, [current, assigndate, getSearchData, state, isDelete]);
 
   const getData = async () => {
-    const response = await filterAssignmentList(
-      getSearchData,
-      state.map(handleValueEnumResquest),
-      assigndate,
-      current - 1,
-    );
+    const response = await filterAssignmentList(getSearchData, state.map(convertEnum.toGet), assigndate, current - 1);
     if (response.status === 200) {
       setIsLoading(false);
       const assignmentResponse = location.state?.assignmentResponse;
@@ -91,23 +88,6 @@ const ManageAssignment = () => {
   const ModalAssignmentDetails = () => {
     setAssignmentDetails();
     SetIsModalAssignmentDetails(false);
-  };
-
-  const formatDate = (assignedDate) => {
-    const initial = assignedDate.split(/\//);
-    const newdate = new Date([initial[1], initial[0], initial[2]].join('/'));
-    return newdate.getTime();
-  };
-
-  const convertStrDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return (
-      (date.getDate() > 9 ? date.getDate() : '0' + date.getDate()) +
-      '/' +
-      (date.getMonth() > 8 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)) +
-      '/' +
-      date.getFullYear()
-    );
   };
 
   const onClickToEdit = (assignmentId) => {
@@ -191,23 +171,19 @@ const ManageAssignment = () => {
     setGetSearchData(data);
   };
 
-  // handle letter case
-  const toTitle = function (txt) {
-    const text = txt.replaceAll('_', ' ');
-    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-  };
+  const [field, setField] = useState();
+  const [order, setOrder] = useState();
 
-  const handleValueEnumResquest = function (str) {
-    return str.split(' ').join('_').toUpperCase();
-  };
+  function onChangeSortOrder(_pagination, _filters, sorter, _extra) {
+    setField(sorter.field);
+    setOrder(sorter.order);
+  }
 
-  const title = (title) => {
+  const title = (title, dataIndex) => {
     return (
       <div id="frame">
         <div>{title}</div>
-        <div>
-          <SortIcon />
-        </div>
+        <div>{order === 'ascend' && field === dataIndex ? <CaretUpOutlined /> : <CaretDownOutlined />}</div>
       </div>
     );
   };
@@ -215,7 +191,7 @@ const ManageAssignment = () => {
   const columns = [
     {
       width: '6%',
-      title: title('No.'),
+      title: title('No.', 'no'),
       dataIndex: 'no',
       key: 'no',
       ellipsis: true,
@@ -229,7 +205,7 @@ const ManageAssignment = () => {
     },
     {
       width: '16%',
-      title: title('Asset Code'),
+      title: title('Asset Code', 'assetCode'),
       dataIndex: 'assetCode',
       ellipsis: true,
       key: 'assetcode',
@@ -243,7 +219,7 @@ const ManageAssignment = () => {
     },
     {
       width: '23%',
-      title: title('Asset Name'),
+      title: title('Asset Name', 'assetName'),
       dataIndex: 'assetName',
       key: 'assetname',
       ellipsis: true,
@@ -257,7 +233,7 @@ const ManageAssignment = () => {
     },
     {
       width: '16%',
-      title: title('Assigned to'),
+      title: title('Assigned to', 'userAssignedTo'),
       dataIndex: 'userAssignedTo',
       key: 'userassignedto',
       ellipsis: true,
@@ -271,7 +247,7 @@ const ManageAssignment = () => {
     },
     {
       width: '16%',
-      title: title('Assigned by'),
+      title: title('Assigned by', 'userAssignedBy'),
       dataIndex: 'userAssignedBy',
       key: 'userassignedby',
       ellipsis: true,
@@ -285,21 +261,23 @@ const ManageAssignment = () => {
     },
     {
       width: '16%',
-      title: title('Assigned Date'),
+      title: title('Assigned Date', 'assignedDate'),
       dataIndex: 'assignedDate',
       key: 'assigneddate',
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
-      sorter: (a, b) => formatDate(convertStrDate(a.assignedDate)) - formatDate(convertStrDate(b.assignedDate)),
+      sorter: (a, b) =>
+        convertDate.formatDate(convertDate.convertStrDate(a.assignedDate)) -
+        convertDate.formatDate(convertDate.convertStrDate(b.assignedDate)),
       render: (text, record) => (
         <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
-          {convertStrDate(text)}
+          {convertDate.convertStrDate(text)}
         </div>
       ),
     },
     {
       width: '23%',
-      title: title('State'),
+      title: title('State', 'status'),
       dataIndex: 'status',
       key: 'status',
       ellipsis: true,
@@ -307,7 +285,7 @@ const ManageAssignment = () => {
       sorter: (a, b) => a.status.localeCompare(b.status),
       render: (text, record) => (
         <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
-          {toTitle(text)}
+          {convertEnum.toShow(text)}
         </div>
       ),
     },
@@ -404,6 +382,7 @@ const ManageAssignment = () => {
             className="user-list"
             dataSource={assignmentList}
             columns={columns}
+            onChange={onChangeSortOrder}
           />
         )}
         <CustomPagination onChange={setCurrent} current={current} total={totalRow}></CustomPagination>
@@ -465,7 +444,9 @@ const ManageAssignment = () => {
               <div className="title">Assigned Date</div>
             </Col>
             <Col span={16} sm={19} md={18}>
-              <div className="content">{convertStrDate(assignmentDetails?.assignedDate) ?? 'Loading...'}</div>
+              <div className="content">
+                {convertDate.convertStrDate(assignmentDetails?.assignedDate) ?? 'Loading...'}
+              </div>
             </Col>
           </Row>
           <Row>
@@ -474,7 +455,7 @@ const ManageAssignment = () => {
             </Col>
             <Col span={16} sm={19} md={18}>
               <div className="content">
-                {!assignmentDetails?.status ? 'Loading...' : toTitle(assignmentDetails?.status)}
+                {!assignmentDetails?.status ? 'Loading...' : convertEnum.toShow(assignmentDetails?.status)}
               </div>
             </Col>
           </Row>

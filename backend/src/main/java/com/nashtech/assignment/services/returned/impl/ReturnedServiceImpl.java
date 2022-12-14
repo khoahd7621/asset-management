@@ -22,6 +22,8 @@ import lombok.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
 
@@ -103,7 +105,8 @@ public class ReturnedServiceImpl implements ReturnedService {
 
     @Override
     public void completeReturnRequest(long id) {
-        Date today = new Date();
+        LocalDate localDate = LocalDate.now();
+        Date today = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         User currentUser = securityContextService.getCurrentUser();
         Optional<ReturnAsset> returnAssetOtp = returnAssetRepository.findById(id);
 

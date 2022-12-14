@@ -1,19 +1,30 @@
 import { useEffect, useState } from 'react';
 import { Button, Input, Modal, Table } from 'antd';
-import { CaretDownOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 
 import { searchAssetsWithKeywordAndStatusesAndCategoryIdsWithPagination } from '../../services/findApiService';
 import CustomPagination from '../Pagination/Pagination';
 
 const ModalChooseAsset = ({ open, onCancel, currentAsset, handleSaveChoose }) => {
   const { Search } = Input;
+  const [field, setField] = useState();
+  const [order, setOrder] = useState();
+
+  function onChangeSortOrder(_pagination, _filters, sorter, _extra) {
+    setField(sorter.field);
+    setOrder(sorter.order);
+  }
+
+  const title = (title, dataIndex) => {
+    return (
+      <span>
+        {title} {order === 'ascend' && field === dataIndex ? <CaretUpOutlined /> : <CaretDownOutlined />}
+      </span>
+    );
+  };
   const TableColumns = [
     {
-      title: (
-        <span>
-          Asset code <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Asset Code', 'assetCode'),
       dataIndex: 'assetCode',
       key: 'assetCode',
       ellipsis: true,
@@ -22,11 +33,7 @@ const ModalChooseAsset = ({ open, onCancel, currentAsset, handleSaveChoose }) =>
       width: '120px',
     },
     {
-      title: (
-        <span>
-          Asset Name <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Asset Name', 'assetName'),
       dataIndex: 'assetName',
       key: 'assetName',
       ellipsis: true,
@@ -34,11 +41,7 @@ const ModalChooseAsset = ({ open, onCancel, currentAsset, handleSaveChoose }) =>
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          Category <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Category', 'category'),
       dataIndex: 'category',
       key: 'category',
       ellipsis: true,
@@ -146,6 +149,7 @@ const ModalChooseAsset = ({ open, onCancel, currentAsset, handleSaveChoose }) =>
           columns={TableColumns}
           dataSource={dataSource}
           pagination={false}
+          onChange={onChangeSortOrder}
           onRow={(record, _rowIndex) => ({
             onClick: () => {
               if (record.key !== selectedKey[0]) {

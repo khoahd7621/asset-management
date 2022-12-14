@@ -6,6 +6,7 @@ import './ManageRequestReturn.scss';
 import { FilterMenu } from '../../../components';
 import TableRequest from '../../../components/TableRequest/TableRequest';
 import { filterRequestList } from '../../../services/findApiService';
+import convertEnum from '../../../utils/convertEnumUtil';
 
 const ManageRequestReturn = () => {
   const { Search } = Input;
@@ -59,14 +60,12 @@ const ManageRequestReturn = () => {
                 acceptedBy: item.acceptByUser,
                 returnDate: item.returnedDate,
                 date: item.assignedDate,
-                state: capitalizeFirstLetter(item.status.toLowerCase().replaceAll('_', ' ')),
+                state: convertEnum.toShow(item.status),
               };
             }),
       );
     }
   };
-
-  const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
   const convertListStatus = (listStatus) => {
     if (listStatus.length === 1 && listStatus[0] === 'All') {

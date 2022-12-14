@@ -1,5 +1,5 @@
 import { Table } from 'antd';
-import { CaretDownOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 
 import './TableRequest.scss';
@@ -8,6 +8,7 @@ import Pagination from '../Pagination/Pagination';
 import { CheckIcon, DeclineIcon } from '../../assets/CustomIcon';
 import ModalRequestCompleted from './ModalRequestCompleted';
 import ModalRequestCanceled from './ModalRequestCanceled';
+import convertDate from '../../utils/convertDateUtil';
 
 const TableRequest = ({
   listAssets = [],
@@ -34,13 +35,25 @@ const TableRequest = ({
     setIsCancel(true);
   };
 
+  const [field, setField] = useState();
+  const [order, setOrder] = useState();
+
+  function onChangeSortOrder(_pagination, _filters, sorter, _extra) {
+    setField(sorter.field);
+    setOrder(sorter.order);
+  }
+
+  const title = (title, dataIndex) => {
+    return (
+      <span>
+        {title} {order === 'ascend' && field === dataIndex ? <CaretUpOutlined /> : <CaretDownOutlined />}
+      </span>
+    );
+  };
+
   const TableAssetColumns = [
     {
-      title: (
-        <span>
-          No. <CaretDownOutlined />
-        </span>
-      ),
+      title: title('No.', 'no'),
       width: '4.5em',
       dataIndex: 'no',
       key: 'no',
@@ -52,11 +65,7 @@ const TableRequest = ({
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          Asset Code <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Asset Code', 'assetCode'),
       dataIndex: 'assetCode',
       key: 'assetCode',
       ellipsis: true,
@@ -67,11 +76,7 @@ const TableRequest = ({
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          Asset Name <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Asset Name', 'assetName'),
       dataIndex: 'assetName',
       key: 'assetName',
       ellipsis: true,
@@ -82,11 +87,7 @@ const TableRequest = ({
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          Requested By <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Requested By', 'requestBy'),
       dataIndex: 'requestBy',
       key: 'requestBy',
       ellipsis: true,
@@ -97,26 +98,18 @@ const TableRequest = ({
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          Assigned Date <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Assigned Date', 'date'),
       dataIndex: 'date',
       key: 'date',
       ellipsis: true,
       render: (text, _record) => {
-        return <div className="col-btn">{convertStrDate(text)}</div>;
+        return <div className="col-btn">{convertDate.convertStrDate(text)}</div>;
       },
       sorter: (a, b) => a.date.localeCompare(b.date),
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          Accepted By <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Accepted By', 'acceptedBy'),
       dataIndex: 'acceptedBy',
       key: 'acceptedBy',
       ellipsis: true,
@@ -128,26 +121,18 @@ const TableRequest = ({
       responsive: ['sm'],
     },
     {
-      title: (
-        <span>
-          Returned Date <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Returned Date', 'returnDate'),
       dataIndex: 'returnDate',
       key: 'returnDate',
       ellipsis: true,
       render: (text, _record) => {
-        return <div className="col-btn">{convertStrDate(text)}</div>;
+        return <div className="col-btn">{convertDate.convertStrDate(text)}</div>;
       },
       sorter: (a, b) => checkString(a.returnDate).localeCompare(checkString(b.returnDate)),
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          State <CaretDownOutlined />
-        </span>
-      ),
+      title: title('State', 'state'),
       key: 'state',
       dataIndex: 'state',
       ellipsis: true,
@@ -188,18 +173,6 @@ const TableRequest = ({
     handleChangeCurrentPage(current);
   };
 
-  const convertStrDate = (dateStr) => {
-    if (dateStr === null) return '';
-    const date = new Date(dateStr);
-    return (
-      (date.getDate() > 9 ? date.getDate() : '0' + date.getDate()) +
-      '/' +
-      (date.getMonth() > 8 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)) +
-      '/' +
-      date.getFullYear()
-    );
-  };
-
   const checkString = (string) => {
     if (string === null) {
       return '';
@@ -218,6 +191,7 @@ const TableRequest = ({
         columns={TableAssetColumns}
         dataSource={listAssets}
         pagination={false}
+        onChange={onChangeSortOrder}
       />
       <Pagination onChange={handleChangePage} current={currentPage} defaultPageSize={pageSize} total={totalRow} />
 

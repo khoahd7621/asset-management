@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Table } from 'antd';
-import { CaretDownOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 
 import './TableAsset.scss';
 
@@ -12,6 +12,7 @@ import ModalAssetNotification from './ModalAssetNotification';
 import { DeleteIcon, EditIcon } from '../../assets/CustomIcon';
 import { getAssetDetailAndItsHistories, getCheckAssetIsValidForDeleteOrNot } from '../../services/getApiService';
 import { adminRoute } from '../../routes/routes';
+import dateConverter from '../../utils/convertDateUtil';
 
 const TableAsset = ({
   listAssets = [],
@@ -24,13 +25,25 @@ const TableAsset = ({
   categories,
   fetchListAssets,
 }) => {
+  const [field, setField] = useState();
+  const [order, setOrder] = useState();
+
+  function onChangeSortOrder(_pagination, _filters, sorter, _extra) {
+    setField(sorter.field);
+    setOrder(sorter.order);
+  }
+
+  const title = (title, dataIndex) => {
+    return (
+      <span>
+        {title} {order === 'ascend' && field === dataIndex ? <CaretUpOutlined /> : <CaretDownOutlined />}
+      </span>
+    );
+  };
+
   const TableAssetColumns = [
     {
-      title: (
-        <span>
-          Asset Code <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Asset Code', 'assetCode'),
       dataIndex: 'assetCode',
       key: 'assetCode',
       ellipsis: true,
@@ -45,11 +58,7 @@ const TableAsset = ({
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          Asset Name <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Asset Name', 'assetName'),
       dataIndex: 'assetName',
       key: 'assetName',
       ellipsis: true,
@@ -64,11 +73,7 @@ const TableAsset = ({
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          Category <CaretDownOutlined />
-        </span>
-      ),
+      title: title('Category', 'category'),
       dataIndex: 'category',
       key: 'category',
       ellipsis: true,
@@ -83,11 +88,7 @@ const TableAsset = ({
       sortDirections: ['ascend', 'descend', 'ascend'],
     },
     {
-      title: (
-        <span>
-          State <CaretDownOutlined />
-        </span>
-      ),
+      title: title('State', 'state'),
       key: 'state',
       dataIndex: 'state',
       ellipsis: true,
@@ -104,7 +105,7 @@ const TableAsset = ({
     {
       key: 'action',
       width: '60px',
-      render: (text, record) => {
+      render: (_text, record) => {
         return (
           <div className="col-action in-active">
             <Link
@@ -160,10 +161,10 @@ const TableAsset = ({
           : response?.data?.histories.map((item, index) => {
               return {
                 key: index,
-                date: convertStrDate(item.assignedDate),
+                date: dateConverter.convertStrDate(item.assignedDate),
                 assignedTo: item.assignedTo,
                 assignedBy: item.assignedBy,
-                returnedDate: convertStrDate(item.returnedDate),
+                returnedDate: dateConverter.convertStrDate(item.returnedDate),
               };
             }),
       );
@@ -176,17 +177,6 @@ const TableAsset = ({
     handleChangeCurrentPage(current);
   };
 
-  const convertStrDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return (
-      (date.getDate() > 9 ? date.getDate() : '0' + date.getDate()) +
-      '/' +
-      (date.getMonth() > 8 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)) +
-      '/' +
-      date.getFullYear()
-    );
-  };
-
   return (
     <>
       <Table
@@ -197,6 +187,7 @@ const TableAsset = ({
         columns={TableAssetColumns}
         dataSource={listAssets}
         pagination={false}
+        onChange={onChangeSortOrder}
       />
       <Pagination onChange={handleChangePage} current={currentPage} defaultPageSize={pageSize} total={totalRow} />
       <ModalAssetDetail

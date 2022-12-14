@@ -2,16 +2,18 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Table, Row, Col, Modal, Input, Button, Checkbox, Popover, Space, Spin } from 'antd';
-import { CloseCircleOutlined } from '@ant-design/icons';
+import { CloseCircleOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 
 import './ListUser.scss';
 
-import { searchUsersWithKeywordAndTypesWithPagination } from '../../services/findApiService';
-import { adminRoute } from '../../routes/routes';
-import { CloseIcon, EditIcon, SortIcon, FilterIcon } from '../../assets/CustomIcon';
-import { checkValid, disableUser } from '../../services/disableApiService';
-import { getUserDetails } from '../../services/getApiService';
-import CustomPagination from '../Pagination/Pagination';
+import { searchUsersWithKeywordAndTypesWithPagination } from '../../../services/findApiService';
+import { adminRoute } from '../../../routes/routes';
+import { CloseIcon, EditIcon, FilterIcon } from '../../../assets/CustomIcon';
+import { checkValid, disableUser } from '../../../services/disableApiService';
+import { getUserDetails } from '../../../services/getApiService';
+import CustomPagination from '../../Pagination/Pagination';
+import convertDate from '../../../utils/convertDateUtil';
+import convertEnum from '../../../utils/convertEnumUtil';
 
 const ListUser = () => {
   const user = useSelector((state) => state.user.user);
@@ -39,34 +41,11 @@ const ListUser = () => {
   const [valueStaffCode, setValueStaffCode] = useState();
   const [isDisabled, setIsDisable] = useState(false);
 
-  const formatDate = (joineddate) => {
-    const initial = joineddate.split(/\//);
-    const newdate = new Date([initial[1], initial[0], initial[2]].join('/'));
-    return newdate.getTime();
-  };
-
   // Letter case
-  const toUpper = function (str) {
-    return str.toUpperCase();
-  };
-  const toTitle = function (txt) {
-    return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
-  };
-
-  const convertStrDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return (
-      (date.getDate() > 9 ? date.getDate() : '0' + date.getDate()) +
-      '/' +
-      (date.getMonth() > 8 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)) +
-      '/' +
-      date.getFullYear()
-    );
-  };
 
   const onChange = async (list) => {
     setCurrent(1);
-    setType(list.map(toUpper));
+    setType(list.map(convertEnum.toShow));
     setCheckedList(list);
     setCheckAll(list.length === plainOptions.length);
     if (list.length === plainOptions.length) {
@@ -143,13 +122,19 @@ const ListUser = () => {
     navigate(`/${adminRoute.home}/${adminRoute.manageUser}/${adminRoute.editUser}/${data.currentTarget.dataset.id}`);
   };
 
-  const title = (title) => {
+  const [field, setField] = useState();
+  const [order, setOrder] = useState();
+
+  function onChangeSortOrder(_pagination, _filters, sorter, _extra) {
+    setField(sorter.field);
+    setOrder(sorter.order);
+  }
+
+  const title = (title, dataIndex) => {
     return (
       <div id="frame">
         <div>{title}</div>
-        <div>
-          <SortIcon />
-        </div>
+        <div>{order === 'ascend' && field === dataIndex ? <CaretUpOutlined /> : <CaretDownOutlined />}</div>
       </div>
     );
   };
@@ -157,7 +142,7 @@ const ListUser = () => {
   const columns = [
     {
       width: '8em',
-      title: title('Staff Code'),
+      title: title('Staff Code', 'staffCode'),
       dataIndex: 'staffCode',
       key: 'staffcode',
       ellipsis: true,
@@ -166,7 +151,7 @@ const ListUser = () => {
     },
     {
       width: '9em',
-      title: title('Full Name'),
+      title: title('Full Name', 'fullName'),
       dataIndex: 'fullName',
       ellipsis: true,
       key: 'fullname',
@@ -188,23 +173,25 @@ const ListUser = () => {
     },
     {
       width: '10em',
-      title: title('Joined Date'),
+      title: title('Joined Date', 'joinedDate'),
       dataIndex: 'joinedDate',
       key: 'joineddate',
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
-      sorter: (a, b) => formatDate(convertStrDate(a.joinedDate)) - formatDate(convertStrDate(b.joinedDate)),
-      render: (text) => convertStrDate(text),
+      sorter: (a, b) =>
+        convertDate.formatDate(convertDate.convertStrDate(a.joinedDate)) -
+        convertDate.formatDate(convertDate.convertStrDate(b.joinedDate)),
+      render: (text) => convertDate.convertStrDate(text),
     },
     {
       width: '5em',
-      title: title('Type'),
+      title: title('Type', 'type'),
       dataIndex: 'type',
       key: 'type',
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.type.localeCompare(b.type),
-      render: (text) => toTitle(text),
+      render: (text) => convertEnum.toShow(text),
       responsive: ['xxl'],
     },
     {
@@ -326,6 +313,7 @@ const ListUser = () => {
             className="user-list"
             dataSource={userList.data}
             columns={columns}
+            onChange={onChangeSortOrder}
           />
 
           <div className="user-list">
@@ -374,7 +362,9 @@ const ListUser = () => {
             <div className="title">Date of Birth</div>
           </Col>
           <Col span={16} sm={19} md={18}>
-            <div className="content">{userDetail?.dateOfBirth ? convertStrDate(userDetail?.dateOfBirth) : ''}</div>
+            <div className="content">
+              {userDetail?.dateOfBirth ? convertDate.convertStrDate(userDetail?.dateOfBirth) : ''}
+            </div>
           </Col>
         </Row>
         <Row>
@@ -382,7 +372,7 @@ const ListUser = () => {
             <div className="title">Gender</div>
           </Col>
           <Col span={16} sm={19} md={18}>
-            <div className="content">{userDetail?.gender ? toTitle(userDetail?.gender) : ''}</div>
+            <div className="content">{userDetail?.gender ? convertEnum.toShow(userDetail?.gender) : ''}</div>
           </Col>
         </Row>
         <Row>
@@ -390,7 +380,9 @@ const ListUser = () => {
             <div className="title">Joined Date</div>
           </Col>
           <Col span={16} sm={19} md={18}>
-            <div className="content">{userDetail?.joinedDate ? convertStrDate(userDetail?.joinedDate) : ''}</div>
+            <div className="content">
+              {userDetail?.joinedDate ? convertDate.convertStrDate(userDetail?.joinedDate) : ''}
+            </div>
           </Col>
         </Row>
         <Row>
@@ -398,7 +390,7 @@ const ListUser = () => {
             <div className="title">Type</div>
           </Col>
           <Col span={16} sm={19} md={18}>
-            <div className="content">{userDetail?.type ? toTitle(userDetail?.type) : ''}</div>
+            <div className="content">{userDetail?.type ? convertEnum.toShow(userDetail?.type) : ''}</div>
           </Col>
         </Row>
         <Row>

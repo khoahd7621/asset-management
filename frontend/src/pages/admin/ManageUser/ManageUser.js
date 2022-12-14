@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+
 import './ManageUser.scss';
 
 import { ListUser } from '../../../components';

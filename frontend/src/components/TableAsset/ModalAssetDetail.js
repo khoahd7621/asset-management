@@ -1,4 +1,6 @@
 import { Col, Row, Table } from 'antd';
+import dateConverter from '../../utils/convertDateUtil';
+import convertEnum from '../../utils/convertEnumUtil';
 
 import CustomModal from '../Modal/Modal';
 
@@ -29,19 +31,6 @@ const ModalAssetDetail = ({ open, onCancel, data, listHistories }) => {
       ellipsis: true,
     },
   ];
-
-  const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
-
-  const convertStrDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return (
-      (date.getDate() > 9 ? date.getDate() : '0' + date.getDate()) +
-      '/' +
-      (date.getMonth() > 8 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1)) +
-      '/' +
-      date.getFullYear()
-    );
-  };
 
   return (
     <CustomModal
@@ -80,7 +69,9 @@ const ModalAssetDetail = ({ open, onCancel, data, listHistories }) => {
           <div className="title">Installed Date</div>
         </Col>
         <Col span={16} sm={19} md={20}>
-          <div className="content">{data.installedDate ? convertStrDate(data.installedDate) : 'Loading...'}</div>
+          <div className="content">
+            {data.installedDate ? dateConverter.convertStrDate(data.installedDate) : 'Loading...'}
+          </div>
         </Col>
       </Row>
       <Row>
@@ -89,7 +80,7 @@ const ModalAssetDetail = ({ open, onCancel, data, listHistories }) => {
         </Col>
         <Col span={16} sm={19} md={20}>
           <div className="content">
-            {data.status ? capitalizeFirstLetter(data.status.toLowerCase().replaceAll('_', ' ')) : 'Loading...'}
+            {data.status ? convertEnum.toShow(data.status) : 'Loading...'}
           </div>
         </Col>
       </Row>
