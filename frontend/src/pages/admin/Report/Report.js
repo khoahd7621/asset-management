@@ -109,7 +109,7 @@ const Report = () => {
   const columns = [
     {
       width: '8em',
-      title: title('Category'),
+      title: title('Category', 'name'),
       dataIndex: 'name',
       key: 'category',
       ellipsis: true,
@@ -119,7 +119,7 @@ const Report = () => {
     },
     {
       width: '6em',
-      title: title('Total'),
+      title: title('Total', 'count'),
       dataIndex: 'count',
       ellipsis: true,
       key: 'total',
@@ -130,7 +130,7 @@ const Report = () => {
     },
     {
       width: '6em',
-      title: title('Assigned'),
+      title: title('Assigned', 'assigned'),
       dataIndex: 'assigned',
       ellipsis: true,
       key: 'assigned',
@@ -140,7 +140,7 @@ const Report = () => {
     },
     {
       width: '6em',
-      title: title('Available'),
+      title: title('Available', 'available'),
       dataIndex: 'available',
       key: 'available',
       ellipsis: true,
@@ -150,7 +150,7 @@ const Report = () => {
     },
     {
       width: '6em',
-      title: title('Not available'),
+      title: title('Not available', 'notAvailable'),
       dataIndex: 'notAvailable',
       key: 'notavailable',
       ellipsis: true,
@@ -160,7 +160,7 @@ const Report = () => {
     },
     {
       width: '8em',
-      title: title('Waiting for recycling'),
+      title: title('Waiting for recycling', 'waitingForRecycling'),
       dataIndex: 'waitingForRecycling',
       key: 'waitingforrecycling',
       ellipsis: true,
@@ -170,7 +170,7 @@ const Report = () => {
     },
     {
       width: '4em',
-      title: title('Recycled'),
+      title: title('Recycled', 'recycling'),
       dataIndex: 'recycling',
       key: 'recycled',
       ellipsis: true,
