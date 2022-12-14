@@ -182,15 +182,16 @@ const ManageAssignment = () => {
   const title = (title, dataIndex) => {
     return (
       <div id="frame">
-        <div>{title}</div>
-        <div>{order === 'ascend' && field === dataIndex ? <CaretUpOutlined /> : <CaretDownOutlined />}</div>
+        <span>
+          {title} {order === 'ascend' && field === dataIndex ? <CaretUpOutlined /> : <CaretDownOutlined />}
+        </span>
       </div>
     );
   };
 
   const columns = [
     {
-      width: '6%',
+      width: '7%',
       title: title('No.', 'no'),
       dataIndex: 'no',
       key: 'no',
@@ -198,7 +199,7 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.no - b.no,
       render: (text, record) => (
-        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details col-btn" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {text}
         </div>
       ),
@@ -212,7 +213,7 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.assetCode.localeCompare(b.assetCode),
       render: (text, record) => (
-        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details col-btn" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {text}
         </div>
       ),
@@ -226,7 +227,7 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.assetName.localeCompare(b.assetName),
       render: (text, record) => (
-        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details col-btn" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {text}
         </div>
       ),
@@ -240,7 +241,7 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.userAssignedTo.localeCompare(b.userAssignedTo),
       render: (text, record) => (
-        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details col-btn" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {text}
         </div>
       ),
@@ -254,7 +255,7 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.userAssignedBy.localeCompare(b.userAssignedBy),
       render: (text, record) => (
-        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details col-btn" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {text}
         </div>
       ),
@@ -270,7 +271,7 @@ const ManageAssignment = () => {
         convertDate.formatDate(convertDate.convertStrDate(a.assignedDate)) -
         convertDate.formatDate(convertDate.convertStrDate(b.assignedDate)),
       render: (text, record) => (
-        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details col-btn" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {convertDate.convertStrDate(text)}
         </div>
       ),
@@ -284,46 +285,43 @@ const ManageAssignment = () => {
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.status.localeCompare(b.status),
       render: (text, record) => (
-        <div className="assignment-details" data-id={record.id} onClick={showAssignmentDetailsModal}>
+        <div className="assignment-details col-btn" data-id={record.id} onClick={showAssignmentDetailsModal}>
           {convertEnum.toShow(text)}
         </div>
       ),
     },
     {
-      width: '23%',
+      width: '120px',
       align: 'left',
       key: 'options',
       dataIndex: 'status',
       title: '',
       render: (_text, record) => {
         return (
-          <div id="frame">
-            <div className="edit-icon">
-              <Button
-                data-id={record.assetCode}
-                type="link"
-                icon={<EditIcon />}
-                disabled={record.status === 'WAITING_FOR_ACCEPTANCE' ? false : true}
-                onClick={() => onClickToEdit(record.id)}
-              ></Button>
-            </div>
-            <div className="delete-icon">
-              <Button
-                onClick={onClickToAbleDelete}
-                data-id={record.id}
-                type="link"
-                icon={<CloseCircleOutlined style={{ color: 'red' }} />}
-                disabled={record.status === 'DECLINED' || record.status === 'WAITING_FOR_ACCEPTANCE' ? false : true}
-              ></Button>
-            </div>
-            <div className="manage-assignment__return-icon">
-              <Button
-                onClick={() => onClickToAbleRequestReturn(record.id)}
-                type="link"
-                icon={<RefreshIcon />}
-                disabled={record.status === 'ACCEPTED' && record.returnAsset === null ? false : true}
-              ></Button>
-            </div>
+          <div className="action">
+            <Button
+              className="edit-icon"
+              data-id={record.assetCode}
+              type="link"
+              icon={<EditIcon />}
+              disabled={record.status === 'WAITING_FOR_ACCEPTANCE' ? false : true}
+              onClick={() => onClickToEdit(record.id)}
+            ></Button>
+            <Button
+              className="delete-icon"
+              onClick={onClickToAbleDelete}
+              data-id={record.id}
+              type="link"
+              icon={<CloseCircleOutlined style={{ color: 'red' }} />}
+              disabled={record.status === 'DECLINED' || record.status === 'WAITING_FOR_ACCEPTANCE' ? false : true}
+            ></Button>
+            <Button
+              className="manage-assignment__return-icon"
+              onClick={() => onClickToAbleRequestReturn(record.id)}
+              type="link"
+              icon={<RefreshIcon />}
+              disabled={record.status === 'ACCEPTED' && record.returnAsset === null ? false : true}
+            ></Button>
           </div>
         );
       },

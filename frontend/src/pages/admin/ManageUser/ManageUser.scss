@@ -11,14 +11,6 @@
 }
 
 .user-list {
-  .ant-pagination.custom-pagination {
-    margin-right: 2.1rem;
-
-    @media (max-width: 1390px) {
-      margin-right: 0.1rem;
-    }
-  }
-
   table {
     display: table;
     background-color: white;
@@ -27,6 +19,36 @@
     border-spacing: 30px 0px;
     width: calc(100% + 60px);
     margin-left: -30px;
+
+    .ant-table-tbody {
+      tr {
+        td {
+          padding: 0px !important;
+          border-bottom: 1px solid #d5d5d5 !important;
+
+          &:last-child {
+            border-color: transparent !important;
+          }
+
+          & > td {
+            margin-left: 14px;
+          }
+
+          .col-btn {
+            padding: 10px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+
+            &:hover {
+              color: #d90000;
+            }
+          }
+        }
+      }
+    }
   }
 
   .ant-table-column-title {
@@ -90,11 +112,11 @@
     }
   }
 
-  #frame {
-    div {
-      display: inline-block;
-      padding-right: 4px;
-    }
+  .action {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 12px;
   }
 
   // modal

@@ -1,10 +1,10 @@
 import { Button, Dropdown, Space, Spin, Table } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 
 import './Report.scss';
 
 import { getReportDetails } from '../../../services/getApiService';
-import { SortIcon } from '../../../assets/CustomIcon';
 import exportFile from '../../../utils/exportFileUtil';
 
 const Report = () => {
@@ -74,13 +74,20 @@ const Report = () => {
     },
   ];
 
-  const title = (title) => {
+  const [field, setField] = useState();
+  const [order, setOrder] = useState();
+
+  function onChangeSortOrder(_pagination, _filters, sorter, _extra) {
+    setField(sorter.field);
+    setOrder(sorter.order);
+  }
+
+  const title = (title, dataIndex) => {
     return (
       <div id="frame">
-        <div>{title}</div>
-        <div>
-          <SortIcon />
-        </div>
+        <span>
+          {title} {order === 'ascend' && field === dataIndex ? <CaretUpOutlined /> : <CaretDownOutlined />}
+        </span>
       </div>
     );
   };
@@ -108,6 +115,7 @@ const Report = () => {
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.name.localeCompare(b.name),
+      render: (text, _record) => <div className="col-btn">{text}</div>,
     },
     {
       width: '6em',
@@ -118,6 +126,7 @@ const Report = () => {
       defaultSortOder: 'ascend',
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.count - b.count,
+      render: (text, _record) => <div className="col-btn">{text}</div>,
     },
     {
       width: '6em',
@@ -127,6 +136,7 @@ const Report = () => {
       key: 'assigned',
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.assigned - b.assigned,
+      render: (text, _record) => <div className="col-btn">{text}</div>,
     },
     {
       width: '6em',
@@ -136,6 +146,7 @@ const Report = () => {
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.available - b.available,
+      render: (text, _record) => <div className="col-btn">{text}</div>,
     },
     {
       width: '6em',
@@ -145,6 +156,7 @@ const Report = () => {
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.notAvailable - b.notAvailable,
+      render: (text, _record) => <div className="col-btn">{text}</div>,
     },
     {
       width: '8em',
@@ -154,6 +166,7 @@ const Report = () => {
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.waitingForRecycling - b.waitingForRecycling,
+      render: (text, _record) => <div className="col-btn">{text}</div>,
     },
     {
       width: '4em',
@@ -163,6 +176,7 @@ const Report = () => {
       ellipsis: true,
       sortDirections: ['ascend', 'desencd', 'ascend'],
       sorter: (a, b) => a.recycling - b.recycling,
+      render: (text, _record) => <div className="col-btn">{text}</div>,
     },
     {
       width: '0em',
@@ -196,6 +210,7 @@ const Report = () => {
           </Space>
         ) : (
           <Table
+            onChange={onChangeSortOrder}
             id="report__table"
             showSorterTooltip={false}
             size="small"
